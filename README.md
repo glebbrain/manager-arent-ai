@@ -13,7 +13,9 @@ Universal Project Manager v4.8 is a maximally optimized automation system with A
 ## Easy start
 
 A. Copy the project to your folder.
+
 B. Create start_IDEA.md in the root. Write your idea in the start_IDEA.md or chat with AI.
+
 C. Write in AgentAI:
 
 1. Analyze and decompose start_IDEA.md
@@ -26,7 +28,9 @@ C. Write in AgentAI:
 5. Delete start_IDEA.md
 
 D. Press Enter.
+
 E. You wait for the agent to work.
+
 F. In a new session, write to the agent (every 5 commands):
 
 Perform project analysis and optimization according to the instructions: `/.project-analysis-optimization.md`
