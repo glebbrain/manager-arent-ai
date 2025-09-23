@@ -348,12 +348,6 @@ Import-Module .\universal\.automation\module\AutomationToolkit.psd1 -Force
 
 ## 🤝 Support
 
-### Contacts
-- **DevOps Lead:** +7-XXX-XXX-XXXX
-- **Backend Lead:** +7-XXX-XXX-XXXX
-- **Frontend Lead:** +7-XXX-XXX-XXXX
-- **QA Lead:** +7-XXX-XXX-XXXX
-
 ### Bug Reports
 Create an issue in the project repository with detailed problem description.
 
