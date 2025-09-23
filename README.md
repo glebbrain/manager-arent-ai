@@ -40,12 +40,14 @@ E. Add each subsequent task to the agent's queue up to 5 times:
 Continue executing tasks from TODO.md according to the instructions: `/.manager/start.md`
 
 G. At the end send AgentAI:
+
 How many main and development tasks remain should be saved in needtasks.json in the project root? Also add the date and time for which tasks remain, how many errors have been fixed from ERRORS.md, and the project's status (is it ready for PROM or PROD)?
 
 H. You can set up 20 commands in a queue, the agent with the queue will work from 30 minutes to 3 hours depending on the complexity of the project.
+
 J. Enjoy
 
-* Tested on Cursor (Version: 1.6.45 (user setup), OS: Windows_NT x64 10)
+🎯 Tested on Cursor (Version: 1.6.45 (user setup), OS: Windows_NT x64 10)
 
 ## ⚡ New Features v4.8 - Maximum Performance & Optimization
 
