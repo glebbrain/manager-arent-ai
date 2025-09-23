@@ -12,7 +12,7 @@ Universal Project Manager v4.8 is a maximally optimized automation system with A
 
 ## Easy start
 
-A. Copy the project to your folder
+A. Copy the project to your folder.
 B. Create start_IDEA.md in the root. Write your idea in the start_IDEA.md or chat with AI.
 C. Write in AgentAI:
 
@@ -25,7 +25,7 @@ C. Write in AgentAI:
 4.3. start-smart-config.json
 5. Delete start_IDEA.md
 
-D. Press Enter
+D. Press Enter.
 E. You wait for the agent to work.
 F. In a new session, write to the agent (every 5 commands):
 
