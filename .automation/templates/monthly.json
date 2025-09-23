@@ -1,0 +1,104 @@
+{
+  "name": "Monthly Project Analysis",
+  "description": "Comprehensive monthly analysis of project health and development trends",
+  "sections": [
+    "system",
+    "project",
+    "performance",
+    "quality", 
+    "development",
+    "git",
+    "build"
+  ],
+  "format": "html",
+  "schedule": {
+    "cron": "0 11 1 * *",
+    "timezone": "UTC"
+  },
+  "template": {
+    "title": "Monthly Project Analysis - {month} {year}",
+    "sections": {
+      "system": {
+        "title": "🖥️ System Health Overview",
+        "metrics": ["platform", "nodeVersion", "memory", "cpus", "uptime"],
+        "trends": true,
+        "monthlyAverages": true
+      },
+      "project": {
+        "title": "📁 Project Evolution",
+        "metrics": ["name", "version", "dependencies", "devDependencies", "path"],
+        "growth": true
+      },
+      "performance": {
+        "title": "📈 Performance Trends",
+        "metrics": ["cpu", "memory", "disk", "network"],
+        "trends": true,
+        "monthlyAverages": true,
+        "peakUsage": true
+      },
+      "quality": {
+        "title": "🔧 Quality Metrics",
+        "metrics": ["linting", "testing", "typeChecking", "security"],
+        "improvements": true,
+        "recommendations": true
+      },
+      "development": {
+        "title": "💻 Development Activity",
+        "metrics": ["fileCount", "directoryCount", "totalSize", "languages", "lastModified"],
+        "trends": true,
+        "growth": true,
+        "activity": true
+      },
+      "git": {
+        "title": "📊 Git Statistics",
+        "metrics": ["branch", "commitCount", "lastCommit", "lastCommitDate"],
+        "monthlyCommits": true,
+        "contributors": true
+      },
+      "build": {
+        "title": "🏗️ Build & Deployment",
+        "metrics": ["lastBuild", "artifact", "buildCount", "successRate"],
+        "reliability": true
+      }
+    }
+  },
+  "analysis": {
+    "trends": true,
+    "comparisons": true,
+    "recommendations": true,
+    "forecasting": true,
+    "benchmarking": true
+  },
+  "reports": {
+    "executiveSummary": true,
+    "technicalDetails": true,
+    "recommendations": true,
+    "nextMonthGoals": true
+  },
+  "alerts": {
+    "highCpuUsage": {
+      "threshold": 80,
+      "message": "High CPU usage detected: {value}%"
+    },
+    "highMemoryUsage": {
+      "threshold": 85,
+      "message": "High memory usage detected: {value}%"
+    },
+    "lowTestCoverage": {
+      "threshold": 50,
+      "message": "Low test coverage: {value}%"
+    },
+    "noRecentCommits": {
+      "threshold": 30,
+      "message": "No commits in the last {value} days"
+    },
+    "buildFailures": {
+      "threshold": 5,
+      "message": "Multiple build failures detected: {value}"
+    },
+    "dependencyOutdated": {
+      "threshold": 90,
+      "message": "Dependencies may be outdated"
+    }
+  }
+}

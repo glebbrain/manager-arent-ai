@@ -1,0 +1,66 @@
+{
+  "name": "api-gateway-enhanced",
+  "version": "2.9.0",
+  "description": "Enhanced API Gateway v2.9 with Advanced Routing & Load Balancing",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "test": "node test-gateway.js",
+    "test:comprehensive": "node test-gateway.js && jest",
+    "build": "npm install",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "cluster": "CLUSTER_MODE=true node server.js",
+    "docker:build": "docker build -t api-gateway-enhanced:v2.9 .",
+    "docker:run": "docker run -p 3000:3000 api-gateway-enhanced:v2.9"
+  },
+  "keywords": [
+    "api-gateway",
+    "load-balancing",
+    "circuit-breaker",
+    "microservices",
+    "routing",
+    "rate-limiting",
+    "monitoring",
+    "enterprise"
+  ],
+  "author": "Universal Project Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "morgan": "^1.10.0",
+    "compression": "^1.7.4",
+    "express-rate-limit": "^6.8.1",
+    "http-proxy-middleware": "^2.0.6",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "joi": "^17.9.2",
+    "winston": "^3.10.0",
+    "redis": "^4.6.7",
+    "opossum": "^8.0.0",
+    "lru-cache": "^9.1.1",
+    "dotenv": "^16.3.1",
+    "rate-limit-redis": "^3.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.6.2",
+    "eslint": "^8.47.0",
+    "prettier": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/universal-project/api-gateway-enhanced"
+  },
+  "bugs": {
+    "url": "https://github.com/universal-project/api-gateway-enhanced/issues"
+  },
+  "homepage": "https://github.com/universal-project/api-gateway-enhanced#readme"
+}

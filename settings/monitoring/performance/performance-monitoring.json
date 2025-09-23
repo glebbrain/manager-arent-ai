@@ -1,0 +1,89 @@
+{
+  "version": "4.8.0",
+  "systemName": "Advanced-Performance-Monitoring-v4.8",
+  "monitoring": {
+    "realTime": true,
+    "quantumEnhanced": {
+      "IsPresent": true
+    },
+    "aiPowered": {
+      "IsPresent": true
+    }
+  },
+  "metrics": {
+    "system": {
+      "network": {
+        "aiAnalysis": {
+          "IsPresent": true
+        },
+        "thresholds": {
+          "warning": 60,
+          "critical": 80
+        },
+        "enabled": true
+      },
+      "cpu": {
+        "aiAnalysis": {
+          "IsPresent": true
+        },
+        "thresholds": {
+          "warning": 75,
+          "critical": 90
+        },
+        "enabled": true
+      },
+      "memory": {
+        "aiAnalysis": {
+          "IsPresent": true
+        },
+        "thresholds": {
+          "warning": 75,
+          "critical": 90
+        },
+        "enabled": true
+      },
+      "disk": {
+        "aiAnalysis": {
+          "IsPresent": true
+        },
+        "thresholds": {
+          "warning": 75,
+          "critical": 90
+        },
+        "enabled": true
+      }
+    },
+    "application": {
+      "responseTime": {
+        "aiAnalysis": {
+          "IsPresent": true
+        },
+        "thresholds": {
+          "warning": 2000,
+          "critical": 5000
+        },
+        "enabled": true
+      },
+      "errorRate": {
+        "aiAnalysis": {
+          "IsPresent": true
+        },
+        "thresholds": {
+          "warning": 1,
+          "critical": 5
+        },
+        "enabled": true
+      },
+      "throughput": {
+        "aiAnalysis": {
+          "IsPresent": true
+        },
+        "thresholds": {
+          "warning": 500,
+          "critical": 100
+        },
+        "enabled": true
+      }
+    }
+  }
+}

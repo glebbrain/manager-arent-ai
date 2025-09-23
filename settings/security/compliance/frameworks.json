@@ -1,0 +1,34 @@
+{
+  "SOX": {
+    "aiFinancialAnalysis": {
+      "IsPresent": true
+    },
+    "enabled": true,
+    "auditTrails": true,
+    "financialControls": true
+  },
+  "HIPAA": {
+    "accessControls": true,
+    "healthDataProtection": true,
+    "aiHealthDataAnalysis": {
+      "IsPresent": true
+    },
+    "enabled": true
+  },
+  "GDPR": {
+    "dataProtection": true,
+    "privacyByDesign": true,
+    "enabled": true,
+    "aiPrivacyAnalysis": {
+      "IsPresent": true
+    }
+  },
+  "ISO27001": {
+    "informationSecurity": true,
+    "enabled": true,
+    "riskManagement": true,
+    "aiRiskAnalysis": {
+      "IsPresent": true
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "alerts": {
+    "scalingFailure": {
+      "severity": "critical",
+      "aiGenerated": {
+        "IsPresent": true
+      },
+      "enabled": true
+    },
+    "performanceDegradation": {
+      "severity": "warning",
+      "aiGenerated": {
+        "IsPresent": true
+      },
+      "enabled": true
+    },
+    "quantumOptimizationOpportunity": {
+      "severity": "info",
+      "quantumGenerated": {
+        "IsPresent": true
+      },
+      "enabled": {
+        "IsPresent": true
+      }
+    },
+    "resourceExhaustion": {
+      "severity": "warning",
+      "aiGenerated": {
+        "IsPresent": true
+      },
+      "enabled": true
+    }
+  },
+  "monitoring": {
+    "predictive": {
+      "aiAnalysis": {
+        "IsPresent": true
+      },
+      "quantumOptimization": {
+        "IsPresent": true
+      },
+      "enabled": {
+        "IsPresent": true
+      }
+    },
+    "realTime": {
+      "aiAnalysis": {
+        "IsPresent": true
+      },
+      "quantumOptimization": {
+        "IsPresent": true
+      },
+      "enabled": true
+    },
+    "anomaly": {
+      "aiAnalysis": {
+        "IsPresent": true
+      },
+      "quantumOptimization": {
+        "IsPresent": true
+      },
+      "enabled": true
+    }
+  },
+  "systemName": "Scaling-Monitoring-v4.8",
+  "version": "4.8.0",
+  "metrics": {
+    "resourceUtilization": {
+      "enabled": true,
+      "aiAnalysis": {
+        "IsPresent": true
+      }
+    },
+    "scalingEvents": {
+      "enabled": true,
+      "aiAnalysis": {
+        "IsPresent": true
+      }
+    },
+    "quantumMetrics": {
+      "quantumAnalysis": {
+        "IsPresent": true
+      },
+      "enabled": {
+        "IsPresent": true
+      }
+    },
+    "performanceMetrics": {
+      "enabled": true,
+      "aiAnalysis": {
+        "IsPresent": true
+      }
+    }
+  }
+}

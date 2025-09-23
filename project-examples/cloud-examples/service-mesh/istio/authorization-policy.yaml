@@ -1,0 +1,548 @@
+# Authorization Policy Configuration for ManagerAgentAI
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: manager-agent-ai-authz
+  namespace: manager-agent-ai
+spec:
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        paths: ["/api/*", "/health", "/metrics", "/dashboard/*", "/ws"]
+---
+# Authorization Policy for API Gateway
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: api-gateway-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: api-gateway
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        paths: ["/api/*", "/health", "/metrics"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/project-manager-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/projects/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/ai-planner-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/ai/*"]
+---
+# Authorization Policy for Dashboard
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: dashboard-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: dashboard
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        paths: ["/dashboard/*", "/ws", "/health", "/metrics"]
+---
+# Authorization Policy for Event Bus
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: event-bus-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: event-bus
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-gateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/events/*", "/api/subscribe", "/api/unsubscribe"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/project-manager-service-account"]
+    to:
+    - operation:
+        methods: ["POST"]
+        paths: ["/api/events"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/ai-planner-service-account"]
+    to:
+    - operation:
+        methods: ["POST"]
+        paths: ["/api/events"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/workflow-orchestrator-service-account"]
+    to:
+    - operation:
+        methods: ["POST"]
+        paths: ["/api/events"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/smart-notifications-service-account"]
+    to:
+    - operation:
+        methods: ["POST"]
+        paths: ["/api/events"]
+---
+# Authorization Policy for Project Manager
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: project-manager-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: project-manager
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-gateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/projects/*", "/health", "/metrics"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/ai-planner-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT"]
+        paths: ["/api/projects/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/workflow-orchestrator-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT"]
+        paths: ["/api/projects/*"]
+---
+# Authorization Policy for AI Planner
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: ai-planner-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: ai-planner
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-gateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/ai/*", "/health", "/metrics"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/project-manager-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/api/ai/plan", "/api/ai/analyze"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/workflow-orchestrator-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/api/ai/workflow"]
+---
+# Authorization Policy for Workflow Orchestrator
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: workflow-orchestrator-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: workflow-orchestrator
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-gateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/workflows/*", "/health", "/metrics"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/project-manager-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/api/workflows/execute"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/ai-planner-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/api/workflows/ai"]
+---
+# Authorization Policy for Smart Notifications
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: smart-notifications-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: smart-notifications
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-gateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/notifications/*", "/health", "/metrics"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/project-manager-service-account"]
+    to:
+    - operation:
+        methods: ["POST"]
+        paths: ["/api/notifications/send"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/ai-planner-service-account"]
+    to:
+    - operation:
+        methods: ["POST"]
+        paths: ["/api/notifications/send"]
+---
+# Authorization Policy for Template Generator
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: template-generator-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: template-generator
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-gateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/templates/*", "/health", "/metrics"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/project-manager-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/api/templates/generate"]
+---
+# Authorization Policy for Consistency Manager
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: consistency-manager-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: consistency-manager
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-gateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/consistency/*", "/health", "/metrics"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/project-manager-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/api/consistency/check"]
+---
+# Authorization Policy for API Versioning
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: api-versioning-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: api-versioning
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-gateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/versioning/*", "/health", "/metrics"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/project-manager-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/api/versioning/check"]
+---
+# Authorization Policy for Deadline Prediction
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: deadline-prediction-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: deadline-prediction
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-gateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/predictions/*", "/health", "/metrics"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/project-manager-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/api/predictions/calculate"]
+---
+# Authorization Policy for Task Distribution
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: task-distribution-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: task-distribution
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-gateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/distribution/*", "/health", "/metrics"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/project-manager-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/api/distribution/assign"]
+---
+# Authorization Policy for PostgreSQL
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: postgres-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/project-manager-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/ai-planner-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/workflow-orchestrator-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/smart-notifications-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/template-generator-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/consistency-manager-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-versioning-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/deadline-prediction-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/task-distribution-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+---
+# Authorization Policy for Redis
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: redis-authz
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-gateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/project-manager-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/ai-planner-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/workflow-orchestrator-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/smart-notifications-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/template-generator-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/consistency-manager-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/api-versioning-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/deadline-prediction-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/task-distribution-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/*"]

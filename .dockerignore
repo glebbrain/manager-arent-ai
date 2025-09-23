@@ -1,0 +1,255 @@
+# ===========================================
+# ManagerAgentAI v4.8 - Docker Ignore File
+# Universal Project Manager - Maximum Performance & Optimization
+# ===========================================
+
+# ===========================================
+# Node.js Dependencies & Cache
+# ===========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+.yarn/
+.yarn-integrity
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ===========================================
+# Build Outputs & Distribution
+# ===========================================
+dist/
+build/
+out/
+.next/
+.nuxt/
+.vuepress/dist/
+.storybook-out/
+coverage/
+*.tgz
+*.tar.gz
+
+# ===========================================
+# Runtime & Process Files
+# ===========================================
+pids/
+*.pid
+*.seed
+*.pid.lock
+*.log
+logs/
+
+# ===========================================
+# Cache Directories
+# ===========================================
+.cache/
+.parcel-cache/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.eslintcache
+*.tsbuildinfo
+.fusebox/
+
+# ===========================================
+# Environment & Configuration
+# ===========================================
+.env*
+!.env.example
+config/local.json
+config/production.json
+config/development.json
+
+# ===========================================
+# Testing & Coverage
+# ===========================================
+coverage/
+.nyc_output/
+test-results/
+*.lcov
+lib-cov/
+
+# ===========================================
+# Development Tools
+# ===========================================
+.grunt/
+bower_components/
+jspm_packages/
+typings/
+.lock-wscript
+build/Release/
+
+# ===========================================
+# IDE & Editor Files
+# ===========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.vscode-test/
+
+# ===========================================
+# Version Control
+# ===========================================
+.git/
+.gitignore
+.gitattributes
+
+# ===========================================
+# Docker & Containerization
+# ===========================================
+Dockerfile*
+docker-compose*
+.dockerignore
+.docker/
+
+# ===========================================
+# CI/CD & Automation
+# ===========================================
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+Jenkinsfile
+azure-pipelines.yml
+
+# ===========================================
+# Operating System Files
+# ===========================================
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.temp
+
+# ===========================================
+# Temporary & Backup Files
+# ===========================================
+tmp/
+temp/
+*.backup.*
+*.bak
+*.old
+task-migration.log
+
+# ===========================================
+# Serverless & Cloud
+# ===========================================
+.serverless/
+.aws/
+.azure/
+.gcp/
+
+# ===========================================
+# Database & Storage
+# ===========================================
+.dynamodb/
+.redis/
+*.db
+*.sqlite
+*.sqlite3
+
+# ===========================================
+# Documentation & Reports
+# ===========================================
+docs/_build/
+docs/build/
+*.pdf
+*.docx
+*.xlsx
+
+# ===========================================
+# ManagerAgentAI Specific
+# ===========================================
+# Automation scripts (keep only essential)
+.automation/scripts/temp/
+.automation/logs/
+.automation/cache/
+
+# Manager temporary files
+.manager/temp/
+.manager/cache/
+.manager/logs/
+
+# Monitoring data
+monitoring-analytics/logs/
+monitoring-analytics/cache/
+monitoring-analytics/temp/
+
+# Settings temporary files
+settings/temp/
+settings/cache/
+settings/logs/
+
+# Project examples (keep structure, exclude large files)
+project-examples/*/node_modules/
+project-examples/*/dist/
+project-examples/*/build/
+
+# Wireframes (keep structure, exclude large assets)
+wireframes/assets/
+wireframes/images/
+
+# ===========================================
+# Security & Sensitive Data
+# ===========================================
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+secrets/
+.secrets/
+
+# ===========================================
+# Performance & Optimization
+# ===========================================
+# Keep performance monitoring configs
+!monitoring-analytics/config/
+!settings/monitoring/
+!settings/performance/
+
+# Exclude large performance logs
+monitoring-analytics/reports/*.log
+monitoring-analytics/reports/*.csv
+monitoring-analytics/reports/*.xlsx
+
+# ===========================================
+# AI & ML Models (exclude large models)
+# ===========================================
+*.model
+*.pkl
+*.h5
+*.pb
+models/
+checkpoints/
+
+# ===========================================
+# Quantum Computing (exclude large simulations)
+# ===========================================
+quantum-simulations/
+quantum-results/
+*.quantum
+
+# ===========================================
+# Blockchain (exclude large chain data)
+# ===========================================
+blockchain-data/
+chain-data/
+*.chain
+
+# ===========================================
+# VR/AR Assets (exclude large 3D models)
+# ===========================================
+vr-assets/
+ar-assets/
+*.fbx
+*.obj
+*.blend
+*.max
+*.ma
+*.mb

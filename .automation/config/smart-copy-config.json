@@ -1,0 +1,94 @@
+{
+  "version": "4.8",
+  "description": "Конфигурация умного копирования для start-v4.8-smart.ps1",
+  "excludeFiles": [
+    "TODO.md",
+    "IDEA.md", 
+    "COMPLETED.md",
+    "ERRORS.md",
+    "README.md",
+    "package.json",
+    "package-lock.json",
+    "yarn.lock",
+    "node_modules",
+    ".git",
+    ".vs",
+    "bin",
+    "obj",
+    "dist",
+    "build",
+    "*.log",
+    "*.tmp",
+    ".DS_Store",
+    "Thumbs.db",
+    "deploy-archives",
+    "backup-*"
+  ],
+  "mergeFiles": {
+    ".manager/start.md": {
+      "type": "append",
+      "description": "Добавляет содержимое в конец файла",
+      "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ==="
+    },
+    ".manager/control-files/INSTRUCTIONS.md": {
+      "type": "append",
+      "description": "Добавляет инструкции в конец файла",
+      "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ==="
+    },
+    ".manager/control-files/TODO.md": {
+      "type": "append",
+      "description": "Добавляет задачи в конец файла",
+      "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ==="
+    },
+    ".manager/control-files/IDEA.md": {
+      "type": "append",
+      "description": "Добавляет идеи в конец файла",
+      "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ==="
+    },
+    ".manager/control-files/COMPLETED.md": {
+      "type": "append",
+      "description": "Добавляет завершенные задачи в конец файла",
+      "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ==="
+    },
+    ".manager/control-files/ERRORS.md": {
+      "type": "append",
+      "description": "Добавляет ошибки в конец файла",
+      "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ==="
+    }
+  },
+  "replaceFiles": {
+    "cursor.json": {
+      "description": "Заменяет конфигурацию Cursor IDE",
+      "backup": true
+    },
+    ".automation/scripts/New-Aliases-v4.8.ps1": {
+      "description": "Заменяет скрипт алиасов",
+      "backup": false
+    },
+    ".automation/Project-Analysis-Optimizer-v4.8.ps1": {
+      "description": "Заменяет анализатор проектов",
+      "backup": false
+    },
+    ".automation/Quick-Access-Optimized-v4.8.ps1": {
+      "description": "Заменяет оптимизатор доступа",
+      "backup": false
+    }
+  },
+  "backupSettings": {
+    "enabled": true,
+    "suffix": "backup",
+    "timestampFormat": "yyyy-MM-dd-HH-mm-ss",
+    "maxBackups": 5
+  },
+  "mergeSettings": {
+    "checkDuplicates": true,
+    "addSeparator": true,
+    "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ===",
+    "encoding": "UTF8"
+  },
+  "logging": {
+    "enabled": true,
+    "level": "INFO",
+    "file": "smart-copy.log"
+  }
+}

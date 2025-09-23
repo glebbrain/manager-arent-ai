@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management - Universal Project Manager v3.1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .header { background: #ffffff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .back-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280; }
+        .header-title { font-size: 1.5rem; font-weight: bold; color: #1f2937; }
+        .header-actions { display: flex; gap: 1rem; align-items: center; }
+        .search-box { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; width: 300px; }
+        .filter-btn, .view-btn { background: #f3f4f6; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; }
+        .main-container { display: flex; min-height: calc(100vh - 80px); }
+        .sidebar { width: 250px; background: #ffffff; border-right: 1px solid #e5e7eb; padding: 2rem 0; }
+        .filter-section { padding: 0 2rem 2rem; border-bottom: 1px solid #e5e7eb; margin-bottom: 2rem; }
+        .filter-title { font-weight: bold; margin-bottom: 1rem; color: #1f2937; }
+        .filter-options { display: flex; flex-direction: column; gap: 0.5rem; }
+        .filter-option { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 0.25rem; cursor: pointer; transition: background 0.2s; }
+        .filter-option:hover { background: #f3f4f6; }
+        .filter-option.active { background: #dbeafe; color: #1e40af; }
+        .main-content { flex: 1; padding: 2rem; }
+        .project-overview { background: #ffffff; padding: 1.5rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .overview-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+        .stat-card { text-align: center; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #1f2937; }
+        .stat-label { color: #6b7280; font-size: 0.875rem; }
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .project-card { background: #ffffff; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        .project-card:hover { transform: translateY(-2px); }
+        .project-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .project-title { font-size: 1.25rem; font-weight: bold; color: #1f2937; }
+        .project-status { padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 500; }
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-completed { background: #dbeafe; color: #1e40af; }
+        .status-paused { background: #fef3c7; color: #92400e; }
+        .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin: 1rem 0; }
+        .progress-fill { height: 100%; background: #2563eb; transition: width 0.3s; }
+        .kanban-board { background: #ffffff; padding: 2rem; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .kanban-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .kanban-columns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+        .kanban-column { background: #f8fafc; padding: 1rem; border-radius: 0.5rem; min-height: 400px; }
+        .column-header { font-weight: bold; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e5e7eb; }
+        .task-card { background: #ffffff; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: move; transition: transform 0.2s; }
+        .task-card:hover { transform: translateY(-1px); }
+        .task-title { font-weight: bold; margin-bottom: 0.5rem; }
+        .task-priority { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 500; margin-bottom: 0.5rem; display: inline-block; }
+        .priority-high { background: #fef2f2; color: #dc2626; }
+        .priority-medium { background: #fef3c7; color: #d97706; }
+        .priority-low { background: #f0fdf4; color: #16a34a; }
+        .task-duration { color: #6b7280; font-size: 0.875rem; }
+        .ai-recommendations { background: #ffffff; padding: 2rem; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .recommendation-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .recommendation-icon { font-size: 1.5rem; }
+        .recommendation-suggestion { color: #2563eb; }
+        .recommendation-warning { color: #f59e0b; }
+        .recommendation-opportunity { color: #10b981; }
+        .team-performance { background: #ffffff; padding: 2rem; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .team-member { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .member-info { flex: 1; }
+        .member-name { font-weight: bold; margin-bottom: 0.25rem; }
+        .member-stats { color: #6b7280; font-size: 0.875rem; }
+        .performance-bar { width: 100px; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+        .performance-fill { height: 100%; background: #2563eb; transition: width 0.3s; }
+        .action-btn { background: #f3f4f6; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; margin-right: 0.5rem; }
+        .action-btn:hover { background: #2563eb; color: white; }
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; padding: 1rem 0; }
+            .main-content { padding: 1rem; }
+            .kanban-columns { grid-template-columns: 1fr; }
+            .projects-grid { grid-template-columns: 1fr; }
+            .overview-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="back-btn">←</button>
+            <h1 class="header-title">Project Management</h1>
+        </div>
+        <div class="header-actions">
+            <input type="text" class="search-box" placeholder="Search projects...">
+            <button class="filter-btn">🔍 Filter</button>
+            <button class="view-btn">📊 View</button>
+            <button class="view-btn">🤖 AI</button>
+            <button class="view-btn">⚙️</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <nav class="sidebar">
+            <div class="filter-section">
+                <h3 class="filter-title">🔍 Filters</h3>
+                <div class="filter-options">
+                    <div class="filter-title">Status:</div>
+                    <div class="filter-option active">All</div>
+                    <div class="filter-option">Active</div>
+                    <div class="filter-option">Completed</div>
+                    <div class="filter-option">Paused</div>
+                </div>
+            </div>
+            <div class="filter-section">
+                <div class="filter-options">
+                    <div class="filter-title">Priority:</div>
+                    <div class="filter-option active">All</div>
+                    <div class="filter-option">High</div>
+                    <div class="filter-option">Medium</div>
+                    <div class="filter-option">Low</div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <section class="project-overview">
+                <h2>📊 Project Overview: 15 Projects | 8 Active | 5 Completed | 2 Paused</h2>
+                <p>AI Optimization: 12 projects optimized | 3 need attention</p>
+                <div class="overview-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Active Projects</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Paused</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">AI Optimized</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="projects-grid">
+                <div class="project-card">
+                    <div class="project-header">
+                        <h3 class="project-title">E-commerce Platform</h3>
+                        <span class="project-status status-active">Active</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                    <p>Team: 5 members</p>
+                    <p>AI Score: 92%</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="action-btn">View</button>
+                        <button class="action-btn">Edit</button>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-header">
+                        <h3 class="project-title">Mobile App</h3>
+                        <span class="project-status status-active">Active</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%"></div>
+                    </div>
+                    <p>Team: 3 members</p>
+                    <p>AI Score: 78%</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="action-btn">View</button>
+                        <button class="action-btn">Edit</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="kanban-board">
+                <div class="kanban-header">
+                    <h2>📋 Kanban Board View</h2>
+                    <div>
+                        <button class="filter-btn">Filter</button>
+                        <button class="view-btn">Export</button>
+                    </div>
+                </div>
+                <div class="kanban-columns">
+                    <div class="kanban-column">
+                        <div class="column-header">To Do (5)</div>
+                        <div class="task-card">
+                            <div class="task-title">User Authentication</div>
+                            <div class="task-priority priority-high">High</div>
+                            <div class="task-duration">2 days</div>
+                        </div>
+                        <div class="task-card">
+                            <div class="task-title">API Design</div>
+                            <div class="task-priority priority-medium">Medium</div>
+                            <div class="task-duration">5 days</div>
+                        </div>
+                    </div>
+                    <div class="kanban-column">
+                        <div class="column-header">In Progress (8)</div>
+                        <div class="task-card">
+                            <div class="task-title">Database Integration</div>
+                            <div class="task-priority priority-medium">Medium</div>
+                            <div class="task-duration">3 days</div>
+                        </div>
+                    </div>
+                    <div class="kanban-column">
+                        <div class="column-header">Review (3)</div>
+                        <div class="task-card">
+                            <div class="task-title">UI Design Review</div>
+                            <div class="task-priority priority-low">Low</div>
+                            <div class="task-duration">1 day</div>
+                        </div>
+                    </div>
+                    <div class="kanban-column">
+                        <div class="column-header">Done (12)</div>
+                        <div class="task-card">
+                            <div class="task-title">Setup Complete</div>
+                            <div class="task-priority priority-low">Low</div>
+                            <div class="task-duration">1 day</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ai-recommendations">
+                <h2>🤖 AI Project Optimization</h2>
+                <div class="recommendation-item">
+                    <div class="recommendation-icon recommendation-suggestion">💡</div>
+                    <div><strong>Suggestion:</strong> Merge similar tasks in "Mobile App" project</div>
+                </div>
+                <div class="recommendation-item">
+                    <div class="recommendation-icon recommendation-warning">⚠️</div>
+                    <div><strong>Warning:</strong> "API Gateway" has high complexity, consider split</div>
+                </div>
+                <div class="recommendation-item">
+                    <div class="recommendation-icon recommendation-opportunity">🎯</div>
+                    <div><strong>Opportunity:</strong> Add automated testing to "E-commerce Platform"</div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <button class="action-btn">Apply All</button>
+                    <button class="action-btn">Review Details</button>
+                    <button class="action-btn">Dismiss</button>
+                </div>
+            </section>
+
+            <section class="team-performance">
+                <h2>👥 Team Performance</h2>
+                <div class="team-member">
+                    <div class="member-avatar">JS</div>
+                    <div class="member-info">
+                        <div class="member-name">John Smith</div>
+                        <div class="member-stats">8 tasks completed</div>
+                    </div>
+                    <div class="performance-bar">
+                        <div class="performance-fill" style="width: 95%"></div>
+                    </div>
+                    <div>95%</div>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">SL</div>
+                    <div class="member-info">
+                        <div class="member-name">Sarah Lee</div>
+                        <div class="member-stats">6 tasks completed</div>
+                    </div>
+                    <div class="performance-bar">
+                        <div class="performance-fill" style="width: 85%"></div>
+                    </div>
+                    <div>85%</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskCards = document.querySelectorAll('.task-card');
+            const columns = document.querySelectorAll('.kanban-column');
+
+            taskCards.forEach(card => {
+                card.draggable = true;
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+            });
+
+            columns.forEach(column => {
+                column.addEventListener('dragover', handleDragOver);
+                column.addEventListener('drop', handleDrop);
+            });
+
+            const filterOptions = document.querySelectorAll('.filter-option');
+            filterOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    filterOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            const searchBox = document.querySelector('.search-box');
+            searchBox.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const projectCards = document.querySelectorAll('.project-card');
+                
+                projectCards.forEach(card => {
+                    const title = card.querySelector('.project-title').textContent.toLowerCase();
+                    if (title.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.id);
+            e.target.style.opacity = '0.5';
+        }
+
+        function handleDragEnd(e) {
+            e.target.style.opacity = '1';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const taskId = e.dataTransfer.getData('text/plain');
+            const task = document.getElementById(taskId);
+            e.target.appendChild(task);
+        }
+    </script>
+</body>
+</html>

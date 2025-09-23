@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Support - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .help-support { display: flex; height: 100vh; }
+        .sidebar { width: 300px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .help-header { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .help-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+        .help-subtitle { color: #6b7280; font-size: 1.1rem; margin-bottom: 1.5rem; }
+        .search-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .search-box { position: relative; margin-bottom: 1rem; }
+        .search-input { width: 100%; padding: 1rem 3rem 1rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; transition: border-color 0.3s ease; }
+        .search-input:focus { outline: none; border-color: #2563eb; }
+        .search-icon { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: #6b7280; }
+        .search-suggestions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+        .suggestion-tag { padding: 0.5rem 1rem; background: #eff6ff; color: #2563eb; border-radius: 20px; font-size: 0.9rem; cursor: pointer; transition: background 0.3s ease; }
+        .suggestion-tag:hover { background: #dbeafe; }
+        .categories-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .category-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.3s ease; }
+        .category-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .category-icon { width: 60px; height: 60px; border-radius: 12px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem; }
+        .category-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem; }
+        .category-description { color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem; }
+        .category-count { color: #6b7280; font-size: 0.8rem; }
+        .faq-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .faq-item { border-bottom: 1px solid #e5e7eb; padding: 1rem 0; }
+        .faq-item:last-child { border-bottom: none; }
+        .faq-question { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .faq-question-text { font-weight: 600; color: #1f2937; }
+        .faq-question-icon { color: #6b7280; transition: transform 0.3s ease; }
+        .faq-answer { display: none; margin-top: 1rem; color: #6b7280; line-height: 1.6; }
+        .faq-answer.active { display: block; }
+        .faq-question.active .faq-question-icon { transform: rotate(180deg); }
+        .contact-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .contact-methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        .contact-method { display: flex; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: background 0.3s ease; }
+        .contact-method:hover { background: #f3f4f6; }
+        .contact-icon { width: 40px; height: 40px; border-radius: 8px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; margin-right: 1rem; }
+        .contact-info { flex: 1; }
+        .contact-title { font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; }
+        .contact-description { color: #6b7280; font-size: 0.9rem; }
+        .ticket-section { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .ticket-form { display: grid; gap: 1rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-group label { font-weight: 500; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea { padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-block { width: 100%; }
+        .nav { padding: 1rem; }
+        .nav-item { display: block; padding: 0.75rem; color: #6b7280; text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .nav-item:hover, .nav-item.active { background: #eff6ff; color: #2563eb; }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-section-title { font-size: 0.8rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; padding: 0 0.75rem; }
+        .article-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .article-item { display: flex; align-items: center; padding: 0.75rem; background: #f8fafc; border-radius: 6px; cursor: pointer; transition: background 0.3s ease; }
+        .article-item:hover { background: #f3f4f6; }
+        .article-icon { width: 32px; height: 32px; border-radius: 6px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem; font-size: 0.8rem; }
+        .article-info { flex: 1; }
+        .article-title { font-weight: 500; color: #1f2937; margin-bottom: 0.25rem; }
+        .article-meta { color: #6b7280; font-size: 0.8rem; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 12px; padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-title { font-size: 1.3rem; font-weight: 600; color: #1f2937; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; color: #6b7280; cursor: pointer; }
+        .search-results { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .search-result-item { padding: 1rem; border-bottom: 1px solid #e5e7eb; cursor: pointer; transition: background 0.3s ease; }
+        .search-result-item:hover { background: #f8fafc; }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-title { font-weight: 600; color: #1f2937; margin-bottom: 0.5rem; }
+        .search-result-description { color: #6b7280; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .search-result-meta { color: #6b7280; font-size: 0.8rem; }
+        .ai-chat { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+        .ai-chat-header { display: flex; align-items: center; margin-bottom: 1rem; }
+        .ai-avatar { width: 40px; height: 40px; border-radius: 50%; background: #10b981; color: white; display: flex; align-items: center; justify-content: center; margin-right: 1rem; }
+        .ai-name { font-weight: 600; color: #1e40af; }
+        .ai-status { color: #10b981; margin-left: auto; font-size: 0.9rem; }
+        .ai-message { background: white; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+        .ai-message-text { color: #374151; margin-bottom: 0.5rem; }
+        .ai-message-time { color: #6b7280; font-size: 0.8rem; }
+        .chat-input { display: flex; gap: 0.5rem; }
+        .chat-input input { flex: 1; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 20px; font-size: 0.9rem; }
+        .chat-send { width: 40px; height: 40px; border-radius: 50%; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        @media (max-width: 768px) {
+            .help-support { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .categories-grid { grid-template-columns: 1fr; }
+            .contact-methods { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="help-support">
+        <div class="sidebar">
+            <div class="nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Навигация</div>
+                    <a href="#" class="nav-item active"><i class="fas fa-home"></i> Главная</a>
+                    <a href="#" class="nav-item"><i class="fas fa-search"></i> Поиск</a>
+                    <a href="#" class="nav-item"><i class="fas fa-question-circle"></i> FAQ</a>
+                    <a href="#" class="nav-item"><i class="fas fa-headset"></i> Контакты</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Популярные статьи</div>
+                    <div class="article-list">
+                        <div class="article-item" onclick="openArticle('getting-started')">
+                            <div class="article-icon"><i class="fas fa-play"></i></div>
+                            <div class="article-info">
+                                <div class="article-title">Начало работы</div>
+                                <div class="article-meta">5 мин чтения</div>
+                            </div>
+                        </div>
+                        <div class="article-item" onclick="openArticle('project-creation')">
+                            <div class="article-icon"><i class="fas fa-plus"></i></div>
+                            <div class="article-info">
+                                <div class="article-title">Создание проекта</div>
+                                <div class="article-meta">3 мин чтения</div>
+                            </div>
+                        </div>
+                        <div class="article-item" onclick="openArticle('ai-features')">
+                            <div class="article-icon"><i class="fas fa-robot"></i></div>
+                            <div class="article-info">
+                                <div class="article-title">AI функции</div>
+                                <div class="article-meta">7 мин чтения</div>
+                            </div>
+                        </div>
+                        <div class="article-item" onclick="openArticle('troubleshooting')">
+                            <div class="article-icon"><i class="fas fa-tools"></i></div>
+                            <div class="article-info">
+                                <div class="article-title">Решение проблем</div>
+                                <div class="article-meta">10 мин чтения</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-question-circle"></i> Помощь и поддержка</h1>
+                <div>
+                    <button class="btn btn-primary" onclick="openTicketModal()">
+                        <i class="fas fa-ticket-alt"></i> Создать тикет
+                    </button>
+                    <button class="btn btn-secondary" onclick="openLiveChat()">
+                        <i class="fas fa-comments"></i> Живой чат
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="help-header">
+                    <div class="help-title">Как мы можем помочь?</div>
+                    <div class="help-subtitle">Найдите ответы на ваши вопросы или свяжитесь с нашей командой поддержки</div>
+                </div>
+                
+                <div class="search-section">
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="Поиск по документации, FAQ, статьям..." id="searchInput">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                    <div class="search-suggestions">
+                        <span class="suggestion-tag" onclick="searchFor('создание проекта')">Создание проекта</span>
+                        <span class="suggestion-tag" onclick="searchFor('AI функции')">AI функции</span>
+                        <span class="suggestion-tag" onclick="searchFor('настройки')">Настройки</span>
+                        <span class="suggestion-tag" onclick="searchFor('ошибки')">Ошибки</span>
+                        <span class="suggestion-tag" onclick="searchFor('интеграции')">Интеграции</span>
+                    </div>
+                </div>
+                
+                <div class="ai-chat">
+                    <div class="ai-chat-header">
+                        <div class="ai-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="ai-name">AI Помощник</div>
+                        <div class="ai-status">Онлайн</div>
+                    </div>
+                    <div class="ai-message">
+                        <div class="ai-message-text">Привет! Я AI помощник Universal Project Manager. Задайте мне любой вопрос о работе с системой, и я помогу найти решение!</div>
+                        <div class="ai-message-time">Только что</div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Задайте вопрос AI помощнику..." id="aiChatInput">
+                        <div class="chat-send" onclick="sendAIMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="categories-grid">
+                    <div class="category-card" onclick="openCategory('getting-started')">
+                        <div class="category-icon">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="category-title">Начало работы</div>
+                        <div class="category-description">Основы работы с системой, создание первого проекта и настройка профиля</div>
+                        <div class="category-count">12 статей</div>
+                    </div>
+                    <div class="category-card" onclick="openCategory('projects')">
+                        <div class="category-icon">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div class="category-title">Управление проектами</div>
+                        <div class="category-description">Создание, настройка и управление проектами, команды и задачи</div>
+                        <div class="category-count">18 статей</div>
+                    </div>
+                    <div class="category-card" onclick="openCategory('ai-features')">
+                        <div class="category-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="category-title">AI функции</div>
+                        <div class="category-description">Использование AI для анализа кода, рекомендаций и автоматизации</div>
+                        <div class="category-count">15 статей</div>
+                    </div>
+                    <div class="category-card" onclick="openCategory('integrations')">
+                        <div class="category-icon">
+                            <i class="fas fa-plug"></i>
+                        </div>
+                        <div class="category-title">Интеграции</div>
+                        <div class="category-description">Подключение внешних сервисов, API и настройка интеграций</div>
+                        <div class="category-count">8 статей</div>
+                    </div>
+                    <div class="category-card" onclick="openCategory('troubleshooting')">
+                        <div class="category-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="category-title">Решение проблем</div>
+                        <div class="category-description">Частые проблемы и их решения, отладка и диагностика</div>
+                        <div class="category-count">22 статьи</div>
+                    </div>
+                    <div class="category-card" onclick="openCategory('api')">
+                        <div class="category-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="category-title">API и разработка</div>
+                        <div class="category-description">API документация, SDK, примеры кода и разработка</div>
+                        <div class="category-count">25 статей</div>
+                    </div>
+                </div>
+                
+                <div class="faq-section">
+                    <h3 style="margin-bottom: 1.5rem; color: #1f2937;">Часто задаваемые вопросы</h3>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-question-text">Как создать новый проект?</span>
+                            <i class="fas fa-chevron-down faq-question-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Для создания нового проекта нажмите кнопку "Создать проект" на главной странице или в меню проектов. Выберите тип проекта, укажите название и описание, добавьте участников команды и настройте параметры. Система автоматически создаст проект с базовой структурой.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-question-text">Как использовать AI функции?</span>
+                            <i class="fas fa-chevron-down faq-question-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            AI функции доступны в разделе "AI Анализ" и "AI Чат". Вы можете загрузить код для анализа, получить рекомендации по оптимизации, использовать AI для генерации кода и решения задач. Настройте AI модели в разделе "Настройки" для персонализации опыта.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-question-text">Как пригласить участников в проект?</span>
+                            <i class="fas fa-chevron-down faq-question-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            В настройках проекта нажмите "Участники" и выберите "Пригласить". Введите email адреса участников, выберите их роли и отправьте приглашения. Участники получат email с ссылкой для присоединения к проекту.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-question-text">Как настроить интеграции с внешними сервисами?</span>
+                            <i class="fas fa-chevron-down faq-question-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Перейдите в "Настройки" → "Интеграции" и выберите нужный сервис. Следуйте инструкциям для подключения: введите API ключи, настройте параметры синхронизации и активируйте интеграцию. Поддерживаются GitHub, Azure DevOps, Trello, Slack и другие сервисы.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-question-text">Как получить поддержку?</span>
+                            <i class="fas fa-chevron-down faq-question-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Вы можете получить поддержку несколькими способами: через AI чат, создав тикет поддержки, связавшись с нами по email или телефону. Также доступна живая поддержка в рабочее время. Все контакты указаны в разделе "Контакты".
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-section">
+                    <h3 style="margin-bottom: 1.5rem; color: #1f2937;">Свяжитесь с нами</h3>
+                    <div class="contact-methods">
+                        <div class="contact-method" onclick="openLiveChat()">
+                            <div class="contact-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-title">Живой чат</div>
+                                <div class="contact-description">Мгновенная поддержка в реальном времени</div>
+                            </div>
+                        </div>
+                        <div class="contact-method" onclick="openEmail()">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-title">Email поддержка</div>
+                                <div class="contact-description">support@universalpm.com</div>
+                            </div>
+                        </div>
+                        <div class="contact-method" onclick="openPhone()">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-title">Телефон</div>
+                                <div class="contact-description">+7 (800) 123-45-67</div>
+                            </div>
+                        </div>
+                        <div class="contact-method" onclick="openTicketModal()">
+                            <div class="contact-icon">
+                                <i class="fas fa-ticket-alt"></i>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-title">Создать тикет</div>
+                                <div class="contact-description">Опишите проблему подробно</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ticket-section">
+                    <h3 style="margin-bottom: 1.5rem; color: #1f2937;">Создать тикет поддержки</h3>
+                    <form class="ticket-form" id="ticketForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ticketSubject">Тема</label>
+                                <input type="text" id="ticketSubject" placeholder="Краткое описание проблемы" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ticketPriority">Приоритет</label>
+                                <select id="ticketPriority" required>
+                                    <option value="low">Низкий</option>
+                                    <option value="medium" selected>Средний</option>
+                                    <option value="high">Высокий</option>
+                                    <option value="urgent">Критический</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ticketCategory">Категория</label>
+                            <select id="ticketCategory" required>
+                                <option value="">Выберите категорию</option>
+                                <option value="technical">Техническая проблема</option>
+                                <option value="billing">Биллинг</option>
+                                <option value="feature">Запрос функции</option>
+                                <option value="bug">Сообщение об ошибке</option>
+                                <option value="other">Другое</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ticketDescription">Описание проблемы</label>
+                            <textarea id="ticketDescription" placeholder="Подробно опишите проблему, шаги для воспроизведения и ожидаемый результат" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Создать тикет</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Search Results Modal -->
+    <div id="searchResultsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Результаты поиска</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="search-results" id="searchResults">
+                <!-- Search results will be populated here -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const query = e.target.value.trim();
+                if (query.length > 2) {
+                    performSearch(query);
+                }
+            });
+            
+            // AI Chat
+            document.getElementById('aiChatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendAIMessage();
+                }
+            });
+            
+            // Ticket form
+            document.getElementById('ticketForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitTicket();
+            });
+        }
+        
+        function toggleFAQ(question) {
+            const answer = question.nextElementSibling;
+            const icon = question.querySelector('.faq-question-icon');
+            
+            question.classList.toggle('active');
+            answer.classList.toggle('active');
+        }
+        
+        function performSearch(query) {
+            // Simulate search results
+            const results = [
+                {
+                    title: 'Создание нового проекта',
+                    description: 'Пошаговое руководство по созданию проекта в Universal Project Manager',
+                    category: 'Проекты',
+                    url: '#'
+                },
+                {
+                    title: 'AI функции и возможности',
+                    description: 'Как использовать AI для анализа кода и получения рекомендаций',
+                    category: 'AI',
+                    url: '#'
+                },
+                {
+                    title: 'Настройка интеграций',
+                    description: 'Подключение внешних сервисов и API к проекту',
+                    category: 'Интеграции',
+                    url: '#'
+                }
+            ];
+            
+            displaySearchResults(results);
+        }
+        
+        function displaySearchResults(results) {
+            const modal = document.getElementById('searchResultsModal');
+            const resultsContainer = document.getElementById('searchResults');
+            
+            resultsContainer.innerHTML = results.map(result => `
+                <div class="search-result-item" onclick="openArticle('${result.url}')">
+                    <div class="search-result-title">${result.title}</div>
+                    <div class="search-result-description">${result.description}</div>
+                    <div class="search-result-meta">Категория: ${result.category}</div>
+                </div>
+            `).join('');
+            
+            modal.style.display = 'flex';
+        }
+        
+        function searchFor(query) {
+            document.getElementById('searchInput').value = query;
+            performSearch(query);
+        }
+        
+        function sendAIMessage() {
+            const input = document.getElementById('aiChatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Add user message
+                const chatContainer = document.querySelector('.ai-chat');
+                const userMessage = document.createElement('div');
+                userMessage.className = 'ai-message';
+                userMessage.innerHTML = `
+                    <div class="ai-message-text">${message}</div>
+                    <div class="ai-message-time">Сейчас</div>
+                `;
+                chatContainer.insertBefore(userMessage, chatContainer.querySelector('.chat-input'));
+                
+                input.value = '';
+                
+                // Simulate AI response
+                setTimeout(() => {
+                    const aiResponse = document.createElement('div');
+                    aiResponse.className = 'ai-message';
+                    aiResponse.innerHTML = `
+                        <div class="ai-message-text">Отличный вопрос! Вот что я рекомендую: ${getAIResponse(message)}</div>
+                        <div class="ai-message-time">Сейчас</div>
+                    `;
+                    chatContainer.insertBefore(aiResponse, chatContainer.querySelector('.chat-input'));
+                }, 1000);
+            }
+        }
+        
+        function getAIResponse(query) {
+            const responses = {
+                'проект': 'Для создания проекта перейдите в раздел "Проекты" и нажмите "Создать проект". Выберите тип проекта и следуйте инструкциям.',
+                'ai': 'AI функции доступны в разделе "AI Анализ". Вы можете загрузить код для анализа или использовать AI чат для получения рекомендаций.',
+                'ошибка': 'Если возникла ошибка, проверьте раздел "Решение проблем" или создайте тикет поддержки с подробным описанием проблемы.',
+                'настройки': 'Настройки доступны в правом верхнем углу. Там вы можете настроить профиль, AI модели и интеграции.'
+            };
+            
+            for (const [key, response] of Object.entries(responses)) {
+                if (query.toLowerCase().includes(key)) {
+                    return response;
+                }
+            }
+            
+            return 'Я помогу вам с этим вопросом. Рекомендую обратиться к соответствующему разделу документации или создать тикет поддержки для более детальной помощи.';
+        }
+        
+        function openCategory(category) {
+            alert(`Открытие категории: ${category}`);
+        }
+        
+        function openArticle(article) {
+            alert(`Открытие статьи: ${article}`);
+        }
+        
+        function openLiveChat() {
+            alert('Открытие живого чата...');
+        }
+        
+        function openEmail() {
+            window.location.href = 'mailto:support@universalpm.com';
+        }
+        
+        function openPhone() {
+            window.location.href = 'tel:+78001234567';
+        }
+        
+        function openTicketModal() {
+            document.getElementById('ticketForm').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function submitTicket() {
+            const form = document.getElementById('ticketForm');
+            const formData = new FormData(form);
+            
+            // Simulate ticket submission
+            alert('Тикет создан! Номер тикета: #' + Math.random().toString(36).substr(2, 8).toUpperCase());
+            form.reset();
+        }
+        
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+        
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

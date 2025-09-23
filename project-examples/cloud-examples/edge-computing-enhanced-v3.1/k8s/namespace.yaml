@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: edge-computing
+  labels:
+    name: edge-computing
+    version: "3.1.0"

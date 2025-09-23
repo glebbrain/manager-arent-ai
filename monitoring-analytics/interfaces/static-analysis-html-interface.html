@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Static Analysis - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .analysis-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .analysis-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .analysis-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .analysis-tools {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .tool-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .tool-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .tool-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .tool-features {
+            margin-bottom: 15px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .feature-icon {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .feature-text {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .tool-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .tool-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .analysis-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .analysis-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .analysis-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .analysis-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recent-analyses {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .analyses-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .analysis-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .analysis-item:hover {
+            background: #f8f9fa;
+        }
+
+        .analysis-item:last-child {
+            border-bottom: none;
+        }
+
+        .analysis-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .analysis-icon.success {
+            background: #10b981;
+        }
+
+        .analysis-icon.warning {
+            background: #f59e0b;
+        }
+
+        .analysis-icon.error {
+            background: #ef4444;
+        }
+
+        .analysis-content {
+            flex: 1;
+        }
+
+        .analysis-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .analysis-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .analysis-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .analysis-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .analysis-tools {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-search"></i> Static Analysis</h1>
+            <p>Advanced static analysis tools integration for Universal Project Manager v3.2</p>
+        </div>
+
+        <div class="analysis-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-bug"></i></div>
+                <div class="overview-value">23</div>
+                <div class="overview-label">Issues Found</div>
+                <div class="overview-trend trend-down">-5 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="overview-value">98%</div>
+                <div class="overview-label">Security Score</div>
+                <div class="overview-trend trend-up">+2% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="overview-value">94%</div>
+                <div class="overview-label">Code Quality</div>
+                <div class="overview-trend trend-up">+3% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-clock"></i></div>
+                <div class="overview-value">2.1s</div>
+                <div class="overview-label">Analysis Time</div>
+                <div class="overview-trend trend-down">-0.3s faster</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-tools"></i></div>
+                <div class="overview-value">12</div>
+                <div class="overview-label">Tools Active</div>
+                <div class="overview-trend trend-stable">No change</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">96%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+1% improvement</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="analysis-section">
+                <h2><i class="fas fa-chart-area"></i> Analysis Tools</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Issue Distribution by Severity</div>
+                    <canvas id="issueChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Code Quality Trends</div>
+                    <canvas id="qualityChart"></canvas>
+                </div>
+
+                <div class="analysis-tools">
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-title">ESLint</div>
+                            <div class="tool-status status-active">Active</div>
+                        </div>
+                        <div class="tool-description">JavaScript/TypeScript linting with custom rules and AI-powered suggestions</div>
+                        <div class="tool-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Custom Rule Engine</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">AI-Powered Fixes</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Real-time Analysis</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Auto-fix Capability</span>
+                            </div>
+                        </div>
+                        <div class="tool-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">8</div>
+                                <div class="metric-label">Issues</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">95%</div>
+                                <div class="metric-label">Fixed</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">1.2s</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="tool-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">Configure</button>
+                        </div>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-title">SonarQube</div>
+                            <div class="tool-status status-active">Active</div>
+                        </div>
+                        <div class="tool-description">Comprehensive code quality analysis with security vulnerability detection</div>
+                        <div class="tool-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Security Analysis</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Code Smells Detection</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Technical Debt</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Coverage Analysis</span>
+                            </div>
+                        </div>
+                        <div class="tool-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">5</div>
+                                <div class="metric-label">Issues</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">98%</div>
+                                <div class="metric-label">Quality</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">3.2s</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="tool-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">Configure</button>
+                        </div>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-title">CodeQL</div>
+                            <div class="tool-status status-active">Active</div>
+                        </div>
+                        <div class="tool-description">Semantic code analysis for security vulnerabilities and bugs</div>
+                        <div class="tool-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Security Vulnerabilities</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Semantic Analysis</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Custom Queries</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Multi-language</span>
+                            </div>
+                        </div>
+                        <div class="tool-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">3</div>
+                                <div class="metric-label">Issues</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">99%</div>
+                                <div class="metric-label">Security</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.5s</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="tool-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">Configure</button>
+                        </div>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-title">PMD</div>
+                            <div class="tool-status status-warning">Warning</div>
+                        </div>
+                        <div class="tool-description">Source code analyzer for Java, JavaScript, and other languages</div>
+                        <div class="tool-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Code Duplication</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Complexity Analysis</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Best Practices</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Performance Issues</span>
+                            </div>
+                        </div>
+                        <div class="tool-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">7</div>
+                                <div class="metric-label">Issues</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">87%</div>
+                                <div class="metric-label">Fixed</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2.8s</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="tool-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">Configure</button>
+                        </div>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-title">Bandit</div>
+                            <div class="tool-status status-active">Active</div>
+                        </div>
+                        <div class="tool-description">Python security linter for finding common security issues</div>
+                        <div class="tool-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Security Issues</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Python-specific</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">OWASP Top 10</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Custom Rules</span>
+                            </div>
+                        </div>
+                        <div class="tool-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">2</div>
+                                <div class="metric-label">Issues</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">96%</div>
+                                <div class="metric-label">Security</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">1.5s</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="tool-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">Configure</button>
+                        </div>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-title">RuboCop</div>
+                            <div class="tool-status status-active">Active</div>
+                        </div>
+                        <div class="tool-description">Ruby static code analyzer and formatter</div>
+                        <div class="tool-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Style Guide</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Auto-correct</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Performance</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Custom Cops</span>
+                            </div>
+                        </div>
+                        <div class="tool-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">4</div>
+                                <div class="metric-label">Issues</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">92%</div>
+                                <div class="metric-label">Fixed</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">1.8s</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="tool-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">Configure</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analysis-controls">
+                <h2><i class="fas fa-cogs"></i> Analysis Controls</h2>
+                
+                <div class="analysis-actions">
+                    <button class="control-btn" onclick="runAllAnalysis()">
+                        <i class="fas fa-play"></i> Run All Analysis
+                    </button>
+                    <button class="control-btn secondary" onclick="configureTools()">
+                        <i class="fas fa-cog"></i> Configure
+                    </button>
+                    <button class="control-btn secondary" onclick="exportReport()">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                </div>
+
+                <div class="analysis-status">
+                    <div class="status-title">Analysis Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Last Analysis</div>
+                        <div class="status-value">2 minutes ago</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Active Tools</div>
+                        <div class="status-value">12 tools</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Total Issues</div>
+                        <div class="status-value">23 issues</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Critical Issues</div>
+                        <div class="status-value">2 issues</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Analysis Time</div>
+                        <div class="status-value">2.1 seconds</div>
+                    </div>
+                </div>
+
+                <div class="recent-analyses">
+                    <div class="analyses-title">Recent Analyses</div>
+                    <div class="analysis-item">
+                        <div class="analysis-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="analysis-content">
+                            <div class="analysis-title">ESLint Analysis</div>
+                            <div class="analysis-description">Found 8 issues, fixed 7 automatically</div>
+                        </div>
+                        <div class="analysis-time">2 minutes ago</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="analysis-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="analysis-content">
+                            <div class="analysis-title">SonarQube Analysis</div>
+                            <div class="analysis-description">Code quality improved to 98%</div>
+                        </div>
+                        <div class="analysis-time">5 minutes ago</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="analysis-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="analysis-content">
+                            <div class="analysis-title">PMD Analysis</div>
+                            <div class="analysis-description">Found 7 issues, 6 need manual review</div>
+                        </div>
+                        <div class="analysis-time">8 minutes ago</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="analysis-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="analysis-content">
+                            <div class="analysis-title">CodeQL Analysis</div>
+                            <div class="analysis-description">Security scan completed, 3 issues found</div>
+                        </div>
+                        <div class="analysis-time">12 minutes ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI Analysis Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        Static analysis accuracy improved by 18% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Some tools need configuration updates for better performance
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI-powered rules available for better code quality
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let issueChart, qualityChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Issue Chart
+            const issueCtx = document.getElementById('issueChart').getContext('2d');
+            issueChart = new Chart(issueCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low', 'Info'],
+                    datasets: [{
+                        data: [2, 5, 8, 6, 2],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#6b7280'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Quality Chart
+            const qualityCtx = document.getElementById('qualityChart').getContext('2d');
+            qualityChart = new Chart(qualityCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(7),
+                    datasets: [{
+                        label: 'Code Quality',
+                        data: [88, 90, 89, 92, 94, 93, 94],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Security Score',
+                        data: [95, 96, 97, 98, 98, 97, 98],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels(days) {
+            const labels = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function runAllAnalysis() {
+            alert('Running all static analysis tools...');
+        }
+
+        function configureTools() {
+            alert('Opening tool configuration...');
+        }
+
+        function exportReport() {
+            alert('Exporting analysis report...');
+        }
+    </script>
+</body>
+</html>

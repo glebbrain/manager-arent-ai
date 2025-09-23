@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: manager-agent-ai-v2.9
+  labels:
+    name: manager-agent-ai-v2.9
+    version: "2.9.0"
+    environment: production
+    managed-by: cloud-native-deployment
+  annotations:
+    description: "ManagerAgentAI v2.9 Cloud-Native Deployment Namespace"
+    contact: "devops@manageragent.ai"

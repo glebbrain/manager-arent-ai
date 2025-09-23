@@ -1,0 +1,339 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-dashboard-enhanced
+  namespace: manager-agent-ai
+  labels:
+    app: analytics-dashboard-enhanced
+    version: "2.9"
+    ai-enhanced: "true"
+    component: "analytics"
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: analytics-dashboard-enhanced
+  template:
+    metadata:
+      labels:
+        app: analytics-dashboard-enhanced
+        version: "2.9"
+        ai-enhanced: "true"
+        component: "analytics"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3001"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: analytics-dashboard-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+      containers:
+      - name: analytics-dashboard
+        image: manager-agent-ai/analytics-dashboard-enhanced:2.9.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3001
+          name: http
+          protocol: TCP
+        - containerPort: 9091
+          name: metrics
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: NODE_ENV
+        - name: AI_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: AI_ENABLED
+        - name: PERFORMANCE_MONITORING
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: PERFORMANCE_MONITORING
+        - name: MONITORING_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: MONITORING_ENABLED
+        - name: PROMETHEUS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: PROMETHEUS_URL
+        - name: GRAFANA_URL
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: GRAFANA_URL
+        - name: JAEGER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: JAEGER_URL
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1000m"
+            ephemeral-storage: "2Gi"
+          limits:
+            memory: "4Gi"
+            cpu: "4000m"
+            ephemeral-storage: "4Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 10
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: cache
+          mountPath: /app/cache
+        - name: data
+          mountPath: /app/data
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: cache
+        emptyDir: {}
+      - name: data
+        persistentVolumeClaim:
+          claimName: analytics-dashboard-pvc
+      nodeSelector:
+        kubernetes.io/os: linux
+        node.kubernetes.io/instance-type: "m5.xlarge"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - analytics-dashboard-enhanced
+              topologyKey: kubernetes.io/hostname
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: node.kubernetes.io/instance-type
+                operator: In
+                values:
+                - "m5.xlarge"
+                - "m5.2xlarge"
+      tolerations:
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 300
+      - key: "node.kubernetes.io/unreachable"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 300
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-dashboard-enhanced-service
+  namespace: manager-agent-ai
+  labels:
+    app: analytics-dashboard-enhanced
+    version: "2.9"
+    ai-enhanced: "true"
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-connection-draining-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-connection-draining-timeout: "60"
+spec:
+  selector:
+    app: analytics-dashboard-enhanced
+  ports:
+  - name: http
+    port: 3001
+    targetPort: 3001
+    protocol: TCP
+  - name: metrics
+    port: 9091
+    targetPort: 9091
+    protocol: TCP
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: analytics-dashboard-pvc
+  namespace: manager-agent-ai
+  labels:
+    app: analytics-dashboard-enhanced
+    version: "2.9"
+    ai-enhanced: "true"
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: gp3
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: analytics-dashboard-sa
+  namespace: manager-agent-ai
+  labels:
+    app: analytics-dashboard-enhanced
+    version: "2.9"
+    ai-enhanced: "true"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: analytics-dashboard-role
+  namespace: manager-agent-ai
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["autoscaling"]
+  resources: ["horizontalpodautoscalers"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["pods", "nodes"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: analytics-dashboard-rolebinding
+  namespace: manager-agent-ai
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: analytics-dashboard-role
+subjects:
+- kind: ServiceAccount
+  name: analytics-dashboard-sa
+  namespace: manager-agent-ai
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: analytics-dashboard-hpa
+  namespace: manager-agent-ai
+  labels:
+    app: analytics-dashboard-enhanced
+    version: "2.9"
+    ai-enhanced: "true"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: analytics-dashboard-enhanced
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "50"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+      - type: Pods
+        value: 2
+        periodSeconds: 15
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+      - type: Pods
+        value: 1
+        periodSeconds: 60
+      selectPolicy: Min
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: analytics-dashboard-pdb
+  namespace: manager-agent-ai
+  labels:
+    app: analytics-dashboard-enhanced
+    version: "2.9"
+    ai-enhanced: "true"
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: analytics-dashboard-enhanced

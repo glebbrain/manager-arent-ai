@@ -1,0 +1,474 @@
+{
+  "version": "6.8.0",
+  "name": "Universal Project Manager Cursor Configuration v6.8",
+  "description": "Универсальная конфигурация Cursor для работы с любыми типами проектов с полной поддержкой AI/ML, квантовых вычислений, Edge AI, Blockchain, AR/VR, Next-Generation Technologies и Maximum Performance & Optimization v4.8. Обновлено с актуальными путями и структурой проекта.",
+  "integration": "Universal Integration Optimizer v4.8 with Maximum Performance & Optimization",
+  "features": {
+    "aiOptimization": true,
+    "mlCaching": true,
+    "parallelExecution": true,
+    "smartCaching": true,
+    "intelligentRouting": true,
+    "predictiveAnalytics": true,
+    "realTimeMonitoring": true,
+    "automatedReporting": true,
+    "quantumComputing": true,
+    "edgeAI": true,
+    "blockchain": true,
+    "arVr": true
+  },
+  "aiFeatures": {
+    "audioAnalysis": true,
+    "autoTagging": true,
+    "recommendations": true,
+    "qualityAssessment": true,
+    "contentModeration": true,
+    "emotionAnalysis": true,
+    "contentGeneration": true,
+    "predictiveAnalytics": true,
+    "quantumOptimization": true,
+    "audioProcessing": true,
+    "musicGeneration": true,
+    "soundDesign": true,
+    "audioQualityAssessment": true,
+    "realTimeAudioProcessing": true,
+    "audioVisualization": true,
+    "soundEffects": true,
+    "audioCompression": true,
+    "audioEnhancement": true
+  },
+  "nextGenTechnologies": {
+    "edgeComputing": true,
+    "blockchain": true,
+    "vrAr": true,
+    "quantumComputing": true,
+    "iot": true,
+    "5g": true,
+    "microservices": true,
+    "serverless": true,
+    "aiOptimization": true,
+    "performanceOptimization": true,
+    "managerAutomationIntegration": true,
+    "enhancedPerformanceV47": true,
+    "intelligentScriptOptimization": true,
+    "advancedMemoryManagement": true,
+    "smartCacheOptimization": true,
+    "enhancedParallelProcessing": true
+  },
+  "projectTypes": {
+    "web": {
+      "frameworks": ["React", "Vue", "Angular", "Svelte", "Astro", "Next.js", "Nuxt.js", "SvelteKit"],
+      "languages": ["JavaScript", "TypeScript", "HTML", "CSS", "SCSS", "SASS"],
+      "tools": ["Vite", "Webpack", "Rollup", "Parcel", "ESLint", "Prettier", "Jest", "Cypress"]
+    },
+    "mobile": {
+      "frameworks": ["React Native", "Flutter", "Ionic", "Xamarin", "Cordova"],
+      "languages": ["JavaScript", "TypeScript", "Dart", "Swift", "Kotlin", "Java"],
+      "tools": ["Expo", "Android Studio", "Xcode", "Flipper", "Detox"]
+    },
+    "desktop": {
+      "frameworks": ["Electron", "Tauri", "Flutter Desktop", "Qt", "GTK"],
+      "languages": ["JavaScript", "TypeScript", "Rust", "C++", "Python", "C#"],
+      "tools": ["Node.js", "Python", "Rust", "CMake", "Conan"]
+    },
+    "backend": {
+      "frameworks": ["Express", "FastAPI", "Django", "Flask", "Spring Boot", "ASP.NET Core"],
+      "languages": ["JavaScript", "TypeScript", "Python", "Java", "C#", "Go", "Rust", "PHP"],
+      "tools": ["Node.js", "Python", "Docker", "Kubernetes", "PostgreSQL", "MongoDB", "Redis"]
+    },
+    "ai-ml": {
+      "frameworks": ["TensorFlow", "PyTorch", "Scikit-learn", "Keras", "Hugging Face"],
+      "languages": ["Python", "R", "Julia", "C++", "JavaScript"],
+      "tools": ["Jupyter", "Colab", "MLflow", "Weights & Biases", "DVC"]
+    },
+    "blockchain": {
+      "frameworks": ["Ethereum", "Solana", "Polygon", "Binance Smart Chain", "Cardano"],
+      "languages": ["Solidity", "Rust", "JavaScript", "TypeScript", "Go"],
+      "tools": ["Hardhat", "Truffle", "Web3.js", "Ethers.js", "Metamask"]
+    },
+    "game": {
+      "frameworks": ["Unity", "Unreal Engine", "Godot", "Phaser", "Three.js"],
+      "languages": ["C#", "C++", "JavaScript", "TypeScript", "GDScript", "Lua"],
+      "tools": ["Visual Studio", "Blender", "Maya", "Photoshop", "GIMP"]
+    }
+  },
+  "universalTools": {
+    "development": {
+      "codeEditor": "Universal code editor with AI assistance",
+      "debugger": "Advanced debugging tools with AI insights",
+      "formatter": "Code formatting and style enforcement",
+      "linter": "Code quality analysis and suggestions",
+      "compiler": "Multi-language compilation support",
+      "transpiler": "Cross-platform code transformation"
+    },
+    "testing": {
+      "unitTesting": "Automated unit test generation and execution",
+      "integrationTesting": "API and service integration testing",
+      "e2eTesting": "End-to-end automated testing",
+      "performanceTesting": "Load and performance analysis",
+      "securityTesting": "Vulnerability scanning and security analysis",
+      "visualTesting": "UI/UX visual regression testing"
+    },
+    "deployment": {
+      "containerization": "Docker and Kubernetes support",
+      "cloudDeployment": "Multi-cloud deployment automation",
+      "ciCd": "Continuous integration and deployment",
+      "monitoring": "Real-time application monitoring",
+      "logging": "Centralized logging and analysis",
+      "backup": "Automated backup and recovery"
+    },
+    "analytics": {
+      "performanceAnalytics": "Application performance metrics",
+      "userAnalytics": "User behavior and engagement tracking",
+      "businessAnalytics": "Business intelligence and reporting",
+      "predictiveAnalytics": "AI-powered forecasting and insights",
+      "realTimeAnalytics": "Live data processing and visualization",
+      "customMetrics": "Custom KPI and metric tracking"
+    }
+  },
+  "aiInstructions": {
+    "general": [
+      "Universal Project Manager - intelligent project management system v6.2",
+      "Поддерживай все типы проектов: web, mobile, desktop, backend, AI/ML, blockchain, game",
+      "Используй AI-powered automation для всех операций",
+      "Применяй quantum computing optimization где возможно",
+      "Интегрируй edge computing для распределенной обработки",
+      "Используй blockchain для безопасности и прозрачности",
+      "Применяй AR/VR технологии для immersive experiences",
+      "Обеспечивай maximum performance и optimization",
+      "Используй intelligent caching и memory management",
+      "Применяй parallel processing для ускорения операций"
+    ],
+    "development": [
+      "Следуй принципам clean code и SOLID",
+      "Используй type-safe development с TypeScript",
+      "Применяй test-driven development (TDD)",
+      "Обеспечивай comprehensive error handling",
+      "Используй dependency injection и inversion of control",
+      "Применяй design patterns для maintainable code",
+      "Обеспечивай security-first development",
+      "Используй performance optimization techniques",
+      "Применяй code review и quality assurance",
+      "Обеспечивай comprehensive documentation"
+    ],
+    "ai-ml": [
+      "Следуй принципам ML/AI разработки с фокусом на производительность",
+      "Используй централизованную конфигурацию через config.yaml",
+      "Применяй environment variables для sensitive data",
+      "Документируй все ML модели с примерами использования",
+      "Используй векторизированные операции numpy/pandas",
+      "Добавляй comprehensive error handling для внешних API",
+      "Проверяй корректность данных перед передачей в ML модели",
+      "Используй model versioning и experiment tracking",
+      "Применяй data validation и preprocessing pipelines",
+      "Обеспечивай model monitoring и performance tracking"
+    ],
+    "blockchain": [
+      "Используй secure smart contract development practices",
+      "Применяй gas optimization techniques",
+      "Обеспечивай comprehensive testing для smart contracts",
+      "Используй multi-signature wallets для security",
+      "Применяй decentralized storage solutions",
+      "Обеспечивай privacy и anonymity где необходимо",
+      "Используй cross-chain compatibility",
+      "Применяй token economics и governance models",
+      "Обеспечивай audit trails и transparency",
+      "Используй quantum-resistant cryptography"
+    ]
+  },
+  "quickCommands": {
+    "start": ".\\.automation\\Universal-Project-Manager-Optimized-v4.8.ps1 -Action comprehensive -AI -Quantum -Performance -Enterprise -Edge -Blockchain -VRAR -Detailed",
+    "build": ".\\.automation\\Quick-Access-Optimized-v4.8.ps1 -Action build -Verbose -Parallel -Cache -AI -ML",
+    "test": ".\\.automation\\Quick-Access-Optimized-v4.8.ps1 -Action test -Verbose -Parallel -AI",
+    "deploy": ".\\.automation\\Quick-Access-Optimized-v4.8.ps1 -Action deploy -Verbose -Parallel -AI -ML",
+    "optimize": ".\\.automation\\Performance-Optimizer-v4.8.ps1 -Action all -Verbose -Force -AI -Quantum",
+    "analyze": ".\\.automation\\Project-Scanner-Optimized-v4.8.ps1 -Action analyze -AI -Quantum -Detailed",
+    "structure": ".\\.automation\\Project-Scanner-Optimized-v4.8.ps1 -Action structure -AI -Quantum -Detailed",
+    "status": ".\\.manager\\Universal-Manager-Integration-v4.8.ps1 -Action status -Category all -Verbose",
+    "plan": ".\\.manager\\Universal-Project-Manager-Optimized-v4.8.ps1 -Action plan -Verbose -Parallel -AI -ML",
+    "monitor": ".\\.manager\\Universal-Project-Manager-Optimized-v4.8.ps1 -Action monitor -Verbose -Detailed -AI -ML",
+    "report": ".\\.manager\\Universal-Project-Manager-Optimized-v4.8.ps1 -Action report -Verbose -Detailed -AI -ML",
+    "quantum": ".\\.automation\\Quantum-Computing-v4.1.ps1 -Action optimize -AI -Quantum -Verbose",
+    "edge-ai": ".\\.automation\\edge-ai-computing-v4.5.ps1 -Action start -Edge -AI -Verbose",
+    "blockchain": ".\\.automation\\Blockchain-Integration-v4.1.ps1 -Action start -Blockchain -Web3 -Verbose",
+    "ar-vr": ".\\.automation\\vr\\VR-AR-Support-System-v4.8.ps1 -Action start -VR -AR -Verbose",
+    "cleanup": ".\\.automation\\cleanup.ps1 -Verbose",
+    "security": ".\\.automation\\security\\security_check.ps1 -Verbose",
+    "integration": ".\\.manager\\Universal-Manager-Integration-v4.8.ps1 -Action optimize -AI -Quantum -Verbose",
+    "sync": ".\\.manager\\Universal-Manager-Integration-v4.8.ps1 -Action status -Category all -Verbose",
+    "health": ".\\.manager\\Universal-Manager-Integration-v4.8.ps1 -Action status -Category performance -Verbose",
+    "mpo": ".\\.automation\\Maximum-Performance-Optimizer-v4.8.ps1 -Action optimize -AI -Quantum -Verbose",
+    "mmo": ".\\.manager\\Maximum-Manager-Optimizer-v4.8.ps1 -Action optimize -AI -Quantum -Verbose",
+    "qai": ".\\.automation\\AI-Enhanced-Features-Manager-v3.5.ps1 -Action analyze -AI -Quantum -Verbose",
+    "qaq": ".\\.automation\\Quantum-Computing-v4.1.ps1 -Action optimize -Quantum -Verbose",
+    "qap": ".\\.automation\\Performance-Optimizer-v4.8.ps1 -Action all -Verbose -Force -AI -Quantum"
+  },
+  "workflows": {
+    "development": {
+      "enabled": true,
+      "steps": ["setup", "build", "test", "deploy"],
+      "parallel": true,
+      "cache": true,
+      "aiOptimized": true
+    },
+    "optimization": {
+      "enabled": true,
+      "steps": ["analyze", "optimize", "test", "deploy"],
+      "parallel": true,
+      "cache": true,
+      "aiOptimized": true
+    },
+    "quantum": {
+      "enabled": true,
+      "steps": ["quantum-setup", "quantum-optimize", "quantum-test"],
+      "parallel": true,
+      "cache": true,
+      "aiOptimized": true
+    },
+    "edge-ai": {
+      "enabled": true,
+      "steps": ["edge-setup", "edge-optimize", "edge-test"],
+      "parallel": true,
+      "cache": true,
+      "aiOptimized": true
+    },
+    "blockchain": {
+      "enabled": true,
+      "steps": ["blockchain-setup", "blockchain-deploy", "blockchain-test"],
+      "parallel": true,
+      "cache": true,
+      "aiOptimized": true
+    },
+    "ar-vr": {
+      "enabled": true,
+      "steps": ["ar-vr-setup", "ar-vr-build", "ar-vr-test"],
+      "parallel": true,
+      "cache": true,
+      "aiOptimized": true
+    },
+    "production": {
+      "enabled": true,
+      "steps": ["analyze", "plan", "execute", "monitor", "report", "optimize"],
+      "parallel": true,
+      "cache": true,
+      "aiOptimized": true
+    }
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Universal Project Setup",
+        "type": "shell",
+        "command": "${workspaceFolder}/.automation/Quick-Access-Optimized-v4.8.ps1",
+        "args": ["-Action", "setup", "-Verbose", "-AI", "-Performance"],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "Universal Build",
+        "type": "shell",
+        "command": "${workspaceFolder}/.automation/Quick-Access-Optimized-v4.8.ps1",
+        "args": ["-Action", "build", "-Verbose", "-AI", "-Performance"],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "Universal Test",
+        "type": "shell",
+        "command": "${workspaceFolder}/.automation/Test-Suite-Enhanced.ps1",
+        "args": ["-Action", "test", "-Verbose", "-AI", "-Performance"],
+        "group": "test",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "Universal Deploy",
+        "type": "shell",
+        "command": "${workspaceFolder}/.automation/deploy-to-prod.ps1",
+        "args": ["-Action", "deploy", "-Verbose", "-AI", "-Performance"],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "Universal Optimize",
+        "type": "shell",
+        "command": "${workspaceFolder}/.automation/Performance-Optimizer-v4.8.ps1",
+        "args": ["-Action", "optimize", "-Verbose", "-AI", "-Performance"],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "Universal Monitor",
+        "type": "shell",
+        "command": "${workspaceFolder}/.automation/Advanced-Monitoring-System-v4.8.ps1",
+        "args": ["-Action", "monitor", "-Verbose", "-AI", "-Performance"],
+        "group": "test",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        }
+      }
+    ]
+  },
+  "extensions": {
+    "recommended": [
+      "ms-vscode.vscode-typescript-next",
+      "bradlc.vscode-tailwindcss",
+      "esbenp.prettier-vscode",
+      "ms-python.python",
+      "ms-python.pylint",
+      "ms-python.black-formatter",
+      "ms-vscode.vscode-json",
+      "redhat.vscode-yaml",
+      "ms-vscode.powershell",
+      "ms-vscode.vscode-docker",
+      "ms-kubernetes-tools.vscode-kubernetes-tools",
+      "ms-azuretools.vscode-azurefunctions",
+      "ms-azuretools.vscode-azureresourcegroups",
+      "ms-azuretools.vscode-azurestorage",
+      "ms-azuretools.vscode-cosmosdb",
+      "ms-azuretools.vscode-azurecontainerregistry",
+      "ms-azuretools.vscode-azureappservice",
+      "ms-azuretools.vscode-azurevirtualmachines",
+      "ms-azuretools.vscode-azuredatastudio",
+      "ms-azuretools.vscode-azureaccount",
+      "ms-azuretools.vscode-azurecli"
+    ],
+    "ai": [
+      "github.copilot",
+      "github.copilot-chat",
+      "ms-vscode.vscode-ai",
+      "ms-vscode.vscode-ai-extension",
+      "ms-vscode.vscode-ai-tools"
+    ],
+    "blockchain": [
+      "tintinweb.solidity",
+      "tintinweb.vscode-solidity-flattener",
+      "tintinweb.vscode-solidity-language-server",
+      "tintinweb.vscode-solidity-metrics",
+      "tintinweb.vscode-solidity-snippets",
+      "tintinweb.vscode-solidity-uml"
+    ]
+  },
+  "settings": {
+    "editor": {
+      "formatOnSave": true,
+      "formatOnPaste": true,
+      "formatOnType": true,
+      "codeActionsOnSave": {
+        "source.fixAll": true,
+        "source.organizeImports": true
+      },
+      "defaultFormatter": "esbenp.prettier-vscode",
+      "tabSize": 2,
+      "insertSpaces": true,
+      "detectIndentation": true,
+      "wordWrap": "on",
+      "lineNumbers": "on",
+      "rulers": [80, 120],
+      "bracketPairColorization": {
+        "enabled": true
+      },
+      "minimap": {
+        "enabled": true,
+        "showSlider": "always"
+      }
+    },
+    "files": {
+      "autoSave": "afterDelay",
+      "autoSaveDelay": 1000,
+      "exclude": {
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true
+      },
+      "associations": {
+        "*.json": "json",
+        "*.yaml": "yaml",
+        "*.yml": "yaml",
+        "*.md": "markdown",
+        "*.ps1": "powershell",
+        "*.py": "python",
+        "*.js": "javascript",
+        "*.ts": "typescript",
+        "*.jsx": "javascriptreact",
+        "*.tsx": "typescriptreact",
+        "*.html": "html",
+        "*.css": "css",
+        "*.scss": "scss",
+        "*.sass": "sass",
+        "*.less": "less",
+        "*.xml": "xml",
+        "*.sql": "sql",
+        "*.dockerfile": "dockerfile",
+        "*.sol": "solidity"
+      }
+    },
+    "terminal": {
+      "integrated": {
+        "shell": {
+          "windows": "powershell.exe",
+          "linux": "/bin/bash",
+          "osx": "/bin/zsh"
+        },
+        "defaultProfile": {
+          "windows": "PowerShell",
+          "linux": "bash",
+          "osx": "zsh"
+        }
+      }
+    },
+    "ai": {
+      "enabled": true,
+      "autoComplete": true,
+      "suggestions": true,
+      "codeGeneration": true,
+      "refactoring": true,
+      "documentation": true,
+      "testing": true,
+      "debugging": true,
+      "optimization": true,
+      "security": true
+    },
+    "performance": {
+      "optimization": true,
+      "caching": true,
+      "parallelProcessing": true,
+      "memoryManagement": true,
+      "cpuOptimization": true,
+      "gpuAcceleration": true,
+      "quantumOptimization": true,
+      "edgeComputing": true
+    }
+  }
+}

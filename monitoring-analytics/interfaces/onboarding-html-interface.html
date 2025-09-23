@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1f2937;
+        }
+
+        .onboarding-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .onboarding-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .onboarding-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .onboarding-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            width: 100%;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #10b981;
+            transition: width 0.3s ease;
+            width: 14.28%;
+        }
+
+        .onboarding-content {
+            padding: 3rem;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #1f2937;
+        }
+
+        .step-description {
+            font-size: 1.1rem;
+            color: #6b7280;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .role-card {
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .role-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: #2563eb;
+        }
+
+        .role-card.selected {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .role-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #2563eb;
+        }
+
+        .role-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+
+        .role-card p {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        .project-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .project-type-card {
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .project-type-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: #2563eb;
+        }
+
+        .project-type-card.selected {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .project-type-card i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #2563eb;
+        }
+
+        .project-type-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #1f2937;
+        }
+
+        .project-type-card p {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .ai-settings {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .ai-settings h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .ai-model {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .ai-model:last-child {
+            border-bottom: none;
+        }
+
+        .ai-model-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .ai-model-info i {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+            color: #2563eb;
+        }
+
+        .ai-model-info span {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .ai-model-info small {
+            display: block;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #10b981;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+
+        .learning-modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .learning-module {
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .learning-module:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: #2563eb;
+        }
+
+        .learning-module i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #2563eb;
+        }
+
+        .learning-module h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+
+        .learning-module p {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .play-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .play-button:hover {
+            background: #1d4ed8;
+        }
+
+        .completion-summary {
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .completion-summary i {
+            font-size: 3rem;
+            color: #10b981;
+            margin-bottom: 1rem;
+        }
+
+        .completion-summary h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .completion-summary ul {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .completion-summary li {
+            padding: 0.5rem 0;
+            color: #374151;
+        }
+
+        .completion-summary li i {
+            font-size: 1rem;
+            color: #10b981;
+            margin-right: 0.5rem;
+        }
+
+        .next-steps {
+            background: #eff6ff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .next-steps h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .next-steps ul {
+            list-style: none;
+        }
+
+        .next-steps li {
+            padding: 0.25rem 0;
+            color: #374151;
+        }
+
+        .next-steps li::before {
+            content: '•';
+            color: #2563eb;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            margin: 0 0.5rem;
+            transition: background 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: #2563eb;
+        }
+
+        .step-dot.completed {
+            background: #10b981;
+        }
+
+        @media (max-width: 768px) {
+            .onboarding-container {
+                width: 95%;
+                margin: 1rem;
+            }
+
+            .onboarding-content {
+                padding: 2rem;
+            }
+
+            .role-grid,
+            .project-type-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .learning-modules {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <div class="onboarding-header">
+            <h1><i class="fas fa-rocket"></i> Добро пожаловать в Universal Project Manager v3.1</h1>
+            <p>Ваша универсальная платформа для управления проектами с интеграцией ИИ</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="onboarding-content">
+            <!-- Step 1: Welcome -->
+            <div class="step active" id="step1">
+                <div class="step-title">
+                    <i class="fas fa-star"></i> Добро пожаловать!
+                </div>
+                <div class="step-description">
+                    Давайте настроим вашу учетную запись и познакомим с возможностями платформы
+                </div>
+                <div class="completion-summary">
+                    <i class="fas fa-magic"></i>
+                    <h3>Universal Project Manager v3.1</h3>
+                    <p>Advanced AI & Enterprise Integration</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Multi-Modal AI Processing</li>
+                        <li><i class="fas fa-check"></i> Quantum Machine Learning</li>
+                        <li><i class="fas fa-check"></i> Enterprise Integration</li>
+                        <li><i class="fas fa-check"></i> UI/UX Design Support</li>
+                    </ul>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="nextStep()">Начать настройку</button>
+                    <button class="btn btn-secondary" onclick="skipOnboarding()">Пропустить</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Role Selection -->
+            <div class="step" id="step2">
+                <div class="step-title">
+                    <i class="fas fa-user"></i> Выберите вашу роль
+                </div>
+                <div class="step-description">
+                    Это поможет нам персонализировать ваш опыт работы с платформой
+                </div>
+                <div class="role-grid">
+                    <div class="role-card" onclick="selectRole(this, 'manager')">
+                        <i class="fas fa-user-tie"></i>
+                        <h3>Менеджер</h3>
+                        <p>Управление проектами и командами</p>
+                    </div>
+                    <div class="role-card" onclick="selectRole(this, 'developer')">
+                        <i class="fas fa-code"></i>
+                        <h3>Разработчик</h3>
+                        <p>Создание и разработка проектов</p>
+                    </div>
+                    <div class="role-card" onclick="selectRole(this, 'designer')">
+                        <i class="fas fa-palette"></i>
+                        <h3>Дизайнер</h3>
+                        <p>UI/UX дизайн и интерфейсы</p>
+                    </div>
+                    <div class="role-card" onclick="selectRole(this, 'analyst')">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Аналитик</h3>
+                        <p>Анализ данных и отчеты</p>
+                    </div>
+                    <div class="role-card" onclick="selectRole(this, 'admin')">
+                        <i class="fas fa-cog"></i>
+                        <h3>Администратор</h3>
+                        <p>Системное администрирование</p>
+                    </div>
+                    <div class="role-card" onclick="selectRole(this, 'team')">
+                        <i class="fas fa-users"></i>
+                        <h3>Команда</h3>
+                        <p>Совместная работа</p>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="prevStep()">Назад</button>
+                    <button class="btn btn-primary" onclick="nextStep()" id="nextBtn2" disabled>Далее</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Profile Setup -->
+            <div class="step" id="step3">
+                <div class="step-title">
+                    <i class="fas fa-user-cog"></i> Настройка профиля
+                </div>
+                <div class="step-description">
+                    Заполните информацию о себе для персонализации опыта
+                </div>
+                <div class="form-group">
+                    <label for="fullName">Полное имя</label>
+                    <input type="text" id="fullName" placeholder="Введите ваше имя">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="company">Компания</label>
+                    <input type="text" id="company" placeholder="Название компании">
+                </div>
+                <div class="form-group">
+                    <label for="position">Должность</label>
+                    <input type="text" id="position" placeholder="Ваша должность">
+                </div>
+                <div class="form-group">
+                    <label>Предпочтения</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="notifications" checked>
+                        <label for="notifications">Получать уведомления</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="newsletter" checked>
+                        <label for="newsletter">Подписаться на новости</label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="prevStep()">Назад</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Далее</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Project Type Selection -->
+            <div class="step" id="step4">
+                <div class="step-title">
+                    <i class="fas fa-project-diagram"></i> Выберите тип проекта
+                </div>
+                <div class="step-description">
+                    Выберите технологии, с которыми вы планируете работать
+                </div>
+                <div class="project-type-grid">
+                    <div class="project-type-card" onclick="selectProjectType(this, 'web')">
+                        <i class="fas fa-globe"></i>
+                        <h4>Web App</h4>
+                        <p>React, Vue, Angular</p>
+                    </div>
+                    <div class="project-type-card" onclick="selectProjectType(this, 'mobile')">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h4>Mobile App</h4>
+                        <p>React Native, Flutter</p>
+                    </div>
+                    <div class="project-type-card" onclick="selectProjectType(this, 'python')">
+                        <i class="fab fa-python"></i>
+                        <h4>Python</h4>
+                        <p>Django, Flask, FastAPI</p>
+                    </div>
+                    <div class="project-type-card" onclick="selectProjectType(this, 'java')">
+                        <i class="fab fa-java"></i>
+                        <h4>Java</h4>
+                        <p>Spring Boot, Maven</p>
+                    </div>
+                    <div class="project-type-card" onclick="selectProjectType(this, 'nodejs')">
+                        <i class="fab fa-node-js"></i>
+                        <h4>Node.js</h4>
+                        <p>Express, Next.js</p>
+                    </div>
+                    <div class="project-type-card" onclick="selectProjectType(this, 'dotnet')">
+                        <i class="fab fa-microsoft"></i>
+                        <h4>.NET</h4>
+                        <p>ASP.NET Core, Blazor</p>
+                    </div>
+                    <div class="project-type-card" onclick="selectProjectType(this, 'rust')">
+                        <i class="fas fa-cog"></i>
+                        <h4>Rust</h4>
+                        <p>WebAssembly, CLI</p>
+                    </div>
+                    <div class="project-type-card" onclick="selectProjectType(this, 'ai')">
+                        <i class="fas fa-brain"></i>
+                        <h4>AI/ML</h4>
+                        <p>TensorFlow, PyTorch</p>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="prevStep()">Назад</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Далее</button>
+                </div>
+            </div>
+
+            <!-- Step 5: AI Settings -->
+            <div class="step" id="step5">
+                <div class="step-title">
+                    <i class="fas fa-robot"></i> Настройка AI функций
+                </div>
+                <div class="step-description">
+                    Выберите AI модели и функции для ваших проектов
+                </div>
+                <div class="ai-settings">
+                    <h3>AI Модели</h3>
+                    <div class="ai-model">
+                        <div class="ai-model-info">
+                            <i class="fas fa-brain"></i>
+                            <div>
+                                <span>GPT-4o</span>
+                                <small>Анализ кода и генерация</small>
+                            </div>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleAI(this)"></div>
+                    </div>
+                    <div class="ai-model">
+                        <div class="ai-model-info">
+                            <i class="fas fa-file-alt"></i>
+                            <div>
+                                <span>Claude-3.5</span>
+                                <small>Документация и анализ</small>
+                            </div>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleAI(this)"></div>
+                    </div>
+                    <div class="ai-model">
+                        <div class="ai-model-info">
+                            <i class="fas fa-eye"></i>
+                            <div>
+                                <span>Gemini 2.0</span>
+                                <small>Мультимодальная обработка</small>
+                            </div>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleAI(this)"></div>
+                    </div>
+                    <div class="ai-model">
+                        <div class="ai-model-info">
+                            <i class="fas fa-microchip"></i>
+                            <div>
+                                <span>Llama 3.1</span>
+                                <small>Локальная модель</small>
+                            </div>
+                        </div>
+                        <div class="toggle-switch" onclick="toggleAI(this)"></div>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="prevStep()">Назад</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Далее</button>
+                </div>
+            </div>
+
+            <!-- Step 6: Learning -->
+            <div class="step" id="step6">
+                <div class="step-title">
+                    <i class="fas fa-graduation-cap"></i> Обучение основам
+                </div>
+                <div class="step-description">
+                    Изучите ключевые функции платформы с интерактивными уроками
+                </div>
+                <div class="learning-modules">
+                    <div class="learning-module" onclick="startLearning('project-creation')">
+                        <i class="fas fa-plus-circle"></i>
+                        <h4>Создание проекта</h4>
+                        <p>Научитесь создавать и настраивать проекты</p>
+                        <button class="play-button">Начать обучение</button>
+                    </div>
+                    <div class="learning-module" onclick="startLearning('ai-analysis')">
+                        <i class="fas fa-robot"></i>
+                        <h4>AI-анализ кода</h4>
+                        <p>Используйте AI для анализа и оптимизации кода</p>
+                        <button class="play-button">Начать обучение</button>
+                    </div>
+                    <div class="learning-module" onclick="startLearning('monitoring')">
+                        <i class="fas fa-chart-bar"></i>
+                        <h4>Мониторинг и отчеты</h4>
+                        <p>Отслеживайте прогресс и создавайте отчеты</p>
+                        <button class="play-button">Начать обучение</button>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="prevStep()">Назад</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Далее</button>
+                </div>
+            </div>
+
+            <!-- Step 7: Completion -->
+            <div class="step" id="step7">
+                <div class="step-title">
+                    <i class="fas fa-check-circle"></i> Поздравляем!
+                </div>
+                <div class="step-description">
+                    Настройка завершена! Вы готовы к работе с Universal Project Manager v3.1
+                </div>
+                <div class="completion-summary">
+                    <i class="fas fa-trophy"></i>
+                    <h3>Настройка завершена!</h3>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Профиль настроен</li>
+                        <li><i class="fas fa-check"></i> AI функции активированы</li>
+                        <li><i class="fas fa-check"></i> Обучение пройдено</li>
+                        <li><i class="fas fa-check"></i> Готов к работе!</li>
+                    </ul>
+                </div>
+                <div class="next-steps">
+                    <h4>Что дальше?</h4>
+                    <ul>
+                        <li>Создайте свой первый проект</li>
+                        <li>Изучите AI-функции</li>
+                        <li>Настройте интеграции</li>
+                        <li>Пригласите команду</li>
+                    </ul>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-success" onclick="completeOnboarding()">Начать работу</button>
+                    <button class="btn btn-secondary" onclick="prevStep()">Назад</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step-dot active" id="dot1"></div>
+            <div class="step-dot" id="dot2"></div>
+            <div class="step-dot" id="dot3"></div>
+            <div class="step-dot" id="dot4"></div>
+            <div class="step-dot" id="dot5"></div>
+            <div class="step-dot" id="dot6"></div>
+            <div class="step-dot" id="dot7"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 7;
+        let selectedRole = null;
+        let selectedProjectTypes = [];
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Update step indicators
+            for (let i = 1; i <= totalSteps; i++) {
+                const dot = document.getElementById(`dot${i}`);
+                if (i < currentStep) {
+                    dot.classList.add('completed');
+                    dot.classList.remove('active');
+                } else if (i === currentStep) {
+                    dot.classList.add('active');
+                    dot.classList.remove('completed');
+                } else {
+                    dot.classList.remove('active', 'completed');
+                }
+            }
+        }
+
+        function showStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            
+            // Show current step
+            document.getElementById(`step${step}`).classList.add('active');
+            
+            updateProgress();
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        function selectRole(card, role) {
+            // Remove selection from all cards
+            document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+            
+            // Select current card
+            card.classList.add('selected');
+            selectedRole = role;
+            
+            // Enable next button
+            document.getElementById('nextBtn2').disabled = false;
+        }
+
+        function selectProjectType(card, type) {
+            if (card.classList.contains('selected')) {
+                card.classList.remove('selected');
+                selectedProjectTypes = selectedProjectTypes.filter(t => t !== type);
+            } else {
+                card.classList.add('selected');
+                selectedProjectTypes.push(type);
+            }
+        }
+
+        function toggleAI(toggle) {
+            toggle.classList.toggle('active');
+        }
+
+        function startLearning(module) {
+            alert(`Запуск обучения: ${module}`);
+            // Here you would implement the actual learning module
+        }
+
+        function completeOnboarding() {
+            // Save onboarding data
+            const onboardingData = {
+                role: selectedRole,
+                projectTypes: selectedProjectTypes,
+                profile: {
+                    name: document.getElementById('fullName').value,
+                    email: document.getElementById('email').value,
+                    company: document.getElementById('company').value,
+                    position: document.getElementById('position').value
+                },
+                preferences: {
+                    notifications: document.getElementById('notifications').checked,
+                    newsletter: document.getElementById('newsletter').checked
+                },
+                completed: true,
+                timestamp: new Date().toISOString()
+            };
+
+            localStorage.setItem('onboardingData', JSON.stringify(onboardingData));
+            
+            // Redirect to main dashboard
+            window.location.href = 'main-gui-interface.html';
+        }
+
+        function skipOnboarding() {
+            if (confirm('Вы уверены, что хотите пропустить настройку? Вы сможете настроить профиль позже.')) {
+                window.location.href = 'main-gui-interface.html';
+            }
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>

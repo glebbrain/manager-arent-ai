@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-distribution
+  namespace: manager-agent-ai
+  labels:
+    app: task-distribution
+    version: v2.4.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: task-distribution
+  template:
+    metadata:
+      labels:
+        app: task-distribution
+        version: v2.4.0
+    spec:
+      containers:
+      - name: task-distribution
+        image: manager-agent-ai-task-distribution:latest
+        ports:
+        - containerPort: 3010
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3010"
+        - name: LOG_LEVEL
+          value: "info"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: manager-agent-ai-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: manager-agent-ai-secrets
+              key: redis-url
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3010
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3010
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: logs
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: task-distribution-service
+  namespace: manager-agent-ai
+  labels:
+    app: task-distribution
+spec:
+  selector:
+    app: task-distribution
+  ports:
+  - port: 3010
+    targetPort: 3010
+    protocol: TCP
+  type: ClusterIP

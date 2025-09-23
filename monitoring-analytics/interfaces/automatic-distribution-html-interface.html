@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatic Distribution - Universal Project Manager v3.3</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .distribution-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .distribution-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .distribution-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .distribution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .developer-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .developer-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .developer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .developer-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .developer-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-available {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-busy {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-overloaded {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .developer-skills {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .developer-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .developer-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .distribution-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .distribution-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .distribution-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .distribution-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recent-distributions {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .distributions-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .distribution-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .distribution-item:hover {
+            background: #f8f9fa;
+        }
+
+        .distribution-item:last-child {
+            border-bottom: none;
+        }
+
+        .distribution-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .distribution-icon.success {
+            background: #10b981;
+        }
+
+        .distribution-icon.warning {
+            background: #f59e0b;
+        }
+
+        .distribution-icon.error {
+            background: #ef4444;
+        }
+
+        .distribution-content {
+            flex: 1;
+        }
+
+        .distribution-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .distribution-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .distribution-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .distribution-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .distribution-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-users-cog"></i> Automatic Distribution</h1>
+            <p>Automatic task distribution among developers - Universal Project Manager v3.3</p>
+        </div>
+
+        <div class="distribution-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-users"></i></div>
+                <div class="overview-value">24</div>
+                <div class="overview-label">Active Developers</div>
+                <div class="overview-trend trend-up">+3 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-tasks"></i></div>
+                <div class="overview-value">156</div>
+                <div class="overview-label">Distributed Tasks</div>
+                <div class="overview-trend trend-up">+23 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="overview-value">94%</div>
+                <div class="overview-label">Distribution Accuracy</div>
+                <div class="overview-trend trend-up">+2% this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-clock"></i></div>
+                <div class="overview-value">2.3h</div>
+                <div class="overview-label">Avg Assignment Time</div>
+                <div class="overview-trend trend-down">-0.5h this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-balance-scale"></i></div>
+                <div class="overview-value">87%</div>
+                <div class="overview-label">Workload Balance</div>
+                <div class="overview-trend trend-up">+5% this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">96%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+3% improvement</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="distribution-section">
+                <h2><i class="fas fa-chart-area"></i> Developer Workload Distribution</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Task Distribution by Developer</div>
+                    <canvas id="distributionChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Workload Balance Over Time</div>
+                    <canvas id="workloadChart"></canvas>
+                </div>
+
+                <div class="distribution-grid">
+                    <div class="developer-card">
+                        <div class="developer-header">
+                            <div class="developer-name">Alex Johnson</div>
+                            <div class="developer-status status-available">Available</div>
+                        </div>
+                        <div class="developer-skills">Frontend, React, TypeScript, UI/UX</div>
+                        <div class="developer-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">8</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">75%</div>
+                                <div class="metric-label">Capacity</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.2</div>
+                                <div class="metric-label">Rating</div>
+                            </div>
+                        </div>
+                        <div class="developer-actions">
+                            <button class="action-btn">Assign Task</button>
+                            <button class="action-btn secondary">View Profile</button>
+                        </div>
+                    </div>
+
+                    <div class="developer-card">
+                        <div class="developer-header">
+                            <div class="developer-name">Sarah Chen</div>
+                            <div class="developer-status status-busy">Busy</div>
+                        </div>
+                        <div class="developer-skills">Backend, Node.js, Python, Database</div>
+                        <div class="developer-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">12</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">95%</div>
+                                <div class="metric-label">Capacity</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.8</div>
+                                <div class="metric-label">Rating</div>
+                            </div>
+                        </div>
+                        <div class="developer-actions">
+                            <button class="action-btn">View Tasks</button>
+                            <button class="action-btn secondary">View Profile</button>
+                        </div>
+                    </div>
+
+                    <div class="developer-card">
+                        <div class="developer-header">
+                            <div class="developer-name">Mike Rodriguez</div>
+                            <div class="developer-status status-available">Available</div>
+                        </div>
+                        <div class="developer-skills">DevOps, AWS, Docker, Kubernetes</div>
+                        <div class="developer-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">6</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">60%</div>
+                                <div class="metric-label">Capacity</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.5</div>
+                                <div class="metric-label">Rating</div>
+                            </div>
+                        </div>
+                        <div class="developer-actions">
+                            <button class="action-btn">Assign Task</button>
+                            <button class="action-btn secondary">View Profile</button>
+                        </div>
+                    </div>
+
+                    <div class="developer-card">
+                        <div class="developer-header">
+                            <div class="developer-name">Emily Davis</div>
+                            <div class="developer-status status-overloaded">Overloaded</div>
+                        </div>
+                        <div class="developer-skills">AI/ML, Python, TensorFlow, Data Science</div>
+                        <div class="developer-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">15</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">110%</div>
+                                <div class="metric-label">Capacity</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.9</div>
+                                <div class="metric-label">Rating</div>
+                            </div>
+                        </div>
+                        <div class="developer-actions">
+                            <button class="action-btn">Reassign</button>
+                            <button class="action-btn secondary">View Profile</button>
+                        </div>
+                    </div>
+
+                    <div class="developer-card">
+                        <div class="developer-header">
+                            <div class="developer-name">David Kim</div>
+                            <div class="developer-status status-available">Available</div>
+                        </div>
+                        <div class="developer-skills">Mobile, React Native, iOS, Android</div>
+                        <div class="developer-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">5</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">50%</div>
+                                <div class="metric-label">Capacity</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.3</div>
+                                <div class="metric-label">Rating</div>
+                            </div>
+                        </div>
+                        <div class="developer-actions">
+                            <button class="action-btn">Assign Task</button>
+                            <button class="action-btn secondary">View Profile</button>
+                        </div>
+                    </div>
+
+                    <div class="developer-card">
+                        <div class="developer-header">
+                            <div class="developer-name">Lisa Wang</div>
+                            <div class="developer-status status-busy">Busy</div>
+                        </div>
+                        <div class="developer-skills">QA, Testing, Automation, Selenium</div>
+                        <div class="developer-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">10</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">85%</div>
+                                <div class="metric-label">Capacity</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.6</div>
+                                <div class="metric-label">Rating</div>
+                            </div>
+                        </div>
+                        <div class="developer-actions">
+                            <button class="action-btn">View Tasks</button>
+                            <button class="action-btn secondary">View Profile</button>
+                        </div>
+                    </div>
+
+                    <div class="developer-card">
+                        <div class="developer-header">
+                            <div class="developer-name">James Wilson</div>
+                            <div class="developer-status status-available">Available</div>
+                        </div>
+                        <div class="developer-skills">Security, Penetration Testing, Compliance</div>
+                        <div class="developer-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">7</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">70%</div>
+                                <div class="metric-label">Capacity</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.7</div>
+                                <div class="metric-label">Rating</div>
+                            </div>
+                        </div>
+                        <div class="developer-actions">
+                            <button class="action-btn">Assign Task</button>
+                            <button class="action-btn secondary">View Profile</button>
+                        </div>
+                    </div>
+
+                    <div class="developer-card">
+                        <div class="developer-header">
+                            <div class="developer-name">Maria Garcia</div>
+                            <div class="developer-status status-available">Available</div>
+                        </div>
+                        <div class="developer-skills">Full Stack, JavaScript, PHP, Laravel</div>
+                        <div class="developer-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">9</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">80%</div>
+                                <div class="metric-label">Capacity</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.4</div>
+                                <div class="metric-label">Rating</div>
+                            </div>
+                        </div>
+                        <div class="developer-actions">
+                            <button class="action-btn">Assign Task</button>
+                            <button class="action-btn secondary">View Profile</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="distribution-controls">
+                <h2><i class="fas fa-cogs"></i> Distribution Controls</h2>
+                
+                <div class="distribution-actions">
+                    <button class="control-btn" onclick="autoDistribute()">
+                        <i class="fas fa-magic"></i> Auto Distribute
+                    </button>
+                    <button class="control-btn secondary" onclick="rebalanceWorkload()">
+                        <i class="fas fa-balance-scale"></i> Rebalance
+                    </button>
+                    <button class="control-btn secondary" onclick="viewAnalytics()">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </button>
+                </div>
+
+                <div class="distribution-status">
+                    <div class="status-title">Distribution Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Last Update</div>
+                        <div class="status-value">2 minutes ago</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Active Developers</div>
+                        <div class="status-value">24 developers</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Distributed Tasks</div>
+                        <div class="status-value">156 tasks</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Distribution Accuracy</div>
+                        <div class="status-value">94%</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Workload Balance</div>
+                        <div class="status-value">87%</div>
+                    </div>
+                </div>
+
+                <div class="recent-distributions">
+                    <div class="distributions-title">Recent Distributions</div>
+                    <div class="distribution-item">
+                        <div class="distribution-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="distribution-content">
+                            <div class="distribution-title">Task #1234 Assigned</div>
+                            <div class="distribution-description">Frontend bug fix assigned to Alex Johnson</div>
+                        </div>
+                        <div class="distribution-time">5 minutes ago</div>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="distribution-content">
+                            <div class="distribution-title">Task #1235 Assigned</div>
+                            <div class="distribution-description">API integration assigned to Sarah Chen</div>
+                        </div>
+                        <div class="distribution-time">12 minutes ago</div>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="distribution-content">
+                            <div class="distribution-title">Task #1236 Reassigned</div>
+                            <div class="distribution-description">Database optimization moved from Emily to Mike</div>
+                        </div>
+                        <div class="distribution-time">18 minutes ago</div>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="distribution-content">
+                            <div class="distribution-title">Task #1237 Assigned</div>
+                            <div class="distribution-description">Mobile app feature assigned to David Kim</div>
+                        </div>
+                        <div class="distribution-time">1 hour ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI Distribution Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        Task distribution improved efficiency by 25% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Emily Davis is overloaded - consider reassigning tasks
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI patterns available for better skill matching
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let distributionChart, workloadChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Distribution Chart
+            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+            distributionChart = new Chart(distributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Alex Johnson', 'Sarah Chen', 'Mike Rodriguez', 'Emily Davis', 'David Kim', 'Lisa Wang', 'James Wilson', 'Maria Garcia'],
+                    datasets: [{
+                        data: [8, 12, 6, 15, 5, 10, 7, 9],
+                        backgroundColor: ['#667eea', '#10b981', '#3b82f6', '#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Workload Chart
+            const workloadCtx = document.getElementById('workloadChart').getContext('2d');
+            workloadChart = new Chart(workloadCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(7),
+                    datasets: [{
+                        label: 'Workload Balance (%)',
+                        data: [82, 85, 88, 90, 87, 89, 87],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Distribution Accuracy (%)',
+                        data: [89, 91, 93, 94, 92, 95, 94],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels(days) {
+            const labels = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function autoDistribute() {
+            alert('Starting automatic task distribution...');
+        }
+
+        function rebalanceWorkload() {
+            alert('Rebalancing developer workload...');
+        }
+
+        function viewAnalytics() {
+            alert('Opening distribution analytics...');
+        }
+    </script>
+</body>
+</html>

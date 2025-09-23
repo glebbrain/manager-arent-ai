@@ -1,0 +1,69 @@
+# API Gateway Dockerfile - Multi-stage build for optimization
+FROM node:18-alpine AS base
+
+# Install system dependencies
+RUN apk add --no-cache \
+    curl \
+    dumb-init \
+    && rm -rf /var/cache/apk/*
+
+# Set working directory
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Dependencies stage
+FROM base AS dependencies
+
+# Copy package files
+COPY api-gateway/package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Build stage
+FROM base AS build
+
+# Copy package files
+COPY api-gateway/package*.json ./
+
+# Install all dependencies (including dev)
+RUN npm ci
+
+# Copy source code
+COPY api-gateway/ ./
+
+# Create logs directory
+RUN mkdir -p logs && chown -R nodejs:nodejs logs
+
+# Production stage
+FROM base AS production
+
+# Copy dependencies from dependencies stage
+COPY --from=dependencies --chown=nodejs:nodejs /app/node_modules ./node_modules
+
+# Copy source code
+COPY --from=build --chown=nodejs:nodejs /app/server.js ./
+COPY --from=build --chown=nodejs:nodejs /app/config/ ./config/
+COPY --from=build --chown=nodejs:nodejs /app/logs/ ./logs/
+
+# Create logs directory with proper permissions
+RUN mkdir -p logs && chown -R nodejs:nodejs /app
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+
+# Use dumb-init for proper signal handling
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application
+CMD ["node", "server.js"]

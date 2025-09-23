@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatic Reports - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .reports-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-status {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .reports-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .reports-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .report-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .report-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .report-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .report-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .schedule-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .schedule-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .schedule-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .schedule-item:hover {
+            background: #f8f9fa;
+        }
+
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-info {
+            flex: 1;
+        }
+
+        .schedule-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .schedule-time {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .schedule-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .chart-container {
+            height: 200px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .report-templates {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .templates-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .template-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .template-item:hover {
+            background: #f8f9fa;
+        }
+
+        .template-item:last-child {
+            border-bottom: none;
+        }
+
+        .template-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .template-frequency {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .template-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .template-btn {
+            background: #f3f4f6;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .template-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .template-btn.primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .template-btn.primary:hover {
+            background: #5a67d8;
+        }
+
+        .insights-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .reports-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-file-alt"></i> Automatic Reports</h1>
+            <p>Automated report generation and scheduling system for Universal Project Manager v3.2</p>
+        </div>
+
+        <div class="reports-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-calendar-check"></i></div>
+                <div class="overview-value">24</div>
+                <div class="overview-label">Scheduled Reports</div>
+                <div class="overview-status status-active">Active</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-file-pdf"></i></div>
+                <div class="overview-value">156</div>
+                <div class="overview-label">Reports Generated</div>
+                <div class="overview-status status-completed">This Month</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-clock"></i></div>
+                <div class="overview-value">2.3h</div>
+                <div class="overview-label">Avg Generation Time</div>
+                <div class="overview-status status-active">Optimized</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-users"></i></div>
+                <div class="overview-value">89%</div>
+                <div class="overview-label">User Satisfaction</div>
+                <div class="overview-status status-completed">High</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="overview-value">12</div>
+                <div class="overview-label">Report Types</div>
+                <div class="overview-status status-active">Available</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">98.5%</div>
+                <div class="overview-label">Auto Success Rate</div>
+                <div class="overview-status status-completed">Excellent</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="reports-section">
+                <h2><i class="fas fa-chart-bar"></i> Report Generation</h2>
+                
+                <div class="controls">
+                    <button class="control-btn" onclick="generateReport()">
+                        <i class="fas fa-plus"></i> Generate New Report
+                    </button>
+                    <button class="control-btn secondary" onclick="scheduleReport()">
+                        <i class="fas fa-calendar-plus"></i> Schedule Report
+                    </button>
+                    <button class="control-btn secondary" onclick="exportReports()">
+                        <i class="fas fa-download"></i> Export All
+                    </button>
+                    <button class="control-btn secondary" onclick="configureTemplates()">
+                        <i class="fas fa-cog"></i> Configure Templates
+                    </button>
+                </div>
+
+                <div class="reports-grid">
+                    <div class="report-card">
+                        <div class="report-header">
+                            <div class="report-title">Daily Performance Report</div>
+                            <div class="report-status status-completed">Generated</div>
+                        </div>
+                        <div class="report-description">Comprehensive daily performance metrics and analytics</div>
+                        <div class="report-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">2.3h</div>
+                                <div class="metric-label">Generation Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">45</div>
+                                <div class="metric-label">Pages</div>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Download</button>
+                            <button class="action-btn secondary">Share</button>
+                        </div>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-header">
+                            <div class="report-title">Weekly Team Analysis</div>
+                            <div class="report-status status-pending">Generating</div>
+                        </div>
+                        <div class="report-description">Team performance analysis and productivity metrics</div>
+                        <div class="report-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">1.8h</div>
+                                <div class="metric-label">Generation Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">32</div>
+                                <div class="metric-label">Pages</div>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button class="action-btn">View Progress</button>
+                            <button class="action-btn secondary">Cancel</button>
+                        </div>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-header">
+                            <div class="report-title">Monthly Project Summary</div>
+                            <div class="report-status status-completed">Generated</div>
+                        </div>
+                        <div class="report-description">Monthly project progress and milestone achievements</div>
+                        <div class="report-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">3.2h</div>
+                                <div class="metric-label">Generation Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">67</div>
+                                <div class="metric-label">Pages</div>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Download</button>
+                            <button class="action-btn secondary">Share</button>
+                        </div>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-header">
+                            <div class="report-title">Code Quality Analysis</div>
+                            <div class="report-status status-completed">Generated</div>
+                        </div>
+                        <div class="report-description">Detailed code quality metrics and improvement recommendations</div>
+                        <div class="report-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">1.5h</div>
+                                <div class="metric-label">Generation Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">28</div>
+                                <div class="metric-label">Pages</div>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Download</button>
+                            <button class="action-btn secondary">Share</button>
+                        </div>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-header">
+                            <div class="report-title">Security Audit Report</div>
+                            <div class="report-status status-completed">Generated</div>
+                        </div>
+                        <div class="report-description">Security vulnerabilities and compliance status</div>
+                        <div class="report-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">2.1h</div>
+                                <div class="metric-label">Generation Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">41</div>
+                                <div class="metric-label">Pages</div>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Download</button>
+                            <button class="action-btn secondary">Share</button>
+                        </div>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-header">
+                            <div class="report-title">Financial Analysis</div>
+                            <div class="report-status status-pending">Scheduled</div>
+                        </div>
+                        <div class="report-description">Project costs, budget analysis, and ROI metrics</div>
+                        <div class="report-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">2.8h</div>
+                                <div class="metric-label">Est. Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">52</div>
+                                <div class="metric-label">Pages</div>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button class="action-btn">View Schedule</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Report Generation Trends</div>
+                    <canvas id="reportChart"></canvas>
+                </div>
+            </div>
+
+            <div class="schedule-section">
+                <h2><i class="fas fa-calendar-alt"></i> Report Schedule</h2>
+                
+                <div class="schedule-list">
+                    <div class="schedule-item">
+                        <div class="schedule-info">
+                            <div class="schedule-name">Daily Performance Report</div>
+                            <div class="schedule-time">Every day at 6:00 AM</div>
+                        </div>
+                        <div class="schedule-status status-active">Active</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-info">
+                            <div class="schedule-name">Weekly Team Analysis</div>
+                            <div class="schedule-time">Every Monday at 9:00 AM</div>
+                        </div>
+                        <div class="schedule-status status-active">Active</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-info">
+                            <div class="schedule-name">Monthly Project Summary</div>
+                            <div class="schedule-time">1st of every month at 8:00 AM</div>
+                        </div>
+                        <div class="schedule-status status-active">Active</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-info">
+                            <div class="schedule-name">Code Quality Analysis</div>
+                            <div class="schedule-time">Every Friday at 5:00 PM</div>
+                        </div>
+                        <div class="schedule-status status-active">Active</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-info">
+                            <div class="schedule-name">Security Audit Report</div>
+                            <div class="schedule-time">Every 2 weeks on Tuesday</div>
+                        </div>
+                        <div class="schedule-status status-active">Active</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-info">
+                            <div class="schedule-name">Financial Analysis</div>
+                            <div class="schedule-time">Last day of month at 10:00 AM</div>
+                        </div>
+                        <div class="schedule-status status-pending">Pending</div>
+                    </div>
+                </div>
+
+                <div class="report-templates">
+                    <div class="templates-title">Report Templates</div>
+                    <div class="template-item">
+                        <div class="template-name">Performance Dashboard</div>
+                        <div class="template-frequency">Daily</div>
+                        <div class="template-actions">
+                            <button class="template-btn primary">Use</button>
+                            <button class="template-btn">Edit</button>
+                        </div>
+                    </div>
+                    <div class="template-item">
+                        <div class="template-name">Team Productivity</div>
+                        <div class="template-frequency">Weekly</div>
+                        <div class="template-actions">
+                            <button class="template-btn primary">Use</button>
+                            <button class="template-btn">Edit</button>
+                        </div>
+                    </div>
+                    <div class="template-item">
+                        <div class="template-name">Project Status</div>
+                        <div class="template-frequency">Monthly</div>
+                        <div class="template-actions">
+                            <button class="template-btn primary">Use</button>
+                            <button class="template-btn">Edit</button>
+                        </div>
+                    </div>
+                    <div class="template-item">
+                        <div class="template-name">Code Quality</div>
+                        <div class="template-frequency">Weekly</div>
+                        <div class="template-actions">
+                            <button class="template-btn primary">Use</button>
+                            <button class="template-btn">Edit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insights-section">
+                    <div class="insights-title">AI Report Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        Report generation time improved by 23% with AI optimization
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Weekly team analysis report is taking longer than expected
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New template available for quarterly business reviews
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeReportChart();
+        });
+
+        function initializeReportChart() {
+            const ctx = document.getElementById('reportChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Reports Generated',
+                        data: [120, 135, 142, 148, 156, 162],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Generation Time (hours)',
+                        data: [45, 48, 52, 49, 47, 44],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateReport() {
+            alert('Opening report generation wizard...');
+        }
+
+        function scheduleReport() {
+            alert('Opening report scheduling interface...');
+        }
+
+        function exportReports() {
+            alert('Exporting all reports...');
+        }
+
+        function configureTemplates() {
+            alert('Opening template configuration...');
+        }
+    </script>
+</body>
+</html>

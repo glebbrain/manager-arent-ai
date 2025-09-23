@@ -1,0 +1,94 @@
+{
+  "TeamActivity": {
+    "CommitFrequency": "Daily",
+    "CodeReviewRate": 90,
+    "CollaborationScore": 85,
+    "ActiveContributors": 1
+  },
+  "QualityTrends": {
+    "TestCoverage": 2.78,
+    "CodeQuality": 85,
+    "QualityTrend": "Improving",
+    "DocumentationCoverage": 13.17,
+    "TechnicalDebt": 2
+  },
+  "PerformanceTrends": {
+    "ResponseTime": {
+      "Change": -10,
+      "Current": 150,
+      "Trend": "Improving"
+    },
+    "CPUUsage": {
+      "Change": -5,
+      "Current": 45,
+      "Trend": "Improving"
+    },
+    "Throughput": {
+      "Change": 50,
+      "Current": 800,
+      "Trend": "Improving"
+    },
+    "MemoryUsage": {
+      "Change": 0,
+      "Current": 200,
+      "Trend": "Stable"
+    }
+  },
+  "CodeActivity": {
+    "PeakActivity": "06.09.2025 0:00:00",
+    "AverageFilesPerDay": 1921.5,
+    "DailyActivity": [
+      {
+        "Date": "01.09.2025 0:00:00",
+        "FilesModified": 33,
+        "TotalSize": 268024.0
+      },
+      {
+        "Date": "02.09.2025 0:00:00",
+        "FilesModified": 21,
+        "TotalSize": 113202.0
+      },
+      {
+        "Date": "03.09.2025 0:00:00",
+        "FilesModified": 56,
+        "TotalSize": 375166.0
+      },
+      {
+        "Date": "04.09.2025 0:00:00",
+        "FilesModified": 102,
+        "TotalSize": 1933735.0
+      },
+      {
+        "Date": "05.09.2025 0:00:00",
+        "FilesModified": 310,
+        "TotalSize": 5353550.0
+      },
+      {
+        "Date": "06.09.2025 0:00:00",
+        "FilesModified": 14833,
+        "TotalSize": 65177789.0
+      },
+      {
+        "Date": "07.09.2025 0:00:00",
+        "FilesModified": 16,
+        "TotalSize": 247590.0
+      },
+      {
+        "Date": "31.08.2025 0:00:00",
+        "FilesModified": 1,
+        "TotalSize": 19764.0
+      }
+    ],
+    "ActivityGrowth": -96.97
+  },
+  "TechnologyUsage": {
+    "TypeScript": 1555,
+    "CSS": 17,
+    "HTML": 106,
+    "PowerShell": 441,
+    "JavaScript": 13375,
+    "YAML": 229,
+    "JSON": 1777,
+    "Python": 1
+  }
+}

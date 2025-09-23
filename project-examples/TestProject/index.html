@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Project - DEV->PROM->PROD</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .status {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        .env {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            min-width: 200px;
+        }
+        .env h3 {
+            margin-top: 0;
+            color: #ffd700;
+        }
+        .info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .timestamp {
+            text-align: center;
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Test Project</h1>
+        <p style="text-align: center; font-size: 1.2em;">Система DEV->PROM->PROD Deployment</p>
+        
+        <div class="status">
+            <div class="env">
+                <h3>🔧 DEV</h3>
+                <p>F:\ProjectsAI</p>
+                <p>Разработка</p>
+            </div>
+            <div class="env">
+                <h3>🧪 PROM</h3>
+                <p>G:\OSPanel\home</p>
+                <p>Тестирование</p>
+            </div>
+            <div class="env">
+                <h3>🌐 PROD</h3>
+                <p>37.140.195.19</p>
+                <p>Продакшн</p>
+            </div>
+        </div>
+        
+        <div class="info">
+            <h3>📋 Информация о проекте</h3>
+            <p><strong>Название:</strong> TestProject</p>
+            <p><strong>Описание:</strong> Тестовый проект для демонстрации системы деплоя</p>
+            <p><strong>Версия:</strong> 1.0.0</p>
+            <p><strong>Статус:</strong> Готов к тестированию</p>
+        </div>
+        
+        <div class="info">
+            <h3>🔄 Workflow</h3>
+            <ol>
+                <li><strong>DEV:</strong> Разработка в F:\ProjectsAI\TestProject</li>
+                <li><strong>PROM:</strong> Тестирование в G:\OSPanel\home\TestProject</li>
+                <li><strong>PROD:</strong> Развертывание на u0488409@37.140.195.19</li>
+            </ol>
+        </div>
+        
+        <div class="timestamp">
+            Создано: <span id="timestamp"></span>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('timestamp').textContent = new Date().toLocaleString('ru-RU');
+    </script>
+</body>
+</html>

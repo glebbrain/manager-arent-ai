@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  api-gateway-enhanced:
+    build: .
+    container_name: api-gateway-enhanced-v2.9
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - CLUSTER_MODE=true
+      - LOG_LEVEL=info
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - JWT_REFRESH_SECRET=your-super-secret-refresh-key-change-in-production
+      - RATE_LIMIT_WINDOW=900000
+      - RATE_LIMIT_MAX=1000
+    volumes:
+      - ./logs:/app/logs
+      - ./config:/app/config
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - redis
+    networks:
+      - gateway-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: gateway-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - gateway-network
+
+  # Example microservices (optional)
+  project-manager-1:
+    image: nginx:alpine
+    container_name: project-manager-1
+    ports:
+      - "3001:80"
+    volumes:
+      - ./test-services/project-manager-1.html:/usr/share/nginx/html/index.html
+    restart: unless-stopped
+    networks:
+      - gateway-network
+
+  project-manager-2:
+    image: nginx:alpine
+    container_name: project-manager-2
+    ports:
+      - "3002:80"
+    volumes:
+      - ./test-services/project-manager-2.html:/usr/share/nginx/html/index.html
+    restart: unless-stopped
+    networks:
+      - gateway-network
+
+volumes:
+  redis-data:
+
+networks:
+  gateway-network:
+    driver: bridge

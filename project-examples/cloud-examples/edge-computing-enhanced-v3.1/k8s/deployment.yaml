@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge-computing-enhanced
+  namespace: edge-computing
+  labels:
+    app: edge-computing-enhanced
+    version: "3.1.0"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: edge-computing-enhanced
+  template:
+    metadata:
+      labels:
+        app: edge-computing-enhanced
+        version: "3.1.0"
+    spec:
+      containers:
+      - name: edge-computing-enhanced
+        image: edge-computing-enhanced-v3.1:latest
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: edge-computing-config
+              key: NODE_ENV
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: edge-computing-config
+              key: LOG_LEVEL
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: edge-computing-config
+              key: PORT
+        - name: HOST
+          valueFrom:
+            configMapKeyRef:
+              name: edge-computing-config
+              key: HOST
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: models
+          mountPath: /app/models
+        - name: data
+          mountPath: /app/data
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: models
+        emptyDir: {}
+      - name: data
+        emptyDir: {}
+      restartPolicy: Always

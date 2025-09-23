@@ -1,0 +1,89 @@
+# Cursor AI Ignore File
+# Files and directories that Cursor should not process or modify
+
+# Build artifacts
+build/
+dist/
+obj/
+bin/
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.lib
+
+# Dependencies
+node_modules/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+temp/
+logs/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Large data files
+*.dat
+*.bin
+*.raw
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Compressed files
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+# Documentation that shouldn't be auto-edited
+CHANGELOG.md
+LICENSE
+CONTRIBUTING.md
+
+# Specific project exclusions
+qdrant_storage/
+data/asm_raw/
+data/asm_norm/
+data/benchmarks/
+data/test_reports/
+data/validation_reports/
+
+# Keep these files for Cursor to process
+!**/*.md
+!**/*.ps1
+!**/cursor.json
+!**/.cursorrules
+!**/.cursorignore

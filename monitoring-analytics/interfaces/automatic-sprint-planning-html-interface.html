@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatic Sprint Planning - Universal Project Manager v3.3</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .sprint-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .sprint-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .sprint-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .sprint-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .sprint-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .sprint-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .sprint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .sprint-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .sprint-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-planning {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-completed {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .sprint-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .sprint-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .sprint-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .sprint-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .sprint-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .sprint-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .sprint-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recent-sprints {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sprints-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .sprint-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .sprint-item:hover {
+            background: #f8f9fa;
+        }
+
+        .sprint-item:last-child {
+            border-bottom: none;
+        }
+
+        .sprint-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .sprint-icon.planning {
+            background: #3b82f6;
+        }
+
+        .sprint-icon.active {
+            background: #10b981;
+        }
+
+        .sprint-icon.completed {
+            background: #6b7280;
+        }
+
+        .sprint-content {
+            flex: 1;
+        }
+
+        .sprint-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .sprint-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .sprint-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sprint-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .sprint-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-calendar-alt"></i> Automatic Sprint Planning</h1>
+            <p>AI sprint planning - Universal Project Manager v3.3</p>
+        </div>
+
+        <div class="sprint-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-calendar-week"></i></div>
+                <div class="overview-value">12</div>
+                <div class="overview-label">Active Sprints</div>
+                <div class="overview-trend trend-up">+2 this month</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-tasks"></i></div>
+                <div class="overview-value">156</div>
+                <div class="overview-label">Sprint Tasks</div>
+                <div class="overview-trend trend-up">+23 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="overview-value">89%</div>
+                <div class="overview-label">Sprint Success Rate</div>
+                <div class="overview-trend trend-up">+5% this month</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-clock"></i></div>
+                <div class="overview-value">2.1d</div>
+                <div class="overview-label">Avg Sprint Duration</div>
+                <div class="overview-trend trend-down">-0.3d this month</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-balance-scale"></i></div>
+                <div class="overview-value">87%</div>
+                <div class="overview-label">Workload Balance</div>
+                <div class="overview-trend trend-up">+3% this month</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">94%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+2% improvement</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sprint-section">
+                <h2><i class="fas fa-chart-area"></i> Sprint Planning Analytics</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Sprint Velocity Over Time</div>
+                    <canvas id="velocityChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Sprint Status Distribution</div>
+                    <canvas id="statusChart"></canvas>
+                </div>
+
+                <div class="sprint-grid">
+                    <div class="sprint-card">
+                        <div class="sprint-header">
+                            <div class="sprint-title">Sprint 23 - Frontend Features</div>
+                            <div class="sprint-status status-active">Active</div>
+                        </div>
+                        <div class="sprint-description">Implement new user interface components and features</div>
+                        <div class="sprint-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">8</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">75%</div>
+                                <div class="metric-label">Progress</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2d</div>
+                                <div class="metric-label">Remaining</div>
+                            </div>
+                        </div>
+                        <div class="sprint-actions">
+                            <button class="action-btn">Update</button>
+                            <button class="action-btn secondary">View Details</button>
+                        </div>
+                    </div>
+
+                    <div class="sprint-card">
+                        <div class="sprint-header">
+                            <div class="sprint-title">Sprint 24 - Backend API</div>
+                            <div class="sprint-status status-planning">Planning</div>
+                        </div>
+                        <div class="sprint-description">Develop REST API endpoints and database integration</div>
+                        <div class="sprint-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">12</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0%</div>
+                                <div class="metric-label">Progress</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">5d</div>
+                                <div class="metric-label">Duration</div>
+                            </div>
+                        </div>
+                        <div class="sprint-actions">
+                            <button class="action-btn">Start</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="sprint-card">
+                        <div class="sprint-header">
+                            <div class="sprint-title">Sprint 22 - Testing Suite</div>
+                            <div class="sprint-status status-completed">Completed</div>
+                        </div>
+                        <div class="sprint-description">Implement comprehensive testing framework</div>
+                        <div class="sprint-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">15</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Progress</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">3d</div>
+                                <div class="metric-label">Duration</div>
+                            </div>
+                        </div>
+                        <div class="sprint-actions">
+                            <button class="action-btn">Review</button>
+                            <button class="action-btn secondary">View Report</button>
+                        </div>
+                    </div>
+
+                    <div class="sprint-card">
+                        <div class="sprint-header">
+                            <div class="sprint-title">Sprint 25 - Performance</div>
+                            <div class="sprint-status status-planning">Planning</div>
+                        </div>
+                        <div class="sprint-description">Optimize application performance and scalability</div>
+                        <div class="sprint-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">10</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0%</div>
+                                <div class="metric-label">Progress</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4d</div>
+                                <div class="metric-label">Duration</div>
+                            </div>
+                        </div>
+                        <div class="sprint-actions">
+                            <button class="action-btn">Start</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="sprint-card">
+                        <div class="sprint-header">
+                            <div class="sprint-title">Sprint 26 - Security</div>
+                            <div class="sprint-status status-planning">Planning</div>
+                        </div>
+                        <div class="sprint-description">Implement security enhancements and audit</div>
+                        <div class="sprint-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">8</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0%</div>
+                                <div class="metric-label">Progress</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">3d</div>
+                                <div class="metric-label">Duration</div>
+                            </div>
+                        </div>
+                        <div class="sprint-actions">
+                            <button class="action-btn">Start</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="sprint-card">
+                        <div class="sprint-header">
+                            <div class="sprint-title">Sprint 27 - Documentation</div>
+                            <div class="sprint-status status-planning">Planning</div>
+                        </div>
+                        <div class="sprint-description">Update project documentation and API docs</div>
+                        <div class="sprint-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">6</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0%</div>
+                                <div class="metric-label">Progress</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2d</div>
+                                <div class="metric-label">Duration</div>
+                            </div>
+                        </div>
+                        <div class="sprint-actions">
+                            <button class="action-btn">Start</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="sprint-card">
+                        <div class="sprint-header">
+                            <div class="sprint-title">Sprint 28 - Mobile App</div>
+                            <div class="sprint-status status-planning">Planning</div>
+                        </div>
+                        <div class="sprint-description">Develop mobile application features</div>
+                        <div class="sprint-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">14</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0%</div>
+                                <div class="metric-label">Progress</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">6d</div>
+                                <div class="metric-label">Duration</div>
+                            </div>
+                        </div>
+                        <div class="sprint-actions">
+                            <button class="action-btn">Start</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="sprint-card">
+                        <div class="sprint-header">
+                            <div class="sprint-title">Sprint 29 - AI Features</div>
+                            <div class="sprint-status status-planning">Planning</div>
+                        </div>
+                        <div class="sprint-description">Integrate AI-powered features and automation</div>
+                        <div class="sprint-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">11</div>
+                                <div class="metric-label">Tasks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0%</div>
+                                <div class="metric-label">Progress</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">5d</div>
+                                <div class="metric-label">Duration</div>
+                            </div>
+                        </div>
+                        <div class="sprint-actions">
+                            <button class="action-btn">Start</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sprint-controls">
+                <h2><i class="fas fa-cogs"></i> Sprint Controls</h2>
+                
+                <div class="sprint-actions">
+                    <button class="control-btn" onclick="createSprint()">
+                        <i class="fas fa-plus"></i> Create Sprint
+                    </button>
+                    <button class="control-btn secondary" onclick="autoPlan()">
+                        <i class="fas fa-magic"></i> Auto Plan
+                    </button>
+                    <button class="control-btn secondary" onclick="viewAnalytics()">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </button>
+                </div>
+
+                <div class="sprint-status">
+                    <div class="status-title">Sprint Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Last Update</div>
+                        <div class="status-value">5 minutes ago</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Active Sprints</div>
+                        <div class="status-value">12 sprints</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Sprint Tasks</div>
+                        <div class="status-value">156 tasks</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Success Rate</div>
+                        <div class="status-value">89%</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Workload Balance</div>
+                        <div class="status-value">87%</div>
+                    </div>
+                </div>
+
+                <div class="recent-sprints">
+                    <div class="sprints-title">Recent Sprints</div>
+                    <div class="sprint-item">
+                        <div class="sprint-icon active">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="sprint-content">
+                            <div class="sprint-title">Sprint 23 - Frontend Features</div>
+                            <div class="sprint-description">8 tasks, 75% progress, 2 days remaining</div>
+                        </div>
+                        <div class="sprint-time">2 hours ago</div>
+                    </div>
+                    <div class="sprint-item">
+                        <div class="sprint-icon planning">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div class="sprint-content">
+                            <div class="sprint-title">Sprint 24 - Backend API</div>
+                            <div class="sprint-description">12 tasks, 0% progress, 5 days duration</div>
+                        </div>
+                        <div class="sprint-time">1 day ago</div>
+                    </div>
+                    <div class="sprint-item">
+                        <div class="sprint-icon completed">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="sprint-content">
+                            <div class="sprint-title">Sprint 22 - Testing Suite</div>
+                            <div class="sprint-description">15 tasks, 100% progress, 3 days duration</div>
+                        </div>
+                        <div class="sprint-time">3 days ago</div>
+                    </div>
+                    <div class="sprint-item">
+                        <div class="sprint-icon planning">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div class="sprint-content">
+                            <div class="sprint-title">Sprint 25 - Performance</div>
+                            <div class="sprint-description">10 tasks, 0% progress, 4 days duration</div>
+                        </div>
+                        <div class="sprint-time">1 week ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI Sprint Planning Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        Sprint planning accuracy improved by 18% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Some sprints need workload rebalancing
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI patterns available for better sprint planning
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let velocityChart, statusChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Velocity Chart
+            const velocityCtx = document.getElementById('velocityChart').getContext('2d');
+            velocityChart = new Chart(velocityCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(7),
+                    datasets: [{
+                        label: 'Sprint Velocity (Story Points)',
+                        data: [45, 52, 48, 55, 58, 62, 59],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Completed Tasks',
+                        data: [12, 15, 13, 18, 16, 20, 17],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Status Chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            statusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Planning', 'Active', 'Completed', 'On Hold'],
+                    datasets: [{
+                        data: [6, 1, 3, 2],
+                        backgroundColor: ['#3b82f6', '#10b981', '#6b7280', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels(days) {
+            const labels = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function createSprint() {
+            alert('Creating new sprint...');
+        }
+
+        function autoPlan() {
+            alert('Running AI sprint planning...');
+        }
+
+        function viewAnalytics() {
+            alert('Opening sprint analytics...');
+        }
+    </script>
+</body>
+</html>

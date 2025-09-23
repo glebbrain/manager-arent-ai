@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .profile { display: flex; height: 100vh; }
+        .sidebar { width: 280px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .profile-header { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .profile-info { display: flex; align-items: center; gap: 2rem; }
+        .avatar { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white; position: relative; }
+        .avatar-edit { position: absolute; bottom: 0; right: 0; width: 36px; height: 36px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 3px solid white; }
+        .profile-details { flex: 1; }
+        .profile-name { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+        .profile-title { color: #6b7280; font-size: 1.1rem; margin-bottom: 1rem; }
+        .profile-stats { display: flex; gap: 2rem; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: #1f2937; }
+        .stat-label { color: #6b7280; font-size: 0.9rem; }
+        .profile-actions { display: flex; gap: 1rem; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-outline { background: transparent; border: 1px solid #d1d5db; color: #374151; }
+        .btn-outline:hover { background: #f3f4f6; }
+        .profile-sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
+        .section { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .section-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem; display: flex; align-items: center; }
+        .section-title i { margin-right: 0.5rem; color: #2563eb; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; transition: border-color 0.3s ease; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #2563eb; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .checkbox-group { display: flex; align-items: center; margin-bottom: 1rem; }
+        .checkbox-group input[type="checkbox"] { width: auto; margin-right: 0.75rem; }
+        .checkbox-group label { margin-bottom: 0; cursor: pointer; }
+        .skills-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .skill-tag { background: #eff6ff; color: #1e40af; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500; }
+        .skill-tag:hover { background: #dbeafe; }
+        .skill-tag .remove { margin-left: 0.5rem; cursor: pointer; }
+        .add-skill { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .add-skill input { flex: 1; }
+        .projects-list { display: flex; flex-direction: column; gap: 1rem; }
+        .project-item { display: flex; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 8px; transition: background 0.3s ease; }
+        .project-item:hover { background: #f3f4f6; }
+        .project-icon { width: 40px; height: 40px; border-radius: 8px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; margin-right: 1rem; }
+        .project-info { flex: 1; }
+        .project-name { font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; }
+        .project-role { color: #6b7280; font-size: 0.9rem; }
+        .project-status { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 500; }
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-completed { background: #dbeafe; color: #1e40af; }
+        .status-archived { background: #f3f4f6; color: #6b7280; }
+        .activity-list { display: flex; flex-direction: column; gap: 1rem; }
+        .activity-item { display: flex; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 8px; }
+        .activity-icon { width: 40px; height: 40px; border-radius: 50%; background: #10b981; color: white; display: flex; align-items: center; justify-content: center; margin-right: 1rem; }
+        .activity-content { flex: 1; }
+        .activity-title { font-weight: 500; color: #1f2937; margin-bottom: 0.25rem; }
+        .activity-description { color: #6b7280; font-size: 0.9rem; }
+        .activity-time { color: #6b7280; font-size: 0.8rem; }
+        .achievements-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .achievement-item { text-align: center; padding: 1.5rem; background: #f8fafc; border-radius: 8px; }
+        .achievement-icon { width: 60px; height: 60px; border-radius: 50%; background: #fbbf24; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem; }
+        .achievement-title { font-weight: 600; color: #1f2937; margin-bottom: 0.5rem; }
+        .achievement-description { color: #6b7280; font-size: 0.9rem; }
+        .nav { padding: 1rem; }
+        .nav-item { display: block; padding: 0.75rem; color: #6b7280; text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .nav-item:hover, .nav-item.active { background: #eff6ff; color: #2563eb; }
+        .security-settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+        .security-item { background: #f8fafc; border-radius: 8px; padding: 1.5rem; }
+        .security-item h4 { font-weight: 600; color: #1f2937; margin-bottom: 0.5rem; }
+        .security-item p { color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem; }
+        .toggle-switch { position: relative; width: 50px; height: 24px; background: #e5e7eb; border-radius: 12px; cursor: pointer; transition: background 0.3s ease; }
+        .toggle-switch.active { background: #10b981; }
+        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: transform 0.3s ease; }
+        .toggle-switch.active::after { transform: translateX(26px); }
+        .danger-zone { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1.5rem; }
+        .danger-zone h4 { color: #dc2626; margin-bottom: 0.5rem; }
+        .danger-zone p { color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem; }
+        @media (max-width: 768px) {
+            .profile { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .profile-info { flex-direction: column; text-align: center; }
+            .profile-sections { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .security-settings { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile">
+        <div class="sidebar">
+            <div class="nav">
+                <a href="#" class="nav-item active"><i class="fas fa-user"></i> Профиль</a>
+                <a href="#" class="nav-item"><i class="fas fa-cog"></i> Настройки</a>
+                <a href="#" class="nav-item"><i class="fas fa-project-diagram"></i> Проекты</a>
+                <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Аналитика</a>
+                <a href="#" class="nav-item"><i class="fas fa-shield-alt"></i> Безопасность</a>
+                <a href="#" class="nav-item"><i class="fas fa-bell"></i> Уведомления</a>
+                <a href="#" class="nav-item"><i class="fas fa-cog"></i> Система</a>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-user"></i> Профиль пользователя</h1>
+                <div>
+                    <button class="btn btn-outline" onclick="editProfile()">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </button>
+                    <button class="btn btn-primary" onclick="saveProfile()">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="profile-header">
+                    <div class="profile-info">
+                        <div class="avatar">
+                            ИП
+                            <div class="avatar-edit" onclick="changeAvatar()">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                        </div>
+                        <div class="profile-details">
+                            <div class="profile-name">Иван Петров</div>
+                            <div class="profile-title">Senior Developer в Tech Corp</div>
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">8</div>
+                                    <div class="stat-label">Проектов</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">156</div>
+                                    <div class="stat-label">Задач выполнено</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">4.8</div>
+                                    <div class="stat-label">Рейтинг</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="btn btn-primary" onclick="shareProfile()">
+                                <i class="fas fa-share"></i> Поделиться
+                            </button>
+                            <button class="btn btn-secondary" onclick="exportProfile()">
+                                <i class="fas fa-download"></i> Экспорт
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-sections">
+                    <!-- Personal Information -->
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-user"></i> Личная информация</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">Имя</label>
+                                <input type="text" id="firstName" value="Иван">
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Фамилия</label>
+                                <input type="text" id="lastName" value="Петров">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" value="ivan.petrov@techcorp.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Телефон</label>
+                            <input type="tel" id="phone" value="+7 (999) 123-45-67">
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Местоположение</label>
+                            <input type="text" id="location" value="Москва, Россия">
+                        </div>
+                        <div class="form-group">
+                            <label for="bio">О себе</label>
+                            <textarea id="bio" placeholder="Расскажите о себе...">Опытный разработчик с 5+ летним стажем в веб-разработке. Специализируюсь на React, Node.js и современных технологиях. Увлекаюсь созданием масштабируемых приложений и изучением новых технологий.</textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Professional Information -->
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-briefcase"></i> Профессиональная информация</div>
+                        <div class="form-group">
+                            <label for="company">Компания</label>
+                            <input type="text" id="company" value="Tech Corp">
+                        </div>
+                        <div class="form-group">
+                            <label for="position">Должность</label>
+                            <input type="text" id="position" value="Senior Developer">
+                        </div>
+                        <div class="form-group">
+                            <label for="experience">Опыт работы</label>
+                            <select id="experience">
+                                <option value="1-2">1-2 года</option>
+                                <option value="3-5" selected>3-5 лет</option>
+                                <option value="6-10">6-10 лет</option>
+                                <option value="10+">10+ лет</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="specialization">Специализация</label>
+                            <input type="text" id="specialization" value="Frontend Development, React, TypeScript">
+                        </div>
+                        <div class="form-group">
+                            <label>Навыки</label>
+                            <div class="skills-list">
+                                <span class="skill-tag">React <span class="remove" onclick="removeSkill(this)">×</span></span>
+                                <span class="skill-tag">TypeScript <span class="remove" onclick="removeSkill(this)">×</span></span>
+                                <span class="skill-tag">Node.js <span class="remove" onclick="removeSkill(this)">×</span></span>
+                                <span class="skill-tag">MongoDB <span class="remove" onclick="removeSkill(this)">×</span></span>
+                                <span class="skill-tag">Docker <span class="remove" onclick="removeSkill(this)">×</span></span>
+                            </div>
+                            <div class="add-skill">
+                                <input type="text" id="newSkill" placeholder="Добавить навык">
+                                <button class="btn btn-sm btn-primary" onclick="addSkill()">Добавить</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Projects -->
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-project-diagram"></i> Мои проекты</div>
+                        <div class="projects-list">
+                            <div class="project-item">
+                                <div class="project-icon"><i class="fas fa-globe"></i></div>
+                                <div class="project-info">
+                                    <div class="project-name">React E-commerce Platform</div>
+                                    <div class="project-role">Lead Developer</div>
+                                </div>
+                                <span class="project-status status-active">Активный</span>
+                            </div>
+                            <div class="project-item">
+                                <div class="project-icon"><i class="fas fa-mobile-alt"></i></div>
+                                <div class="project-info">
+                                    <div class="project-name">Vue.js Admin Dashboard</div>
+                                    <div class="project-role">Frontend Developer</div>
+                                </div>
+                                <span class="project-status status-completed">Завершен</span>
+                            </div>
+                            <div class="project-item">
+                                <div class="project-icon"><i class="fas fa-brain"></i></div>
+                                <div class="project-info">
+                                    <div class="project-name">AI Chat Application</div>
+                                    <div class="project-role">Full-stack Developer</div>
+                                </div>
+                                <span class="project-status status-archived">Архив</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-history"></i> Последняя активность</div>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon"><i class="fas fa-code"></i></div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Завершил задачу "Настройка аутентификации"</div>
+                                    <div class="activity-description">React E-commerce Platform</div>
+                                </div>
+                                <div class="activity-time">2 часа назад</div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon"><i class="fas fa-comment"></i></div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Оставил комментарий к задаче</div>
+                                    <div class="activity-description">Vue.js Admin Dashboard</div>
+                                </div>
+                                <div class="activity-time">4 часа назад</div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon"><i class="fas fa-plus"></i></div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Создал новый проект</div>
+                                    <div class="activity-description">AI Chat Application</div>
+                                </div>
+                                <div class="activity-time">1 день назад</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Achievements -->
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-trophy"></i> Достижения</div>
+                        <div class="achievements-grid">
+                            <div class="achievement-item">
+                                <div class="achievement-icon"><i class="fas fa-code"></i></div>
+                                <div class="achievement-title">Мастер кода</div>
+                                <div class="achievement-description">Выполнил 100+ задач</div>
+                            </div>
+                            <div class="achievement-item">
+                                <div class="achievement-icon"><i class="fas fa-users"></i></div>
+                                <div class="achievement-title">Командный игрок</div>
+                                <div class="achievement-description">Участвовал в 10+ проектах</div>
+                            </div>
+                            <div class="achievement-item">
+                                <div class="achievement-icon"><i class="fas fa-star"></i></div>
+                                <div class="achievement-title">Высокий рейтинг</div>
+                                <div class="achievement-description">Рейтинг выше 4.5</div>
+                            </div>
+                            <div class="achievement-item">
+                                <div class="achievement-icon"><i class="fas fa-clock"></i></div>
+                                <div class="achievement-title">Пунктуальность</div>
+                                <div class="achievement-description">95% задач в срок</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Security Settings -->
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-shield-alt"></i> Безопасность</div>
+                        <div class="security-settings">
+                            <div class="security-item">
+                                <h4>Двухфакторная аутентификация</h4>
+                                <p>Дополнительная защита вашего аккаунта</p>
+                                <div class="toggle-switch active" onclick="toggleSecurity(this)"></div>
+                            </div>
+                            <div class="security-item">
+                                <h4>Уведомления о входе</h4>
+                                <p>Получать уведомления о новых входах</p>
+                                <div class="toggle-switch active" onclick="toggleSecurity(this)"></div>
+                            </div>
+                            <div class="security-item">
+                                <h4>Смена пароля</h4>
+                                <p>Последний раз меняли: 30 дней назад</p>
+                                <button class="btn btn-sm btn-primary" onclick="changePassword()">Изменить</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Danger Zone -->
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-exclamation-triangle"></i> Опасная зона</div>
+                        <div class="danger-zone">
+                            <h4>Удалить аккаунт</h4>
+                            <p>Это действие необратимо. Все ваши данные будут удалены навсегда.</p>
+                            <button class="btn btn-danger" onclick="deleteAccount()">
+                                <i class="fas fa-trash"></i> Удалить аккаунт
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function editProfile() {
+            // Enable form editing
+            const inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => input.disabled = false);
+            alert('Режим редактирования включен');
+        }
+        
+        function saveProfile() {
+            // Collect profile data
+            const profileData = {
+                personal: {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    location: document.getElementById('location').value,
+                    bio: document.getElementById('bio').value
+                },
+                professional: {
+                    company: document.getElementById('company').value,
+                    position: document.getElementById('position').value,
+                    experience: document.getElementById('experience').value,
+                    specialization: document.getElementById('specialization').value
+                }
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('profileData', JSON.stringify(profileData));
+            alert('Профиль сохранен!');
+        }
+        
+        function changeAvatar() {
+            alert('Загрузка нового аватара...');
+        }
+        
+        function shareProfile() {
+            alert('Ссылка на профиль скопирована в буфер обмена!');
+        }
+        
+        function exportProfile() {
+            alert('Экспорт профиля в PDF...');
+        }
+        
+        function addSkill() {
+            const input = document.getElementById('newSkill');
+            const skill = input.value.trim();
+            
+            if (skill) {
+                const skillsList = document.querySelector('.skills-list');
+                const skillTag = document.createElement('span');
+                skillTag.className = 'skill-tag';
+                skillTag.innerHTML = `${skill} <span class="remove" onclick="removeSkill(this)">×</span>`;
+                skillsList.appendChild(skillTag);
+                input.value = '';
+            }
+        }
+        
+        function removeSkill(element) {
+            element.parentElement.remove();
+        }
+        
+        function toggleSecurity(toggle) {
+            toggle.classList.toggle('active');
+        }
+        
+        function changePassword() {
+            alert('Открытие формы смены пароля...');
+        }
+        
+        function deleteAccount() {
+            if (confirm('Вы уверены, что хотите удалить аккаунт?')) {
+                if (confirm('Последнее предупреждение! Все данные будут удалены навсегда!')) {
+                    alert('Аккаунт будет удален через 7 дней. Проверьте email для подтверждения.');
+                }
+            }
+        }
+        
+        // Load profile data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedProfile = localStorage.getItem('profileData');
+            if (savedProfile) {
+                const profileData = JSON.parse(savedProfile);
+                // Apply saved profile data
+                if (profileData.personal) {
+                    document.getElementById('firstName').value = profileData.personal.firstName || '';
+                    document.getElementById('lastName').value = profileData.personal.lastName || '';
+                    document.getElementById('email').value = profileData.personal.email || '';
+                    document.getElementById('phone').value = profileData.personal.phone || '';
+                    document.getElementById('location').value = profileData.personal.location || '';
+                    document.getElementById('bio').value = profileData.personal.bio || '';
+                }
+                if (profileData.professional) {
+                    document.getElementById('company').value = profileData.professional.company || '';
+                    document.getElementById('position').value = profileData.professional.position || '';
+                    document.getElementById('experience').value = profileData.professional.experience || '';
+                    document.getElementById('specialization').value = profileData.professional.specialization || '';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

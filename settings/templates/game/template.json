@@ -1,0 +1,115 @@
+{
+  "template": {
+    "name": "Game Development Template",
+    "version": "1.0.0",
+    "description": "Universal template for game development with Unity",
+    "type": "game",
+    "category": "gaming",
+    "tags": ["unity", "csharp", "game-development", "2d", "3d"],
+    "author": "ManagerAgentAI",
+    "created": "2025-01-31",
+    "lastUpdated": "2025-01-31"
+  },
+  "structure": {
+    "directories": [
+      "Assets",
+      "Assets/Scripts",
+      "Assets/Scripts/Player",
+      "Assets/Scripts/Enemies",
+      "Assets/Scripts/Managers",
+      "Assets/Scripts/UI",
+      "Assets/Scripts/Utils",
+      "Assets/Scenes",
+      "Assets/Prefabs",
+      "Assets/Materials",
+      "Assets/Textures",
+      "Assets/Sprites",
+      "Assets/Audio",
+      "Assets/Animations",
+      "Assets/Shaders",
+      "ProjectSettings",
+      "Packages",
+      "Tests",
+      "Tests/EditMode",
+      "Tests/PlayMode",
+      "docs",
+      "scripts",
+      "config"
+    ],
+    "files": [
+      "ProjectSettings/ProjectVersion.txt",
+      "ProjectSettings/ProjectSettings.asset",
+      "Assets/Scripts/GameManager.cs",
+      "Assets/Scripts/Player/PlayerController.cs",
+      "Assets/Scripts/Player/PlayerMovement.cs",
+      "Assets/Scripts/Enemies/Enemy.cs",
+      "Assets/Scripts/Enemies/EnemyAI.cs",
+      "Assets/Scripts/Managers/SceneManager.cs",
+      "Assets/Scripts/Managers/AudioManager.cs",
+      "Assets/Scripts/UI/MainMenu.cs",
+      "Assets/Scripts/UI/GameUI.cs",
+      "Assets/Scripts/Utils/Helpers.cs",
+      "Assets/Scenes/MainMenu.unity",
+      "Assets/Scenes/Game.unity",
+      "Assets/Prefabs/Player.prefab",
+      "Assets/Prefabs/Enemy.prefab",
+      "Tests/EditMode/GameManagerTests.cs",
+      "Tests/PlayMode/PlayerTests.cs",
+      "docs/README.md",
+      "docs/GAME_DESIGN.md",
+      "scripts/build.bat",
+      "scripts/build.sh",
+      "config/unity-version.txt"
+    ]
+  },
+  "dependencies": {
+    "production": [
+      "Unity Engine 2022.3 LTS",
+      "Unity Input System",
+      "Unity TextMeshPro",
+      "Unity Cinemachine",
+      "Unity Post Processing"
+    ],
+    "development": [
+      "Unity Test Framework",
+      "Unity Code Coverage",
+      "Unity Profiler",
+      "Unity Memory Profiler",
+      "Unity Frame Debugger"
+    ]
+  },
+  "scripts": {
+    "build:windows": "Unity -batchmode -quit -projectPath . -buildTarget Win64 -executeMethod BuildScript.BuildWindows",
+    "build:android": "Unity -batchmode -quit -projectPath . -buildTarget Android -executeMethod BuildScript.BuildAndroid",
+    "build:ios": "Unity -batchmode -quit -projectPath . -buildTarget iOS -executeMethod BuildScript.BuildiOS",
+    "test": "Unity -batchmode -quit -projectPath . -runTests -testResults TestResults.xml",
+    "test:coverage": "Unity -batchmode -quit -projectPath . -runTests -testResults TestResults.xml -enableCodeCoverage -coverageResultsPath CoverageResults"
+  },
+  "configuration": {
+    "unity_version": "2022.3.0f1",
+    "target_platforms": ["Windows", "Android", "iOS"],
+    "graphics_api": "DirectX 11",
+    "scripting_backend": "IL2CPP",
+    "api_compatibility": ".NET Standard 2.1",
+    "build_target": "Win64"
+  },
+  "features": {
+    "2d_graphics": true,
+    "3d_graphics": true,
+    "physics": true,
+    "audio": true,
+    "animation": true,
+    "ui_system": true,
+    "input_system": true,
+    "scene_management": true,
+    "prefab_system": true,
+    "testing": true,
+    "profiling": true,
+    "build_automation": true,
+    "cross_platform": true,
+    "mobile_support": true,
+    "vr_support": false,
+    "ar_support": false,
+    "multiplayer": false
+  }
+}

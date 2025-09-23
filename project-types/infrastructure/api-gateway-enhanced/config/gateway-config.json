@@ -1,0 +1,289 @@
+{
+  "version": "2.9.0",
+  "gateway": {
+    "port": 3000,
+    "clusterMode": true,
+    "maxRequestSize": "10mb",
+    "rateLimit": {
+      "windowMs": 900000,
+      "max": 1000,
+      "skipSuccessfulRequests": false,
+      "skipFailedRequests": false
+    },
+    "security": {
+      "jwtSecret": "your-super-secret-jwt-key-change-in-production",
+      "jwtRefreshSecret": "your-super-secret-refresh-key-change-in-production",
+      "allowedOrigins": "*",
+      "corsCredentials": true
+    },
+    "monitoring": {
+      "enableMetrics": true,
+      "enablePrometheus": true,
+      "logLevel": "info",
+      "healthCheckInterval": 30000
+    }
+  },
+  "services": {
+    "project-manager": {
+      "instances": [
+        {
+          "url": "http://project-manager-1:3000",
+          "weight": 1,
+          "healthy": true,
+          "region": "us-east-1"
+        },
+        {
+          "url": "http://project-manager-2:3000",
+          "weight": 1,
+          "healthy": true,
+          "region": "us-east-1"
+        },
+        {
+          "url": "http://project-manager-3:3000",
+          "weight": 2,
+          "healthy": true,
+          "region": "us-west-2"
+        }
+      ],
+      "timeout": 5000,
+      "retries": 3,
+      "circuitBreaker": {
+        "timeout": 3000,
+        "errorThresholdPercentage": 50,
+        "resetTimeout": 30000,
+        "rollingCountTimeout": 10000,
+        "rollingCountBuckets": 10
+      },
+      "loadBalancing": {
+        "algorithm": "weighted-round-robin",
+        "healthCheckInterval": 30000,
+        "stickySession": false
+      }
+    },
+    "ai-planner": {
+      "instances": [
+        {
+          "url": "http://ai-planner-1:3000",
+          "weight": 1,
+          "healthy": true,
+          "region": "us-east-1"
+        },
+        {
+          "url": "http://ai-planner-2:3000",
+          "weight": 1,
+          "healthy": true,
+          "region": "us-west-2"
+        }
+      ],
+      "timeout": 10000,
+      "retries": 2,
+      "circuitBreaker": {
+        "timeout": 5000,
+        "errorThresholdPercentage": 40,
+        "resetTimeout": 60000,
+        "rollingCountTimeout": 15000,
+        "rollingCountBuckets": 15
+      },
+      "loadBalancing": {
+        "algorithm": "round-robin",
+        "healthCheckInterval": 30000,
+        "stickySession": false
+      }
+    },
+    "workflow-orchestrator": {
+      "instances": [
+        {
+          "url": "http://workflow-orchestrator:3000",
+          "weight": 1,
+          "healthy": true,
+          "region": "us-east-1"
+        }
+      ],
+      "timeout": 15000,
+      "retries": 3,
+      "circuitBreaker": {
+        "timeout": 10000,
+        "errorThresholdPercentage": 60,
+        "resetTimeout": 45000,
+        "rollingCountTimeout": 20000,
+        "rollingCountBuckets": 20
+      },
+      "loadBalancing": {
+        "algorithm": "round-robin",
+        "healthCheckInterval": 30000,
+        "stickySession": false
+      }
+    },
+    "smart-notifications": {
+      "instances": [
+        {
+          "url": "http://smart-notifications:3000",
+          "weight": 1,
+          "healthy": true,
+          "region": "us-east-1"
+        }
+      ],
+      "timeout": 3000,
+      "retries": 2,
+      "circuitBreaker": {
+        "timeout": 2000,
+        "errorThresholdPercentage": 70,
+        "resetTimeout": 30000,
+        "rollingCountTimeout": 5000,
+        "rollingCountBuckets": 5
+      },
+      "loadBalancing": {
+        "algorithm": "round-robin",
+        "healthCheckInterval": 30000,
+        "stickySession": false
+      }
+    },
+    "analytics-dashboard": {
+      "instances": [
+        {
+          "url": "http://analytics-dashboard:3001",
+          "weight": 1,
+          "healthy": true,
+          "region": "us-east-1"
+        }
+      ],
+      "timeout": 5000,
+      "retries": 2,
+      "circuitBreaker": {
+        "timeout": 3000,
+        "errorThresholdPercentage": 50,
+        "resetTimeout": 30000,
+        "rollingCountTimeout": 10000,
+        "rollingCountBuckets": 10
+      },
+      "loadBalancing": {
+        "algorithm": "round-robin",
+        "healthCheckInterval": 30000,
+        "stickySession": false
+      }
+    }
+  },
+  "loadBalancing": {
+    "algorithms": {
+      "round-robin": {
+        "description": "Distribute requests evenly across instances",
+        "useCase": "General purpose load balancing"
+      },
+      "weighted-round-robin": {
+        "description": "Distribute requests based on instance weights",
+        "useCase": "Instances with different capacities"
+      },
+      "least-connections": {
+        "description": "Route to instance with fewest active connections",
+        "useCase": "Long-running connections or stateful services"
+      },
+      "ip-hash": {
+        "description": "Route based on client IP hash",
+        "useCase": "Sticky sessions or client affinity"
+      }
+    },
+    "healthCheck": {
+      "interval": 30000,
+      "timeout": 5000,
+      "retries": 3,
+      "path": "/health"
+    }
+  },
+  "circuitBreaker": {
+    "defaults": {
+      "timeout": 3000,
+      "errorThresholdPercentage": 50,
+      "resetTimeout": 30000,
+      "rollingCountTimeout": 10000,
+      "rollingCountBuckets": 10
+    },
+    "patterns": {
+      "fast": {
+        "timeout": 1000,
+        "errorThresholdPercentage": 60,
+        "resetTimeout": 15000
+      },
+      "slow": {
+        "timeout": 10000,
+        "errorThresholdPercentage": 40,
+        "resetTimeout": 60000
+      },
+      "critical": {
+        "timeout": 5000,
+        "errorThresholdPercentage": 30,
+        "resetTimeout": 120000
+      }
+    }
+  },
+  "monitoring": {
+    "metrics": {
+      "enabled": true,
+      "retention": 3600000,
+      "collectionInterval": 60000
+    },
+    "alerting": {
+      "enabled": true,
+      "thresholds": {
+        "errorRate": 0.05,
+        "responseTime": 1000,
+        "cpuUsage": 0.8,
+        "memoryUsage": 0.8
+      }
+    },
+    "logging": {
+      "level": "info",
+      "format": "json",
+      "retention": "7d"
+    }
+  },
+  "security": {
+    "authentication": {
+      "jwt": {
+        "secret": "your-super-secret-jwt-key-change-in-production",
+        "refreshSecret": "your-super-secret-refresh-key-change-in-production",
+        "expiresIn": "1h",
+        "refreshExpiresIn": "7d"
+      },
+      "rateLimiting": {
+        "enabled": true,
+        "windowMs": 900000,
+        "max": 1000,
+        "skipSuccessfulRequests": false,
+        "skipFailedRequests": false
+      }
+    },
+    "cors": {
+      "enabled": true,
+      "origins": "*",
+      "credentials": true,
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+      "allowedHeaders": ["Content-Type", "Authorization", "X-Requested-With", "X-API-Key"]
+    },
+    "helmet": {
+      "enabled": true,
+      "contentSecurityPolicy": {
+        "directives": {
+          "defaultSrc": ["'self'"],
+          "styleSrc": ["'self'", "'unsafe-inline'"],
+          "scriptSrc": ["'self'"],
+          "imgSrc": ["'self'", "data:", "https:"]
+        }
+      }
+    }
+  },
+  "redis": {
+    "enabled": false,
+    "url": "redis://localhost:6379",
+    "options": {
+      "retryDelayOnFailover": 100,
+      "enableReadyCheck": false,
+      "maxRetriesPerRequest": null
+    }
+  },
+  "clustering": {
+    "enabled": true,
+    "workers": "auto",
+    "restartOnFailure": true,
+    "gracefulShutdown": true
+  }
+}

@@ -1,0 +1,79 @@
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: ai-enhanced-telemetry
+  namespace: manager-agent-ai
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+    overrides:
+    - match:
+        metric: ALL_METRICS
+      tagOverrides:
+        request_protocol:
+          value: "http"
+        response_code:
+          value: "200"
+        source_app:
+          value: "api-gateway"
+        destination_app:
+          value: "microservice"
+        ai_model:
+          value: "gpt-4"
+        ai_operation:
+          value: "prediction"
+        user_tier:
+          value: "premium"
+        request_category:
+          value: "ai-inference"
+        performance_tier:
+          value: "high"
+        geographic_region:
+          value: "us-east"
+        deployment_stage:
+          value: "production"
+        experiment_group:
+          value: "control"
+        ai_confidence:
+          value: "0.95"
+        response_time_tier:
+          value: "fast"
+        error_category:
+          value: "none"
+        circuit_breaker_state:
+          value: "closed"
+        load_balancer_algorithm:
+          value: "least_conn"
+        cache_hit:
+          value: "true"
+        retry_count:
+          value: "0"
+        timeout_occurred:
+          value: "false"
+        rate_limit_exceeded:
+          value: "false"
+        authentication_method:
+          value: "jwt"
+        authorization_level:
+          value: "user"
+        data_sensitivity:
+          value: "public"
+        compliance_requirement:
+          value: "gdpr"
+        cost_tier:
+          value: "standard"
+        resource_utilization:
+          value: "medium"
+        scaling_decision:
+          value: "none"
+        anomaly_detected:
+          value: "false"
+        prediction_accuracy:
+          value: "0.92"
+        model_version:
+          value: "v2.9"
+        feature_flags:
+          value: "ai_enhanced_routing,circuit_breaker,rate_limiting"
+        custom_dimensions:
+          value: "ai_workload,enterprise_tier,real_time_processing"

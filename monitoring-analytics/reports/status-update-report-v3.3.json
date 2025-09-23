@@ -1,0 +1,25 @@
+{
+  "Analysis": {
+    "FileStatus": {
+      "ModifiedThisWeek": 15372,
+      "TotalFiles": 15372,
+      "Size": 73488820.0,
+      "ModifiedToday": 16
+    },
+    "ProjectStatus": {
+      "Health": "Good",
+      "ActiveFiles": 16,
+      "LastActivity": "2025-09-07T16:27:52.304897+04:00",
+      "ProjectSize": 73488820.0
+    },
+    "DependencyStatus": {},
+    "TaskStatus": {
+      "CompletionRate": 100.0,
+      "PendingTasks": 0,
+      "CompletedTasks": 68,
+      "TotalTasks": 68
+    }
+  },
+  "AIAnalysis": "Project status analyzed with AI insights",
+  "Recommendations": []
+}

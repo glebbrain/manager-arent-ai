@@ -1,0 +1,119 @@
+{
+  "template": {
+    "name": "Library Package Template",
+    "version": "1.0.0",
+    "description": "Universal template for creating reusable libraries",
+    "type": "library",
+    "category": "package",
+    "tags": ["typescript", "npm", "rollup", "jest", "eslint"],
+    "author": "ManagerAgentAI",
+    "created": "2025-01-31",
+    "lastUpdated": "2025-01-31"
+  },
+  "structure": {
+    "directories": [
+      "src",
+      "src/core",
+      "src/utils",
+      "src/types",
+      "src/constants",
+      "tests",
+      "tests/unit",
+      "tests/integration",
+      "docs",
+      "examples",
+      "scripts",
+      "config"
+    ],
+    "files": [
+      "package.json",
+      "tsconfig.json",
+      "rollup.config.js",
+      "babel.config.js",
+      ".env.example",
+      ".gitignore",
+      "README.md",
+      "LICENSE",
+      "CHANGELOG.md",
+      "src/index.ts",
+      "src/core/main.ts",
+      "src/utils/helpers.ts",
+      "src/types/index.ts",
+      "src/constants/index.ts",
+      "tests/setup.ts",
+      "tests/core.test.ts",
+      "tests/utils.test.ts",
+      "docs/API.md",
+      "docs/EXAMPLES.md",
+      "examples/basic-usage.js",
+      "examples/advanced-usage.js",
+      "scripts/build.js",
+      "scripts/test.js",
+      "config/jest.config.js",
+      "config/eslint.config.js"
+    ]
+  },
+  "dependencies": {
+    "production": [
+      "typescript",
+      "@types/node"
+    ],
+    "development": [
+      "jest",
+      "@types/jest",
+      "ts-jest",
+      "rollup",
+      "@rollup/plugin-typescript",
+      "@rollup/plugin-node-resolve",
+      "@rollup/plugin-commonjs",
+      "@rollup/plugin-terser",
+      "rollup-plugin-dts",
+      "eslint",
+      "@typescript-eslint/parser",
+      "@typescript-eslint/eslint-plugin",
+      "prettier",
+      "husky",
+      "lint-staged",
+      "semantic-release",
+      "@semantic-release/changelog",
+      "@semantic-release/git"
+    ]
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write src/**/*.ts",
+    "prepublishOnly": "npm run build",
+    "semantic-release": "semantic-release"
+  },
+  "configuration": {
+    "entry": "src/index.ts",
+    "output": "dist",
+    "format": ["cjs", "esm", "umd"],
+    "minify": true,
+    "sourcemap": true,
+    "types": true,
+    "test_environment": "node"
+  },
+  "features": {
+    "typescript": true,
+    "bundling": true,
+    "testing": true,
+    "linting": true,
+    "formatting": true,
+    "sourcemaps": true,
+    "types": true,
+    "minification": true,
+    "multiple_formats": true,
+    "semantic_versioning": true,
+    "automated_releases": true,
+    "changelog": true,
+    "examples": true,
+    "documentation": true
+  }
+}

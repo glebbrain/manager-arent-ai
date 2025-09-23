@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Automation Platform - Real-time Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>🚀 Universal Automation Platform</h1>
+                <div class="status-indicator">
+                    <span class="status-dot online"></span>
+                    <span class="status-text">System Online</span>
+                </div>
+                <div class="last-updated">
+                    Last updated: <span id="lastUpdated">--</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Grid -->
+        <main class="dashboard-main">
+            <!-- System Overview Cards -->
+            <section class="overview-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📊 System Health</h3>
+                        <div class="card-actions">
+                            <button class="btn-refresh" onclick="refreshData()">🔄</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric-grid">
+                            <div class="metric-item">
+                                <div class="metric-value" id="cpuUsage">--</div>
+                                <div class="metric-label">CPU Usage</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value" id="memoryUsage">--</div>
+                                <div class="metric-label">Memory Usage</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value" id="diskUsage">--</div>
+                                <div class="metric-label">Disk Usage</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value" id="networkLatency">--</div>
+                                <div class="metric-label">Network Latency</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🔧 Active Projects</h3>
+                        <div class="card-actions">
+                            <button class="btn-add" onclick="addProject()">+</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="project-list" id="projectList">
+                            <!-- Projects will be loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>⚡ Build Status</h3>
+                        <div class="card-actions">
+                            <button class="btn-refresh" onclick="refreshBuilds()">🔄</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="build-status" id="buildStatus">
+                            <!-- Build status will be loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3>📈 Performance Trends</h3>
+                        <div class="chart-controls">
+                            <select id="timeRange" onchange="updateChart()">
+                                <option value="1h">Last Hour</option>
+                                <option value="6h">Last 6 Hours</option>
+                                <option value="24h" selected>Last 24 Hours</option>
+                                <option value="7d">Last 7 Days</option>
+                            </select>
+                            <button class="btn-refresh" onclick="refreshChart('performance')">🔄</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3>🧪 Test Coverage</h3>
+                        <div class="chart-controls">
+                            <button class="btn-refresh" onclick="refreshChart('testCoverage')">🔄</button>
+                            <button class="btn-export" onclick="exportChart('testCoverage')">📊</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <canvas id="testCoverageChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3>🔨 Build Status</h3>
+                        <div class="chart-controls">
+                            <button class="btn-refresh" onclick="refreshChart('buildStatus')">🔄</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <canvas id="buildStatusChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3>📊 Project Activity</h3>
+                        <div class="chart-controls">
+                            <button class="btn-refresh" onclick="refreshChart('projectActivity')">🔄</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <canvas id="projectActivityChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Real-time Activity -->
+            <section class="activity-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🔄 Real-time Activity</h3>
+                        <div class="card-actions">
+                            <button class="btn-clear" onclick="clearActivity()">Clear</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="activity-feed" id="activityFeed">
+                            <!-- Activity items will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🚨 Alerts & Notifications</h3>
+                        <div class="card-actions">
+                            <span class="alert-count" id="alertCount">0</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="alerts-list" id="alertsList">
+                            <!-- Alerts will be loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <span>Universal Automation Platform v2.1</span>
+                    <span>|</span>
+                    <span>Production Ready</span>
+                </div>
+                <div class="footer-stats">
+                    <span>Uptime: <span id="uptime">--</span></span>
+                    <span>|</span>
+                    <span>Version: 2.1.0</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="dashboard.js"></script>
+    <script src="websocket.js"></script>
+    <script src="charts.js"></script>
+</body>
+</html>

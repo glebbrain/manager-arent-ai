@@ -1,0 +1,332 @@
+{
+  "project-manager": {
+    "name": "Project Manager",
+    "description": "Project creation, management, and configuration services",
+    "endpoint": "http://localhost:3001",
+    "health": "/health",
+    "version": "2.2.0",
+    "status": "active",
+    "priority": 1,
+    "timeout": 30000,
+    "retries": 3,
+    "routes": [
+      {
+        "path": "/api/projects",
+        "methods": ["GET", "POST"],
+        "description": "List and create projects",
+        "auth": true,
+        "rateLimit": 100
+      },
+      {
+        "path": "/api/projects/*",
+        "methods": ["GET", "PUT", "DELETE"],
+        "description": "Get, update, or delete specific project",
+        "auth": true,
+        "rateLimit": 200
+      },
+      {
+        "path": "/api/templates",
+        "methods": ["GET"],
+        "description": "List available project templates",
+        "auth": false,
+        "rateLimit": 500
+      },
+      {
+        "path": "/api/scan",
+        "methods": ["POST"],
+        "description": "Scan project and suggest configuration",
+        "auth": true,
+        "rateLimit": 50
+      },
+      {
+        "path": "/api/configure",
+        "methods": ["POST"],
+        "description": "Auto-configure existing project",
+        "auth": true,
+        "rateLimit": 25
+      }
+    ],
+    "script": "project-manager.ps1",
+    "dependencies": ["templates", "validation"],
+    "healthCheck": {
+      "interval": 30000,
+      "timeout": 5000,
+      "retries": 3
+    }
+  },
+  "ai-planner": {
+    "name": "AI Planner",
+    "description": "AI-powered task planning and prioritization services",
+    "endpoint": "http://localhost:3002",
+    "health": "/health",
+    "version": "2.2.0",
+    "status": "active",
+    "priority": 2,
+    "timeout": 45000,
+    "retries": 2,
+    "routes": [
+      {
+        "path": "/api/tasks",
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "description": "Task management operations",
+        "auth": true,
+        "rateLimit": 200
+      },
+      {
+        "path": "/api/plans",
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "description": "Project plan management",
+        "auth": true,
+        "rateLimit": 100
+      },
+      {
+        "path": "/api/prioritize",
+        "methods": ["POST"],
+        "description": "AI task prioritization",
+        "auth": true,
+        "rateLimit": 50
+      },
+      {
+        "path": "/api/recommend",
+        "methods": ["POST"],
+        "description": "AI project recommendations",
+        "auth": true,
+        "rateLimit": 30
+      },
+      {
+        "path": "/api/analyze",
+        "methods": ["POST"],
+        "description": "AI project analysis",
+        "auth": true,
+        "rateLimit": 20
+      }
+    ],
+    "script": "ai-planner.ps1",
+    "dependencies": ["project-manager", "analytics"],
+    "healthCheck": {
+      "interval": 30000,
+      "timeout": 10000,
+      "retries": 2
+    }
+  },
+  "workflow-orchestrator": {
+    "name": "Workflow Orchestrator",
+    "description": "Workflow execution and orchestration services",
+    "endpoint": "http://localhost:3003",
+    "health": "/health",
+    "version": "2.2.0",
+    "status": "active",
+    "priority": 3,
+    "timeout": 60000,
+    "retries": 2,
+    "routes": [
+      {
+        "path": "/api/workflows",
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "description": "Workflow management operations",
+        "auth": true,
+        "rateLimit": 100
+      },
+      {
+        "path": "/api/workflows/*/execute",
+        "methods": ["POST"],
+        "description": "Execute specific workflow",
+        "auth": true,
+        "rateLimit": 25
+      },
+      {
+        "path": "/api/workflows/*/status",
+        "methods": ["GET"],
+        "description": "Get workflow execution status",
+        "auth": true,
+        "rateLimit": 200
+      },
+      {
+        "path": "/api/workflows/*/stop",
+        "methods": ["POST"],
+        "description": "Stop running workflow",
+        "auth": true,
+        "rateLimit": 50
+      },
+      {
+        "path": "/api/workflows/*/logs",
+        "methods": ["GET"],
+        "description": "Get workflow execution logs",
+        "auth": true,
+        "rateLimit": 100
+      }
+    ],
+    "script": "workflow-orchestrator.ps1",
+    "dependencies": ["project-manager", "ai-planner"],
+    "healthCheck": {
+      "interval": 30000,
+      "timeout": 5000,
+      "retries": 3
+    }
+  },
+  "smart-notifications": {
+    "name": "Smart Notifications",
+    "description": "Intelligent notification and alerting services",
+    "endpoint": "http://localhost:3004",
+    "health": "/health",
+    "version": "2.2.0",
+    "status": "active",
+    "priority": 4,
+    "timeout": 15000,
+    "retries": 3,
+    "routes": [
+      {
+        "path": "/api/notifications",
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "description": "Notification management",
+        "auth": true,
+        "rateLimit": 300
+      },
+      {
+        "path": "/api/notifications/*/send",
+        "methods": ["POST"],
+        "description": "Send specific notification",
+        "auth": true,
+        "rateLimit": 100
+      },
+      {
+        "path": "/api/notifications/*/status",
+        "methods": ["GET"],
+        "description": "Get notification status",
+        "auth": true,
+        "rateLimit": 500
+      },
+      {
+        "path": "/api/alerts",
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "description": "Alert management",
+        "auth": true,
+        "rateLimit": 200
+      },
+      {
+        "path": "/api/subscriptions",
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "description": "Notification subscriptions",
+        "auth": true,
+        "rateLimit": 150
+      }
+    ],
+    "script": "smart-notifications.ps1",
+    "dependencies": ["project-manager", "analytics"],
+    "healthCheck": {
+      "interval": 30000,
+      "timeout": 5000,
+      "retries": 3
+    }
+  },
+  "template-generator": {
+    "name": "Template Generator",
+    "description": "Project template generation and validation services",
+    "endpoint": "http://localhost:3005",
+    "health": "/health",
+    "version": "2.2.0",
+    "status": "active",
+    "priority": 5,
+    "timeout": 30000,
+    "retries": 2,
+    "routes": [
+      {
+        "path": "/api/templates",
+        "methods": ["GET", "POST"],
+        "description": "Template management",
+        "auth": true,
+        "rateLimit": 200
+      },
+      {
+        "path": "/api/templates/*/generate",
+        "methods": ["POST"],
+        "description": "Generate project from template",
+        "auth": true,
+        "rateLimit": 50
+      },
+      {
+        "path": "/api/templates/*/validate",
+        "methods": ["POST"],
+        "description": "Validate template configuration",
+        "auth": true,
+        "rateLimit": 100
+      },
+      {
+        "path": "/api/templates/*/preview",
+        "methods": ["GET"],
+        "description": "Preview template structure",
+        "auth": false,
+        "rateLimit": 500
+      },
+      {
+        "path": "/api/templates/categories",
+        "methods": ["GET"],
+        "description": "Get template categories",
+        "auth": false,
+        "rateLimit": 1000
+      }
+    ],
+    "script": "template-generator.ps1",
+    "dependencies": ["project-manager", "validation"],
+    "healthCheck": {
+      "interval": 30000,
+      "timeout": 5000,
+      "retries": 3
+    }
+  },
+  "consistency-manager": {
+    "name": "Consistency Manager",
+    "description": "Code consistency validation and enforcement services",
+    "endpoint": "http://localhost:3006",
+    "health": "/health",
+    "version": "2.2.0",
+    "status": "active",
+    "priority": 6,
+    "timeout": 45000,
+    "retries": 2,
+    "routes": [
+      {
+        "path": "/api/consistency/validate",
+        "methods": ["POST"],
+        "description": "Validate code consistency",
+        "auth": true,
+        "rateLimit": 50
+      },
+      {
+        "path": "/api/consistency/fix",
+        "methods": ["POST"],
+        "description": "Auto-fix consistency issues",
+        "auth": true,
+        "rateLimit": 25
+      },
+      {
+        "path": "/api/consistency/status",
+        "methods": ["GET"],
+        "description": "Get consistency validation status",
+        "auth": true,
+        "rateLimit": 200
+      },
+      {
+        "path": "/api/consistency/rules",
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "description": "Consistency rules management",
+        "auth": true,
+        "rateLimit": 100
+      },
+      {
+        "path": "/api/consistency/reports",
+        "methods": ["GET", "POST"],
+        "description": "Consistency reports",
+        "auth": true,
+        "rateLimit": 75
+      }
+    ],
+    "script": "consistency-manager.ps1",
+    "dependencies": ["project-manager", "validation"],
+    "healthCheck": {
+      "interval": 30000,
+      "timeout": 10000,
+      "retries": 2
+    }
+  }
+}

@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Types Documentation - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .documentation-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .documentation-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .documentation-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .project-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .type-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .type-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .type-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .type-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .type-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-beta {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-deprecated {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .type-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .type-features {
+            margin-bottom: 15px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .feature-icon {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .feature-text {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .type-advantages {
+            margin-bottom: 15px;
+        }
+
+        .advantage-item {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .advantage-icon {
+            margin-right: 10px;
+            color: #10b981;
+        }
+
+        .advantage-text {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .type-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .type-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .management-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .management-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .management-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .documentation-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recent-updates {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .updates-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .update-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .update-item:hover {
+            background: #f8f9fa;
+        }
+
+        .update-item:last-child {
+            border-bottom: none;
+        }
+
+        .update-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .update-icon.created {
+            background: #10b981;
+        }
+
+        .update-icon.updated {
+            background: #3b82f6;
+        }
+
+        .update-icon.reviewed {
+            background: #f59e0b;
+        }
+
+        .update-content {
+            flex: 1;
+        }
+
+        .update-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .update-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .update-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .documentation-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .project-types {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-folder-tree"></i> Project Types Documentation</h1>
+            <p>Comprehensive documentation for project types and their advantages in Universal Project Manager v3.2</p>
+        </div>
+
+        <div class="documentation-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-folder"></i></div>
+                <div class="overview-value">12</div>
+                <div class="overview-label">Project Types</div>
+                <div class="overview-trend trend-up">+2 this month</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-project-diagram"></i></div>
+                <div class="overview-value">156</div>
+                <div class="overview-label">Active Projects</div>
+                <div class="overview-trend trend-up">+15 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="overview-value">94%</div>
+                <div class="overview-label">Success Rate</div>
+                <div class="overview-trend trend-up">+3% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-clock"></i></div>
+                <div class="overview-value">2.1m</div>
+                <div class="overview-label">Avg Setup Time</div>
+                <div class="overview-trend trend-down">-0.3m faster</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-users"></i></div>
+                <div class="overview-value">89%</div>
+                <div class="overview-label">User Satisfaction</div>
+                <div class="overview-trend trend-up">+2% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">96%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+1% improvement</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="documentation-section">
+                <h2><i class="fas fa-chart-area"></i> Project Types</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Project Type Distribution</div>
+                    <canvas id="typeChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Project Success Rates</div>
+                    <canvas id="successChart"></canvas>
+                </div>
+
+                <div class="project-types">
+                    <div class="type-card">
+                        <div class="type-header">
+                            <div class="type-title">Web Application</div>
+                            <div class="type-status status-active">Active</div>
+                        </div>
+                        <div class="type-description">Full-stack web applications with frontend and backend components</div>
+                        <div class="type-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Frontend Framework Support</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Backend API Integration</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Database Configuration</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Deployment Automation</span>
+                            </div>
+                        </div>
+                        <div class="type-advantages">
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Complete project structure</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">AI-powered code generation</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Automated testing setup</span>
+                            </div>
+                        </div>
+                        <div class="type-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">45</div>
+                                <div class="metric-label">Projects</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">96%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">1.8m</div>
+                                <div class="metric-label">Setup Time</div>
+                            </div>
+                        </div>
+                        <div class="type-actions">
+                            <button class="action-btn">Create</button>
+                            <button class="action-btn secondary">Learn More</button>
+                        </div>
+                    </div>
+
+                    <div class="type-card">
+                        <div class="type-header">
+                            <div class="type-title">Mobile Application</div>
+                            <div class="type-status status-active">Active</div>
+                        </div>
+                        <div class="type-description">Cross-platform mobile applications with native performance</div>
+                        <div class="type-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">React Native Support</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Flutter Integration</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Platform-specific Code</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">App Store Deployment</span>
+                            </div>
+                        </div>
+                        <div class="type-advantages">
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Cross-platform compatibility</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Native performance</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Automated build process</span>
+                            </div>
+                        </div>
+                        <div class="type-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">32</div>
+                                <div class="metric-label">Projects</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">94%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2.3m</div>
+                                <div class="metric-label">Setup Time</div>
+                            </div>
+                        </div>
+                        <div class="type-actions">
+                            <button class="action-btn">Create</button>
+                            <button class="action-btn secondary">Learn More</button>
+                        </div>
+                    </div>
+
+                    <div class="type-card">
+                        <div class="type-header">
+                            <div class="type-title">API Service</div>
+                            <div class="type-status status-active">Active</div>
+                        </div>
+                        <div class="type-description">RESTful API services with comprehensive documentation</div>
+                        <div class="type-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">REST API Generation</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">GraphQL Support</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Auto Documentation</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">API Testing Suite</span>
+                            </div>
+                        </div>
+                        <div class="type-advantages">
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Rapid API development</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Comprehensive testing</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Auto-generated docs</span>
+                            </div>
+                        </div>
+                        <div class="type-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">28</div>
+                                <div class="metric-label">Projects</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">98%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">1.5m</div>
+                                <div class="metric-label">Setup Time</div>
+                            </div>
+                        </div>
+                        <div class="type-actions">
+                            <button class="action-btn">Create</button>
+                            <button class="action-btn secondary">Learn More</button>
+                        </div>
+                    </div>
+
+                    <div class="type-card">
+                        <div class="type-header">
+                            <div class="type-title">Data Science</div>
+                            <div class="type-status status-active">Active</div>
+                        </div>
+                        <div class="type-description">Data science projects with ML/AI capabilities</div>
+                        <div class="type-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Jupyter Notebooks</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">ML Framework Support</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Data Visualization</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Model Deployment</span>
+                            </div>
+                        </div>
+                        <div class="type-advantages">
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Pre-configured ML environment</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">AI model integration</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Data pipeline automation</span>
+                            </div>
+                        </div>
+                        <div class="type-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">18</div>
+                                <div class="metric-label">Projects</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">92%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">3.2m</div>
+                                <div class="metric-label">Setup Time</div>
+                            </div>
+                        </div>
+                        <div class="type-actions">
+                            <button class="action-btn">Create</button>
+                            <button class="action-btn secondary">Learn More</button>
+                        </div>
+                    </div>
+
+                    <div class="type-card">
+                        <div class="type-header">
+                            <div class="type-title">Desktop Application</div>
+                            <div class="type-status status-active">Active</div>
+                        </div>
+                        <div class="type-description">Cross-platform desktop applications with native UI</div>
+                        <div class="type-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Electron Support</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Native UI Components</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Auto-updater Integration</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Platform Packaging</span>
+                            </div>
+                        </div>
+                        <div class="type-advantages">
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Cross-platform compatibility</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Native performance</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Easy distribution</span>
+                            </div>
+                        </div>
+                        <div class="type-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">15</div>
+                                <div class="metric-label">Projects</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">90%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2.8m</div>
+                                <div class="metric-label">Setup Time</div>
+                            </div>
+                        </div>
+                        <div class="type-actions">
+                            <button class="action-btn">Create</button>
+                            <button class="action-btn secondary">Learn More</button>
+                        </div>
+                    </div>
+
+                    <div class="type-card">
+                        <div class="type-header">
+                            <div class="type-title">Microservices</div>
+                            <div class="type-status status-beta">Beta</div>
+                        </div>
+                        <div class="type-description">Microservices architecture with containerization</div>
+                        <div class="type-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Docker Integration</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Kubernetes Support</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Service Discovery</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Load Balancing</span>
+                            </div>
+                        </div>
+                        <div class="type-advantages">
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Scalable architecture</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Independent deployment</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Fault isolation</span>
+                            </div>
+                        </div>
+                        <div class="type-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">8</div>
+                                <div class="metric-label">Projects</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">85%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.1m</div>
+                                <div class="metric-label">Setup Time</div>
+                            </div>
+                        </div>
+                        <div class="type-actions">
+                            <button class="action-btn">Create</button>
+                            <button class="action-btn secondary">Learn More</button>
+                        </div>
+                    </div>
+
+                    <div class="type-card">
+                        <div class="type-header">
+                            <div class="type-title">Game Development</div>
+                            <div class="type-status status-beta">Beta</div>
+                        </div>
+                        <div class="type-description">Game development projects with engine integration</div>
+                        <div class="type-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Unity Integration</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Unreal Engine Support</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Asset Management</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Build Automation</span>
+                            </div>
+                        </div>
+                        <div class="type-advantages">
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Engine-specific optimization</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Asset pipeline automation</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Multi-platform builds</span>
+                            </div>
+                        </div>
+                        <div class="type-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">6</div>
+                                <div class="metric-label">Projects</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">88%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">5.2m</div>
+                                <div class="metric-label">Setup Time</div>
+                            </div>
+                        </div>
+                        <div class="type-actions">
+                            <button class="action-btn">Create</button>
+                            <button class="action-btn secondary">Learn More</button>
+                        </div>
+                    </div>
+
+                    <div class="type-card">
+                        <div class="type-header">
+                            <div class="type-title">Blockchain</div>
+                            <div class="type-status status-beta">Beta</div>
+                        </div>
+                        <div class="type-description">Blockchain and cryptocurrency projects</div>
+                        <div class="type-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Smart Contract Development</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">DApp Integration</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Token Management</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">DeFi Protocols</span>
+                            </div>
+                        </div>
+                        <div class="type-advantages">
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Pre-configured blockchain tools</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Smart contract templates</span>
+                            </div>
+                            <div class="advantage-item">
+                                <i class="fas fa-star advantage-icon"></i>
+                                <span class="advantage-text">Security best practices</span>
+                            </div>
+                        </div>
+                        <div class="type-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">4</div>
+                                <div class="metric-label">Projects</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">82%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">6.5m</div>
+                                <div class="metric-label">Setup Time</div>
+                            </div>
+                        </div>
+                        <div class="type-actions">
+                            <button class="action-btn">Create</button>
+                            <button class="action-btn secondary">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="management-controls">
+                <h2><i class="fas fa-cogs"></i> Management Controls</h2>
+                
+                <div class="management-actions">
+                    <button class="control-btn" onclick="createProject()">
+                        <i class="fas fa-plus"></i> Create Project
+                    </button>
+                    <button class="control-btn secondary" onclick="compareTypes()">
+                        <i class="fas fa-balance-scale"></i> Compare Types
+                    </button>
+                    <button class="control-btn secondary" onclick="exportDocs()">
+                        <i class="fas fa-download"></i> Export Docs
+                    </button>
+                </div>
+
+                <div class="documentation-status">
+                    <div class="status-title">Documentation Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Total Types</div>
+                        <div class="status-value">12 types</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Active Types</div>
+                        <div class="status-value">8 types</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Beta Types</div>
+                        <div class="status-value">4 types</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Documentation</div>
+                        <div class="status-value">100% complete</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Last Update</div>
+                        <div class="status-value">2 hours ago</div>
+                    </div>
+                </div>
+
+                <div class="recent-updates">
+                    <div class="updates-title">Recent Updates</div>
+                    <div class="update-item">
+                        <div class="update-icon created">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="update-content">
+                            <div class="update-title">Blockchain Project Type</div>
+                            <div class="update-description">Added new blockchain project type with DeFi support</div>
+                        </div>
+                        <div class="update-time">2 hours ago</div>
+                    </div>
+                    <div class="update-item">
+                        <div class="update-icon updated">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="update-content">
+                            <div class="update-title">Web Application Type</div>
+                            <div class="update-description">Updated web application type with new frameworks</div>
+                        </div>
+                        <div class="update-time">4 hours ago</div>
+                    </div>
+                    <div class="update-item">
+                        <div class="update-icon reviewed">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="update-content">
+                            <div class="update-title">API Service Type</div>
+                            <div class="update-description">Reviewed and optimized API service documentation</div>
+                        </div>
+                        <div class="update-time">6 hours ago</div>
+                    </div>
+                    <div class="update-item">
+                        <div class="update-icon created">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="update-content">
+                            <div class="update-title">Game Development Type</div>
+                            <div class="update-description">Added game development project type with Unity support</div>
+                        </div>
+                        <div class="update-time">1 day ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI Project Type Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        Project type recommendations accuracy improved by 25% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Some project types need better documentation for beginners
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI templates available for all project types
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let typeChart, successChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Type Chart
+            const typeCtx = document.getElementById('typeChart').getContext('2d');
+            typeChart = new Chart(typeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Web App', 'Mobile App', 'API Service', 'Data Science', 'Desktop App', 'Microservices', 'Game Dev', 'Blockchain'],
+                    datasets: [{
+                        data: [45, 32, 28, 18, 15, 8, 6, 4],
+                        backgroundColor: ['#667eea', '#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Success Chart
+            const successCtx = document.getElementById('successChart').getContext('2d');
+            successChart = new Chart(successCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Web App', 'Mobile App', 'API Service', 'Data Science', 'Desktop App', 'Microservices', 'Game Dev', 'Blockchain'],
+                    datasets: [{
+                        label: 'Success Rate (%)',
+                        data: [96, 94, 98, 92, 90, 85, 88, 82],
+                        backgroundColor: ['#667eea', '#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function createProject() {
+            alert('Creating new project...');
+        }
+
+        function compareTypes() {
+            alert('Comparing project types...');
+        }
+
+        function exportDocs() {
+            alert('Exporting documentation...');
+        }
+    </script>
+</body>
+</html>

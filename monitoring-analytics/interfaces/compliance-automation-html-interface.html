@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliance Automation - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .compliance-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .compliance-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .compliance-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .compliance-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .compliance-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .compliance-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .compliance-status {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .status-compliant {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-non-compliant {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .compliance-dashboard {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .compliance-dashboard h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .dashboard-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .compliance-framework {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .framework-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .framework-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .framework-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .framework-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .framework-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .framework-score {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .framework-score.excellent {
+            color: #10b981;
+        }
+
+        .framework-score.good {
+            color: #f59e0b;
+        }
+
+        .framework-score.poor {
+            color: #ef4444;
+        }
+
+        .framework-status {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .compliance-requirements {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .requirements-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .requirement-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .requirement-item:last-child {
+            border-bottom: none;
+        }
+
+        .requirement-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .requirement-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .requirement-progress {
+            width: 100px;
+            height: 6px;
+            background: #f3f4f6;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+
+        .requirement-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-compliant {
+            background: #10b981;
+        }
+
+        .progress-partial {
+            background: #f59e0b;
+        }
+
+        .progress-non-compliant {
+            background: #ef4444;
+        }
+
+        .ai-compliance {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .ai-compliance h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .ai-suggestions {
+            margin-bottom: 25px;
+        }
+
+        .suggestion-item {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .suggestion-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .suggestion-description {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .suggestion-priority {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .suggestion-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .suggestion-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .compliance-metrics {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .audit-trail {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .audit-trail h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .audit-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: #f3f4f6;
+            color: #666;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .audit-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .audit-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .audit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .audit-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .audit-time {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .audit-description {
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+
+        .audit-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .compliance-settings {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .compliance-settings h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .setting-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .setting-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .setting-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .setting-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle.active {
+            background: #667eea;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle.active::after {
+            transform: translateX(26px);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .select-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .compliance-summary {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .framework-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> Compliance Automation</h1>
+            <p>Automated regulatory compliance management with AI-powered monitoring</p>
+            
+            <div class="compliance-summary">
+                <div class="compliance-card">
+                    <div class="compliance-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="compliance-value">94%</div>
+                    <div class="compliance-label">Overall Compliance</div>
+                    <div class="compliance-status status-compliant">Compliant</div>
+                </div>
+                <div class="compliance-card">
+                    <div class="compliance-icon"><i class="fas fa-list-check"></i></div>
+                    <div class="compliance-value">156</div>
+                    <div class="compliance-label">Requirements Met</div>
+                    <div class="compliance-status status-compliant">94% Complete</div>
+                </div>
+                <div class="compliance-card">
+                    <div class="compliance-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="compliance-value">8</div>
+                    <div class="compliance-label">Issues Found</div>
+                    <div class="compliance-status status-warning">Needs Attention</div>
+                </div>
+                <div class="compliance-card">
+                    <div class="compliance-icon"><i class="fas fa-clock"></i></div>
+                    <div class="compliance-value">2.3d</div>
+                    <div class="compliance-label">Avg. Resolution</div>
+                    <div class="compliance-status status-compliant">Within SLA</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="compliance-dashboard">
+                <h2><i class="fas fa-tachometer-alt"></i> Compliance Dashboard</h2>
+                
+                <div class="dashboard-controls">
+                    <button class="control-btn" onclick="runAudit()">
+                        <i class="fas fa-play"></i> Run Audit
+                    </button>
+                    <button class="control-btn" onclick="generateReport()">
+                        <i class="fas fa-file-alt"></i> Generate Report
+                    </button>
+                    <button class="control-btn secondary" onclick="exportData()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="control-btn secondary" onclick="viewHistory()">
+                        <i class="fas fa-history"></i> History
+                    </button>
+                </div>
+
+                <div class="compliance-framework">
+                    <div class="framework-title">Compliance Frameworks</div>
+                    <div class="framework-grid">
+                        <div class="framework-item">
+                            <div class="framework-name">GDPR</div>
+                            <div class="framework-score excellent">98%</div>
+                            <div class="framework-status status-compliant">Compliant</div>
+                        </div>
+                        <div class="framework-item">
+                            <div class="framework-name">SOC 2</div>
+                            <div class="framework-score excellent">95%</div>
+                            <div class="framework-status status-compliant">Compliant</div>
+                        </div>
+                        <div class="framework-item">
+                            <div class="framework-name">ISO 27001</div>
+                            <div class="framework-score good">87%</div>
+                            <div class="framework-status status-warning">Partial</div>
+                        </div>
+                        <div class="framework-item">
+                            <div class="framework-name">HIPAA</div>
+                            <div class="framework-score excellent">92%</div>
+                            <div class="framework-status status-compliant">Compliant</div>
+                        </div>
+                        <div class="framework-item">
+                            <div class="framework-name">PCI DSS</div>
+                            <div class="framework-score good">89%</div>
+                            <div class="framework-status status-warning">Partial</div>
+                        </div>
+                        <div class="framework-item">
+                            <div class="framework-name">CCPA</div>
+                            <div class="framework-score excellent">96%</div>
+                            <div class="framework-status status-compliant">Compliant</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compliance-requirements">
+                    <div class="requirements-title">Key Requirements Status</div>
+                    <div class="requirement-item">
+                        <div class="requirement-name">Data Encryption at Rest</div>
+                        <div class="requirement-progress">
+                            <div class="requirement-progress-fill progress-compliant" style="width: 100%;"></div>
+                        </div>
+                        <div class="requirement-status status-compliant">Compliant</div>
+                    </div>
+                    <div class="requirement-item">
+                        <div class="requirement-name">Access Control Management</div>
+                        <div class="requirement-progress">
+                            <div class="requirement-progress-fill progress-compliant" style="width: 95%;"></div>
+                        </div>
+                        <div class="requirement-status status-compliant">Compliant</div>
+                    </div>
+                    <div class="requirement-item">
+                        <div class="requirement-name">Audit Logging</div>
+                        <div class="requirement-progress">
+                            <div class="requirement-progress-fill progress-partial" style="width: 78%;"></div>
+                        </div>
+                        <div class="requirement-status status-warning">Partial</div>
+                    </div>
+                    <div class="requirement-item">
+                        <div class="requirement-name">Data Retention Policy</div>
+                        <div class="requirement-progress">
+                            <div class="requirement-progress-fill progress-compliant" style="width: 100%;"></div>
+                        </div>
+                        <div class="requirement-status status-compliant">Compliant</div>
+                    </div>
+                    <div class="requirement-item">
+                        <div class="requirement-name">Incident Response Plan</div>
+                        <div class="requirement-progress">
+                            <div class="requirement-progress-fill progress-partial" style="width: 65%;"></div>
+                        </div>
+                        <div class="requirement-status status-warning">Partial</div>
+                    </div>
+                    <div class="requirement-item">
+                        <div class="requirement-name">Third-party Risk Assessment</div>
+                        <div class="requirement-progress">
+                            <div class="requirement-progress-fill progress-compliant" style="width: 88%;"></div>
+                        </div>
+                        <div class="requirement-status status-compliant">Compliant</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-compliance">
+                <h2><i class="fas fa-brain"></i> AI Compliance Assistant</h2>
+                
+                <div class="ai-suggestions">
+                    <div class="suggestion-item">
+                        <div class="suggestion-title">Audit Logging Enhancement</div>
+                        <div class="suggestion-description">
+                            Your audit logging is at 78% compliance. Implementing comprehensive logging for all user actions would bring you to 100% compliance.
+                        </div>
+                        <div class="suggestion-priority">Priority: High | Impact: +22% compliance</div>
+                        <div class="suggestion-actions">
+                            <button class="suggestion-btn">Implement</button>
+                            <button class="suggestion-btn">View Details</button>
+                        </div>
+                    </div>
+
+                    <div class="suggestion-item">
+                        <div class="suggestion-title">Incident Response Plan Update</div>
+                        <div class="suggestion-description">
+                            Your incident response plan needs updating to include new AI security threats and response procedures.
+                        </div>
+                        <div class="suggestion-priority">Priority: Medium | Impact: +35% compliance</div>
+                        <div class="suggestion-actions">
+                            <button class="suggestion-btn">Update Plan</button>
+                            <button class="suggestion-btn">Learn More</button>
+                        </div>
+                    </div>
+
+                    <div class="suggestion-item">
+                        <div class="suggestion-title">Data Classification Automation</div>
+                        <div class="suggestion-description">
+                            Implement automated data classification to ensure proper handling of sensitive information according to GDPR requirements.
+                        </div>
+                        <div class="suggestion-priority">Priority: Low | Impact: +8% compliance</div>
+                        <div class="suggestion-actions">
+                            <button class="suggestion-btn">Implement</button>
+                            <button class="suggestion-btn">View Analysis</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compliance-metrics">
+                    <div class="framework-title">Compliance Metrics</div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-value">94%</div>
+                            <div class="metric-label">Overall Score</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">156</div>
+                            <div class="metric-label">Requirements</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">8</div>
+                            <div class="metric-label">Issues</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">2.3d</div>
+                            <div class="metric-label">Avg. Resolution</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="audit-trail">
+            <h2><i class="fas fa-clipboard-list"></i> Audit Trail</h2>
+            
+            <div class="audit-filters">
+                <button class="filter-btn active" onclick="filterAudit('all')">All</button>
+                <button class="filter-btn" onclick="filterAudit('success')">Success</button>
+                <button class="filter-btn" onclick="filterAudit('warning')">Warning</button>
+                <button class="filter-btn" onclick="filterAudit('error')">Error</button>
+            </div>
+
+            <div class="audit-list">
+                <div class="audit-item">
+                    <div class="audit-header">
+                        <div class="audit-title">Data Encryption Check</div>
+                        <div class="audit-time">2 hours ago</div>
+                    </div>
+                    <div class="audit-description">Verified that all sensitive data is encrypted at rest using AES-256</div>
+                    <div class="audit-status status-success">Success</div>
+                </div>
+
+                <div class="audit-item">
+                    <div class="audit-header">
+                        <div class="audit-title">Access Control Audit</div>
+                        <div class="audit-time">4 hours ago</div>
+                    </div>
+                    <div class="audit-description">Found 3 inactive user accounts that need to be disabled</div>
+                    <div class="audit-status status-warning">Warning</div>
+                </div>
+
+                <div class="audit-item">
+                    <div class="audit-header">
+                        <div class="audit-title">Backup Verification</div>
+                        <div class="audit-time">6 hours ago</div>
+                    </div>
+                    <div class="audit-description">Successfully verified all backup systems are functioning correctly</div>
+                    <div class="audit-status status-success">Success</div>
+                </div>
+
+                <div class="audit-item">
+                    <div class="audit-header">
+                        <div class="audit-title">Security Patch Check</div>
+                        <div class="audit-time">8 hours ago</div>
+                    </div>
+                    <div class="audit-description">Identified 2 critical security patches that need to be applied</div>
+                    <div class="audit-status status-error">Error</div>
+                </div>
+
+                <div class="audit-item">
+                    <div class="audit-header">
+                        <div class="audit-title">Compliance Report Generation</div>
+                        <div class="audit-time">1 day ago</div>
+                    </div>
+                    <div class="audit-description">Generated monthly compliance report for SOC 2 framework</div>
+                    <div class="audit-status status-success">Success</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="compliance-settings">
+            <h2><i class="fas fa-cog"></i> Compliance Settings</h2>
+            
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <div class="setting-title">Auto Compliance Monitoring</div>
+                    <div class="setting-description">Automatically monitor compliance requirements and generate alerts</div>
+                    <div class="setting-control">
+                        <div class="toggle active" onclick="toggleSetting(this)"></div>
+                        <span>Enabled</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">AI Risk Assessment</div>
+                    <div class="setting-description">Use AI to assess compliance risks and provide recommendations</div>
+                    <div class="setting-control">
+                        <div class="toggle active" onclick="toggleSetting(this)"></div>
+                        <span>Enabled</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Automated Reporting</div>
+                    <div class="setting-description">Generate compliance reports automatically on schedule</div>
+                    <div class="setting-control">
+                        <div class="toggle active" onclick="toggleSetting(this)"></div>
+                        <span>Enabled</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Alert Threshold</div>
+                    <div class="setting-description">Minimum compliance percentage to trigger alerts</div>
+                    <div class="setting-control">
+                        <input type="number" class="input-field" value="90" min="50" max="100">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Audit Frequency</div>
+                    <div class="setting-description">How often to run compliance audits</div>
+                    <div class="setting-control">
+                        <select class="select-field">
+                            <option>Daily</option>
+                            <option selected>Weekly</option>
+                            <option>Monthly</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Notification Email</div>
+                    <div class="setting-description">Email address for compliance alerts</div>
+                    <div class="setting-control">
+                        <input type="email" class="input-field" placeholder="compliance@company.com">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSetting(element) {
+            element.classList.toggle('active');
+            const isActive = element.classList.contains('active');
+            const span = element.nextElementSibling;
+            span.textContent = isActive ? 'Enabled' : 'Disabled';
+        }
+
+        function runAudit() {
+            alert('Compliance audit started... This may take a few minutes.');
+            // Simulate audit process
+            setTimeout(() => {
+                alert('Audit completed! Found 2 new issues that need attention.');
+            }, 3000);
+        }
+
+        function generateReport() {
+            alert('Generating compliance report...');
+        }
+
+        function exportData() {
+            alert('Compliance data exported successfully!');
+        }
+
+        function viewHistory() {
+            alert('Opening compliance history...');
+        }
+
+        function filterAudit(filter) {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter audit items based on status
+            const auditItems = document.querySelectorAll('.audit-item');
+            auditItems.forEach(item => {
+                const status = item.querySelector('.audit-status');
+                if (filter === 'all' || status.classList.contains('status-' + filter)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Auto-update compliance metrics
+        setInterval(function() {
+            const complianceValues = document.querySelectorAll('.compliance-value');
+            complianceValues.forEach(value => {
+                const currentValue = parseFloat(value.textContent);
+                if (!isNaN(currentValue)) {
+                    const change = (Math.random() - 0.5) * 0.01;
+                    const newValue = Math.max(0, Math.min(100, currentValue + change));
+                    if (value.textContent.includes('%')) {
+                        value.textContent = newValue.toFixed(0) + '%';
+                    } else {
+                        value.textContent = Math.round(newValue);
+                    }
+                }
+            });
+        }, 30000);
+    </script>
+</body>
+</html>

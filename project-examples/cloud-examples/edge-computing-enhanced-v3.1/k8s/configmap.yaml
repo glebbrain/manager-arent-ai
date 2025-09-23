@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edge-computing-config
+  namespace: edge-computing
+data:
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  PORT: "3000"
+  HOST: "0.0.0.0"
+  
+  # AI Processing Configuration
+  AI_PROCESSING_ENABLED: "true"
+  AI_MODEL_PATH: "/app/models"
+  AI_INFERENCE_TIMEOUT: "1000"
+  AI_BATCH_SIZE: "1"
+  AI_QUANTIZATION: "true"
+  
+  # Analytics Configuration
+  ANALYTICS_ENABLED: "true"
+  ANALYTICS_REAL_TIME_PROCESSING: "true"
+  ANALYTICS_DATA_RETENTION: "3600"
+  ANALYTICS_COMPRESSION_ENABLED: "true"
+  
+  # Security Configuration
+  SECURITY_ENABLED: "true"
+  SECURITY_ZERO_TRUST: "true"
+  SECURITY_ENCRYPTION_LEVEL: "AES-256"
+  SECURITY_DEVICE_AUTHENTICATION: "true"
+  
+  # Orchestration Configuration
+  ORCHESTRATION_ENABLED: "true"
+  ORCHESTRATION_LOAD_BALANCING: "round-robin"
+  ORCHESTRATION_AUTO_SCALING: "true"
+  ORCHESTRATION_HEALTH_CHECK_INTERVAL: "30000"
+  
+  # Optimization Configuration
+  OPTIMIZATION_ENABLED: "true"
+  OPTIMIZATION_LEVEL: "balanced"
+  OPTIMIZATION_LATENCY: "true"
+  OPTIMIZATION_THROUGHPUT: "true"
+  OPTIMIZATION_RESOURCE: "true"
+  OPTIMIZATION_ENERGY: "true"
+  OPTIMIZATION_COST: "true"

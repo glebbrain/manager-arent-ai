@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: advanced-security
+  namespace: advanced-security
+  labels:
+    app: advanced-security
+    version: "3.1.0"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: advanced-security
+  template:
+    metadata:
+      labels:
+        app: advanced-security
+        version: "3.1.0"
+    spec:
+      containers:
+      - name: advanced-security
+        image: advanced-security-v3.1:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: CONTRACT_ADDRESS
+          valueFrom:
+            secretKeyRef:
+              name: blockchain-secrets
+              key: contract-address
+        - name: PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: blockchain-secrets
+              key: private-key
+        envFrom:
+        - configMapRef:
+            name: advanced-security-config
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: models
+          mountPath: /app/models
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: models
+        emptyDir: {}
+      restartPolicy: Always

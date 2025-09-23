@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderator Dashboard - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .dashboard { display: flex; height: 100vh; }
+        .sidebar { width: 250px; background: white; border-right: 1px solid #e5e7eb; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stat-card h3 { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+        .stat-card p { color: #6b7280; }
+        .section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .section h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #1f2937; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .table th { background: #f8fafc; font-weight: 600; color: #374151; }
+        .btn { padding: 0.5rem 1rem; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .nav { padding: 1rem; }
+        .nav-item { display: block; padding: 0.75rem; color: #6b7280; text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .nav-item:hover, .nav-item.active { background: #eff6ff; color: #2563eb; }
+        .chart { height: 300px; background: #f8fafc; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6b7280; }
+        .filters { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .filter-select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; }
+        .search-input { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; width: 200px; }
+        .status-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 500; }
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-archived { background: #f3f4f6; color: #6b7280; }
+        .ai-recommendations { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+        .ai-recommendations h4 { color: #1e40af; margin-bottom: 0.5rem; }
+        .ai-recommendations ul { list-style: none; }
+        .ai-recommendations li { padding: 0.25rem 0; color: #374151; }
+        .ai-recommendations li::before { content: '•'; color: #2563eb; margin-right: 0.5rem; }
+        @media (max-width: 768px) {
+            .dashboard { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .filters { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="nav">
+                <a href="#" class="nav-item active"><i class="fas fa-home"></i> Главная</a>
+                <a href="#" class="nav-item"><i class="fas fa-project-diagram"></i> Проекты</a>
+                <a href="#" class="nav-item"><i class="fas fa-users"></i> Пользователи</a>
+                <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Аналитика</a>
+                <a href="#" class="nav-item"><i class="fas fa-cog"></i> Настройки</a>
+                <a href="#" class="nav-item"><i class="fas fa-server"></i> Система</a>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-user-shield"></i> Moderator Dashboard</h1>
+                <div>
+                    <button class="btn btn-primary"><i class="fas fa-plus"></i> Создать проект</button>
+                    <button class="btn btn-secondary"><i class="fas fa-download"></i> Экспорт</button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <!-- AI Recommendations -->
+                <div class="ai-recommendations">
+                    <h4><i class="fas fa-robot"></i> AI-рекомендации</h4>
+                    <ul>
+                        <li>Увеличить кэш для часто используемых проектов</li>
+                        <li>Оптимизировать запросы к базе данных</li>
+                        <li>Добавить CDN для статических файлов</li>
+                    </ul>
+                </div>
+                
+                <!-- Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>24</h3>
+                        <p>Активные проекты</p>
+                        <small style="color: #10b981;">+12% за месяц</small>
+                    </div>
+                    <div class="stat-card">
+                        <h3>156</h3>
+                        <p>Пользователи онлайн</p>
+                        <small style="color: #10b981;">+25% за неделю</small>
+                    </div>
+                    <div class="stat-card">
+                        <h3>98%</h3>
+                        <p>Производительность</p>
+                        <small style="color: #10b981;">+2% за неделю</small>
+                    </div>
+                    <div class="stat-card">
+                        <h3>67%</h3>
+                        <p>Использование диска</p>
+                        <small style="color: #f59e0b;">+5% за месяц</small>
+                    </div>
+                </div>
+                
+                <!-- Projects Management -->
+                <div class="section">
+                    <h2><i class="fas fa-project-diagram"></i> Управление проектами</h2>
+                    <div class="filters">
+                        <input type="text" class="search-input" placeholder="Поиск проектов...">
+                        <select class="filter-select">
+                            <option>Все статусы</option>
+                            <option>Активные</option>
+                            <option>Архивные</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>Все типы</option>
+                            <option>Web App</option>
+                            <option>Mobile App</option>
+                            <option>AI/ML</option>
+                        </select>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Автор</th>
+                                <th>Технологии</th>
+                                <th>Статус</th>
+                                <th>Рейтинг</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>React E-commerce Platform</td>
+                                <td>@dev123</td>
+                                <td>React + Node.js</td>
+                                <td><span class="status-badge status-active">Активный</span></td>
+                                <td>4.8 (156)</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm">Редактировать</button>
+                                    <button class="btn btn-danger btn-sm">Удалить</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Vue.js Admin Dashboard</td>
+                                <td>@designer456</td>
+                                <td>Vue + TypeScript</td>
+                                <td><span class="status-badge status-pending">Тест</span></td>
+                                <td>4.6 (89)</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm">Редактировать</button>
+                                    <button class="btn btn-danger btn-sm">Удалить</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>React Native Mobile App</td>
+                                <td>@mobile_dev</td>
+                                <td>React Native + Firebase</td>
+                                <td><span class="status-badge status-archived">Архив</span></td>
+                                <td>4.7 (234)</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm">Редактировать</button>
+                                    <button class="btn btn-danger btn-sm">Удалить</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Users Management -->
+                <div class="section">
+                    <h2><i class="fas fa-users"></i> Управление пользователями</h2>
+                    <div class="filters">
+                        <input type="text" class="search-input" placeholder="Поиск пользователей...">
+                        <select class="filter-select">
+                            <option>Все роли</option>
+                            <option>Разработчик</option>
+                            <option>Дизайнер</option>
+                            <option>Администратор</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>Все статусы</option>
+                            <option>Активные</option>
+                            <option>Заблокированные</option>
+                        </select>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Пользователь</th>
+                                <th>Роль</th>
+                                <th>Проекты</th>
+                                <th>Статус</th>
+                                <th>Последний вход</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>@dev123 (Иван Петров)</td>
+                                <td>Разработчик</td>
+                                <td>8</td>
+                                <td><span class="status-badge status-active">Активен</span></td>
+                                <td>2 часа назад</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm">Редактировать</button>
+                                    <button class="btn btn-danger btn-sm">Заблокировать</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>@designer456 (Анна Сидорова)</td>
+                                <td>Дизайнер</td>
+                                <td>12</td>
+                                <td><span class="status-badge status-active">Активен</span></td>
+                                <td>1 час назад</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm">Редактировать</button>
+                                    <button class="btn btn-danger btn-sm">Заблокировать</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>@admin789 (Петр Козлов)</td>
+                                <td>Администратор</td>
+                                <td>25</td>
+                                <td><span class="status-badge status-active">Активен</span></td>
+                                <td>30 минут назад</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm">Редактировать</button>
+                                    <button class="btn btn-danger btn-sm">Заблокировать</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- System Analytics -->
+                <div class="section">
+                    <h2><i class="fas fa-chart-line"></i> Системная аналитика</h2>
+                    <div class="chart">
+                        <i class="fas fa-chart-bar" style="font-size: 3rem; color: #d1d5db;"></i>
+                        <p>График производительности за последние 24 часа</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simple JavaScript for basic functionality
+        function filterProjects() {
+            console.log('Filtering projects...');
+        }
+        
+        function filterUsers() {
+            console.log('Filtering users...');
+        }
+        
+        function editProject(id) {
+            alert(`Редактирование проекта ${id}`);
+        }
+        
+        function deleteProject(id) {
+            if (confirm('Вы уверены, что хотите удалить проект?')) {
+                alert(`Проект ${id} удален`);
+            }
+        }
+        
+        function editUser(id) {
+            alert(`Редактирование пользователя ${id}`);
+        }
+        
+        function blockUser(id) {
+            if (confirm('Вы уверены, что хотите заблокировать пользователя?')) {
+                alert(`Пользователь ${id} заблокирован`);
+            }
+        }
+        
+        // Add event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers for buttons
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const action = this.textContent.trim();
+                    if (action.includes('Редактировать')) {
+                        editProject(1);
+                    } else if (action.includes('Удалить')) {
+                        deleteProject(1);
+                    } else if (action.includes('Заблокировать')) {
+                        blockUser(1);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

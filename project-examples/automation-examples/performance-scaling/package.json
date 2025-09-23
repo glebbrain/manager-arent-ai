@@ -1,0 +1,59 @@
+{
+  "name": "performance-scaling-system",
+  "version": "2.0.0",
+  "description": "Advanced auto-scaling and load balancing system with intelligent performance optimization",
+  "main": "auto-scaling/auto-scaler.js",
+  "scripts": {
+    "start": "node auto-scaling/auto-scaler.js",
+    "start:scaler": "node auto-scaling/auto-scaler.js",
+    "start:balancer": "node load-balancing/load-balancer.js",
+    "start:monitor": "node performance-monitoring/performance-monitor.js",
+    "test": "jest",
+    "test:scaling": "jest auto-scaling/",
+    "test:balancing": "jest load-balancing/",
+    "test:monitoring": "jest performance-monitoring/",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:comprehensive": "npm run test:scaling && npm run test:balancing && npm run test:monitoring && npm run test:integration",
+    "docker:build": "docker build -t performance-scaling-system .",
+    "docker:run": "docker run -p 3009:3009 -p 3010:3010 performance-scaling-system",
+    "docker:compose": "docker-compose up -d",
+    "deploy": "./deploy-performance-scaling.ps1",
+    "test:deployment": "./test-performance-scaling.ps1"
+  },
+  "keywords": [
+    "auto-scaling",
+    "load-balancing",
+    "performance",
+    "scaling",
+    "kubernetes",
+    "monitoring"
+  ],
+  "author": "ManagerAgentAI",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "winston": "^3.10.0",
+    "axios": "^1.5.0",
+    "dotenv": "^16.3.1",
+    "node-cron": "^3.0.2",
+    "redis": "^4.6.8",
+    "mongodb": "^6.1.0",
+    "@kubernetes/client-node": "^0.20.0",
+    "prometheus-client": "^15.0.0",
+    "grafana-api": "^1.0.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "ws": "^8.14.2",
+    "socket.io": "^4.7.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "nodemon": "^3.0.1",
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

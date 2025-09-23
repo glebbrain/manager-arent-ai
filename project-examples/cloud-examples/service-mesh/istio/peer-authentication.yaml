@@ -1,0 +1,191 @@
+# Peer Authentication Configuration for ManagerAgentAI
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: manager-agent-ai-mtls
+  namespace: manager-agent-ai
+spec:
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for API Gateway
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: api-gateway-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: api-gateway
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for Dashboard
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: dashboard-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: dashboard
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for Event Bus
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: event-bus-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: event-bus
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for Project Manager
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: project-manager-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: project-manager
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for AI Planner
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: ai-planner-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: ai-planner
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for Workflow Orchestrator
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: workflow-orchestrator-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: workflow-orchestrator
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for Smart Notifications
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: smart-notifications-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: smart-notifications
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for Template Generator
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: template-generator-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: template-generator
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for Consistency Manager
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: consistency-manager-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: consistency-manager
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for API Versioning
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: api-versioning-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: api-versioning
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for Deadline Prediction
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: deadline-prediction-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: deadline-prediction
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for Task Distribution
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: task-distribution-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: task-distribution
+  mtls:
+    mode: STRICT
+---
+# Peer Authentication for PostgreSQL
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: postgres-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  mtls:
+    mode: PERMISSIVE
+---
+# Peer Authentication for Redis
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: redis-mtls
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  mtls:
+    mode: PERMISSIVE

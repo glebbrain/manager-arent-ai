@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Versioning - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .versioning-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .versioning-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .versioning-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .versioning-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .version-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .version-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .version-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .version-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .version-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-current {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-deprecated {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-retired {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .version-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .version-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .version-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .versioning-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .versioning-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .versioning-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .versioning-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recent-changes {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .changes-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .change-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .change-item:hover {
+            background: #f8f9fa;
+        }
+
+        .change-item:last-child {
+            border-bottom: none;
+        }
+
+        .change-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .change-icon.success {
+            background: #10b981;
+        }
+
+        .change-icon.warning {
+            background: #f59e0b;
+        }
+
+        .change-icon.error {
+            background: #ef4444;
+        }
+
+        .change-content {
+            flex: 1;
+        }
+
+        .change-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .change-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .change-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .versioning-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .versioning-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-code-branch"></i> API Versioning</h1>
+            <p>API versioning system for Universal Project Manager v3.2</p>
+        </div>
+
+        <div class="versioning-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-code-branch"></i></div>
+                <div class="overview-value">8</div>
+                <div class="overview-label">Active Versions</div>
+                <div class="overview-trend trend-up">+1 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-tachometer-alt"></i></div>
+                <div class="overview-value">45ms</div>
+                <div class="overview-label">Avg Response Time</div>
+                <div class="overview-trend trend-down">-8ms this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="overview-value">99.8%</div>
+                <div class="overview-label">Uptime</div>
+                <div class="overview-trend trend-up">+0.2% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-download"></i></div>
+                <div class="overview-value">2.3M</div>
+                <div class="overview-label">Requests/day</div>
+                <div class="overview-trend trend-up">+156K this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="overview-value">3</div>
+                <div class="overview-label">Deprecated APIs</div>
+                <div class="overview-trend trend-down">-2 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">98%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+2% improvement</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="versioning-section">
+                <h2><i class="fas fa-chart-area"></i> API Versions</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">API Version Usage Distribution</div>
+                    <canvas id="versionChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">API Version Adoption Over Time</div>
+                    <canvas id="adoptionChart"></canvas>
+                </div>
+
+                <div class="versioning-grid">
+                    <div class="version-card">
+                        <div class="version-header">
+                            <div class="version-title">API v3.2</div>
+                            <div class="version-status status-current">Current</div>
+                        </div>
+                        <div class="version-description">Latest stable version with all features</div>
+                        <div class="version-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">1.2M</div>
+                                <div class="metric-label">Requests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">42ms</div>
+                                <div class="metric-label">Response</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">99.9%</div>
+                                <div class="metric-label">Uptime</div>
+                            </div>
+                        </div>
+                        <div class="version-actions">
+                            <button class="action-btn">Manage</button>
+                            <button class="action-btn secondary">Monitor</button>
+                        </div>
+                    </div>
+
+                    <div class="version-card">
+                        <div class="version-header">
+                            <div class="version-title">API v3.1</div>
+                            <div class="version-status status-current">Current</div>
+                        </div>
+                        <div class="version-description">Previous stable version with legacy support</div>
+                        <div class="version-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">856K</div>
+                                <div class="metric-label">Requests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">45ms</div>
+                                <div class="metric-label">Response</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">99.8%</div>
+                                <div class="metric-label">Uptime</div>
+                            </div>
+                        </div>
+                        <div class="version-actions">
+                            <button class="action-btn">Manage</button>
+                            <button class="action-btn secondary">Monitor</button>
+                        </div>
+                    </div>
+
+                    <div class="version-card">
+                        <div class="version-header">
+                            <div class="version-title">API v3.0</div>
+                            <div class="version-status status-deprecated">Deprecated</div>
+                        </div>
+                        <div class="version-description">Deprecated version - migration recommended</div>
+                        <div class="version-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">234K</div>
+                                <div class="metric-label">Requests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">52ms</div>
+                                <div class="metric-label">Response</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">99.5%</div>
+                                <div class="metric-label">Uptime</div>
+                            </div>
+                        </div>
+                        <div class="version-actions">
+                            <button class="action-btn">Migrate</button>
+                            <button class="action-btn secondary">Monitor</button>
+                        </div>
+                    </div>
+
+                    <div class="version-card">
+                        <div class="version-header">
+                            <div class="version-title">API v2.9</div>
+                            <div class="version-status status-deprecated">Deprecated</div>
+                        </div>
+                        <div class="version-description">Legacy version - will be retired soon</div>
+                        <div class="version-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">89K</div>
+                                <div class="metric-label">Requests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">67ms</div>
+                                <div class="metric-label">Response</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">99.2%</div>
+                                <div class="metric-label">Uptime</div>
+                            </div>
+                        </div>
+                        <div class="version-actions">
+                            <button class="action-btn">Migrate</button>
+                            <button class="action-btn secondary">Monitor</button>
+                        </div>
+                    </div>
+
+                    <div class="version-card">
+                        <div class="version-header">
+                            <div class="version-title">API v2.8</div>
+                            <div class="version-status status-retired">Retired</div>
+                        </div>
+                        <div class="version-description">Retired version - no longer supported</div>
+                        <div class="version-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">12K</div>
+                                <div class="metric-label">Requests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">89ms</div>
+                                <div class="metric-label">Response</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">95.0%</div>
+                                <div class="metric-label">Uptime</div>
+                            </div>
+                        </div>
+                        <div class="version-actions">
+                            <button class="action-btn">Archive</button>
+                            <button class="action-btn secondary">Monitor</button>
+                        </div>
+                    </div>
+
+                    <div class="version-card">
+                        <div class="version-header">
+                            <div class="version-title">API v3.3-beta</div>
+                            <div class="version-status status-current">Beta</div>
+                        </div>
+                        <div class="version-description">Beta version with experimental features</div>
+                        <div class="version-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">45K</div>
+                                <div class="metric-label">Requests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">38ms</div>
+                                <div class="metric-label">Response</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">98.5%</div>
+                                <div class="metric-label">Uptime</div>
+                            </div>
+                        </div>
+                        <div class="version-actions">
+                            <button class="action-btn">Test</button>
+                            <button class="action-btn secondary">Monitor</button>
+                        </div>
+                    </div>
+
+                    <div class="version-card">
+                        <div class="version-header">
+                            <div class="version-title">API v3.4-alpha</div>
+                            <div class="version-status status-current">Alpha</div>
+                        </div>
+                        <div class="version-description">Alpha version for internal testing</div>
+                        <div class="version-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">8K</div>
+                                <div class="metric-label">Requests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">35ms</div>
+                                <div class="metric-label">Response</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">97.8%</div>
+                                <div class="metric-label">Uptime</div>
+                            </div>
+                        </div>
+                        <div class="version-actions">
+                            <button class="action-btn">Test</button>
+                            <button class="action-btn secondary">Monitor</button>
+                        </div>
+                    </div>
+
+                    <div class="version-card">
+                        <div class="version-header">
+                            <div class="version-title">API v2.7</div>
+                            <div class="version-status status-retired">Retired</div>
+                        </div>
+                        <div class="version-description">Retired version - archived</div>
+                        <div class="version-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">0</div>
+                                <div class="metric-label">Requests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">-</div>
+                                <div class="metric-label">Response</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0%</div>
+                                <div class="metric-label">Uptime</div>
+                            </div>
+                        </div>
+                        <div class="version-actions">
+                            <button class="action-btn">Archive</button>
+                            <button class="action-btn secondary">View</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="versioning-controls">
+                <h2><i class="fas fa-cogs"></i> Versioning Controls</h2>
+                
+                <div class="versioning-actions">
+                    <button class="control-btn" onclick="createVersion()">
+                        <i class="fas fa-plus"></i> Create Version
+                    </button>
+                    <button class="control-btn secondary" onclick="migrateUsers()">
+                        <i class="fas fa-arrow-right"></i> Migrate Users
+                    </button>
+                    <button class="control-btn secondary" onclick="viewAnalytics()">
+                        <i class="fas fa-chart-bar"></i> View Analytics
+                    </button>
+                </div>
+
+                <div class="versioning-status">
+                    <div class="status-title">Versioning Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Last Update</div>
+                        <div class="status-value">3 minutes ago</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Active Versions</div>
+                        <div class="status-value">8 versions</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Total Requests</div>
+                        <div class="status-value">2.3M requests/day</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Avg Response Time</div>
+                        <div class="status-value">45ms</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Deprecated APIs</div>
+                        <div class="status-value">3 APIs</div>
+                    </div>
+                </div>
+
+                <div class="recent-changes">
+                    <div class="changes-title">Recent Version Changes</div>
+                    <div class="change-item">
+                        <div class="change-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="change-content">
+                            <div class="change-title">API v3.2 Released</div>
+                            <div class="change-description">New stable version with enhanced features</div>
+                        </div>
+                        <div class="change-time">2 hours ago</div>
+                    </div>
+                    <div class="change-item">
+                        <div class="change-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="change-content">
+                            <div class="change-title">API v3.0 Deprecated</div>
+                            <div class="change-description">Version marked as deprecated, migration recommended</div>
+                        </div>
+                        <div class="change-time">1 day ago</div>
+                    </div>
+                    <div class="change-item">
+                        <div class="change-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="change-content">
+                            <div class="change-title">API v3.3-beta Released</div>
+                            <div class="change-description">Beta version with experimental features</div>
+                        </div>
+                        <div class="change-time">3 days ago</div>
+                    </div>
+                    <div class="change-item">
+                        <div class="change-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="change-content">
+                            <div class="change-title">API v2.8 Retired</div>
+                            <div class="change-description">Legacy version retired and archived</div>
+                        </div>
+                        <div class="change-time">1 week ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI Versioning Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        API versioning improved compatibility by 30% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Some deprecated APIs need user migration
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI patterns available for better version management
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let versionChart, adoptionChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Version Chart
+            const versionCtx = document.getElementById('versionChart').getContext('2d');
+            versionChart = new Chart(versionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['v3.2', 'v3.1', 'v3.0', 'v2.9', 'v2.8', 'v3.3-beta', 'v3.4-alpha', 'v2.7'],
+                    datasets: [{
+                        data: [1200, 856, 234, 89, 12, 45, 8, 0],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#6b7280'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Adoption Chart
+            const adoptionCtx = document.getElementById('adoptionChart').getContext('2d');
+            adoptionChart = new Chart(adoptionCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(7),
+                    datasets: [{
+                        label: 'v3.2 Adoption (%)',
+                        data: [45, 52, 58, 65, 72, 78, 85],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'v3.1 Usage (%)',
+                        data: [35, 32, 28, 25, 22, 18, 15],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'v3.0 Usage (%)',
+                        data: [20, 16, 14, 10, 6, 4, 0],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels(days) {
+            const labels = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function createVersion() {
+            alert('Creating new API version...');
+        }
+
+        function migrateUsers() {
+            alert('Starting user migration process...');
+        }
+
+        function viewAnalytics() {
+            alert('Opening version analytics...');
+        }
+    </script>
+</body>
+</html>

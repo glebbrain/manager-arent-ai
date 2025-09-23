@@ -1,0 +1,177 @@
+{
+  "version": "4.4.0",
+  "buildDate": "2025-01-31",
+  "author": "Universal Development Team",
+  "description": "Universal Automation Toolkit v4.4 - Enhanced Performance & Optimization",
+  "features": {
+    "ai": {
+      "enabled": true,
+      "multiModal": true,
+      "quantum": true,
+      "enterprise": true,
+      "uiux": true,
+      "advanced": true,
+      "migration": true,
+      "backup": true,
+      "nextGeneration": true,
+      "edgeComputing": true,
+      "blockchain": true,
+      "vr": true,
+      "iot": true,
+      "5g": true,
+      "microservices": true,
+      "serverless": true,
+      "containers": true,
+      "api": true
+    },
+    "automation": {
+      "projectScanner": true,
+      "universalManager": true,
+      "aiFeatures": true,
+      "testing": true,
+      "build": true,
+      "deployment": true,
+      "monitoring": true,
+      "optimization": true,
+      "performance": true,
+      "caching": true,
+      "parallelExecution": true,
+      "memoryOptimization": true,
+      "intelligentCaching": true,
+      "batchProcessing": true,
+      "smartScheduling": true
+    }
+  },
+  "settings": {
+    "verbose": false,
+    "generateReports": true,
+    "enableLogging": true,
+    "parallelProcessing": true,
+    "autoBackup": true,
+    "performanceMonitoring": true,
+    "intelligentCaching": true,
+    "memoryOptimization": true,
+    "batchProcessing": true,
+    "smartScheduling": true,
+    "errorRecovery": true,
+    "resourceManagement": true
+  },
+  "performance": {
+    "maxConcurrentTasks": 20,
+    "memoryLimit": "4GB",
+    "timeout": 600,
+    "retryAttempts": 5,
+    "cacheEnabled": true,
+    "parallelExecution": true,
+    "batchSize": 10,
+    "memoryOptimized": true,
+    "intelligentCaching": true,
+    "performanceMonitoring": true,
+    "resourceManagement": true,
+    "errorRecovery": true
+  },
+  "optimization": {
+    "intelligentCaching": {
+      "enabled": true,
+      "cacheSize": "1GB",
+      "ttl": 3600,
+      "invalidationStrategy": "smart",
+      "preloadEnabled": true,
+      "compressionEnabled": true
+    },
+    "parallelExecution": {
+      "enabled": true,
+      "maxWorkers": 8,
+      "batchSize": 5,
+      "timeout": 300,
+      "loadBalancing": true,
+      "priorityQueuing": true
+    },
+    "memoryOptimization": {
+      "enabled": true,
+      "gcThreshold": "80%",
+      "memoryPool": true,
+      "leakDetection": true,
+      "compressionEnabled": true,
+      "garbageCollection": "aggressive"
+    },
+    "performanceMonitoring": {
+      "enabled": true,
+      "metricsInterval": 30,
+      "alertThreshold": 90,
+      "reporting": true,
+      "realTimeMonitoring": true,
+      "predictiveAnalytics": true
+    },
+    "resourceManagement": {
+      "enabled": true,
+      "cpuLimit": "80%",
+      "memoryLimit": "4GB",
+      "diskLimit": "10GB",
+      "networkLimit": "100Mbps",
+      "autoScaling": true
+    },
+    "errorRecovery": {
+      "enabled": true,
+      "maxRetries": 3,
+      "retryDelay": 5,
+      "fallbackEnabled": true,
+      "circuitBreaker": true,
+      "healthChecks": true
+    }
+  },
+  "aliases": {
+    "v4.4": {
+      "qao": "Quick-Access-Optimized",
+      "umo": "Universal-Manager-Optimized", 
+      "pso": "Project-Scanner-Optimized",
+      "qam": "Quick-Access-Monitor",
+      "qas": "Quick-Access-Status",
+      "qac": "Quick-Access-Cache",
+      "qacr": "Quick-Access-Cache-Reset",
+      "po": "Performance-Optimizer"
+    },
+    "legacy": {
+      "ia": "Invoke-Automation",
+      "qa": "Quick-Access",
+      "iaq": "Invoke-Automation-Quick",
+      "iad": "Invoke-Automation-Dev",
+      "iap": "Invoke-Automation-Prod",
+      "qasc": "Quick-Access-Scan",
+      "qad": "Quick-Dev",
+      "psc": "Project-Scanner",
+      "uam": "Universal-Automation-Manager",
+      "aefm": "AI-Enhanced-Features-Manager"
+    }
+  },
+  "scripts": {
+    "main": {
+      "quickAccess": ".automation/Quick-Access-Optimized-v4.3.ps1",
+      "universalManager": ".automation/Universal-Manager-Optimized-v4.2.ps1",
+      "projectScanner": ".automation/Project-Scanner-Optimized-v4.2.ps1",
+      "performanceOptimizer": ".automation/Performance-Optimizer-v4.4.ps1"
+    },
+    "ai": {
+      "aiModules": ".automation/AI-Modules-Manager-v4.0.ps1",
+      "aiFeatures": ".automation/AI-Enhanced-Features-Manager-v3.5.ps1"
+    },
+    "utilities": {
+      "aliases": ".automation/scripts/New-Aliases-v4.3.ps1"
+    }
+  },
+  "deployment": {
+    "dev": {
+      "path": "F:\\ProjectsAI",
+      "description": "Development environment"
+    },
+    "prom": {
+      "path": "G:\\OSPanel\\home",
+      "description": "Local testing environment"
+    },
+    "prod": {
+      "path": "/var/www/u0488409/data/www",
+      "server": "u0488409@37.140.195.19",
+      "description": "Production environment"
+    }
+  }
+}

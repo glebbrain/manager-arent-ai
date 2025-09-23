@@ -1,0 +1,133 @@
+# Multi-stage Dockerfile for Forecasting Service v2.4
+FROM node:18-alpine AS base
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/cache/apk/*
+
+# Copy package files
+COPY forecasting/package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Development stage
+FROM base AS development
+
+# Install development dependencies
+RUN npm ci
+
+# Copy source code
+COPY forecasting/ .
+
+# Create logs directory
+RUN mkdir -p logs
+
+# Expose port
+EXPOSE 3016
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3016/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Start development server
+CMD ["npm", "run", "dev"]
+
+# Production stage
+FROM base AS production
+
+# Create non-root user
+RUN addgroup -g 1001 -S forecasting && \
+    adduser -S forecasting -u 1001
+
+# Copy source code
+COPY forecasting/ .
+
+# Create necessary directories
+RUN mkdir -p logs config && \
+    chown -R forecasting:forecasting /app
+
+# Switch to non-root user
+USER forecasting
+
+# Expose port
+EXPOSE 3016
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3016/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Start production server
+CMD ["npm", "start"]
+
+# Build stage
+FROM base AS build
+
+# Install build dependencies
+RUN npm ci
+
+# Copy source code
+COPY forecasting/ .
+
+# Build application
+RUN npm run build
+
+# Final production stage
+FROM node:18-alpine AS final
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/cache/apk/*
+
+# Copy package files
+COPY forecasting/package*.json ./
+
+# Install production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy built application
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/forecasting-engine.js ./
+COPY --from=build /app/integrated-forecasting-system.js ./
+COPY --from=build /app/resource-forecaster.js ./
+COPY --from=build /app/capacity-forecaster.js ./
+COPY --from=build /app/demand-forecaster.js ./
+COPY --from=build /app/risk-forecaster.js ./
+COPY --from=build /app/scenario-planner.js ./
+COPY --from=build /app/forecast-validator.js ./
+COPY --from=build /app/forecast-optimizer.js ./
+COPY --from=build /app/forecast-monitor.js ./
+COPY --from=build /app/server.js ./
+
+# Create non-root user
+RUN addgroup -g 1001 -S forecasting && \
+    adduser -S forecasting -u 1001
+
+# Create necessary directories
+RUN mkdir -p logs config && \
+    chown -R forecasting:forecasting /app
+
+# Switch to non-root user
+USER forecasting
+
+# Expose port
+EXPOSE 3016
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3016/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Start production server
+CMD ["node", "server.js"]

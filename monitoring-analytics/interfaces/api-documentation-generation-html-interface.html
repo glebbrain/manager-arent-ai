@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation Generation - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .api-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .generation-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .generation-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .api-endpoints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .endpoint-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .endpoint-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .endpoint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .endpoint-method {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .method-get {
+            background: #10b981;
+        }
+
+        .method-post {
+            background: #3b82f6;
+        }
+
+        .method-put {
+            background: #f59e0b;
+        }
+
+        .method-delete {
+            background: #ef4444;
+        }
+
+        .endpoint-path {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .endpoint-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .endpoint-params {
+            margin-bottom: 15px;
+        }
+
+        .params-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .param-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .param-item:last-child {
+            border-bottom: none;
+        }
+
+        .param-name {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-size: 0.8rem;
+        }
+
+        .param-type {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .endpoint-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .generation-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .generation-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .control-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .option-item:hover {
+            background: #e5e7eb;
+        }
+
+        .option-checkbox {
+            margin-right: 10px;
+        }
+
+        .option-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .generation-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .generation-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .recent-generations {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .generations-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .generation-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .generation-item:hover {
+            background: #f8f9fa;
+        }
+
+        .generation-item:last-child {
+            border-bottom: none;
+        }
+
+        .generation-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .generation-icon.success {
+            background: #10b981;
+        }
+
+        .generation-icon.warning {
+            background: #f59e0b;
+        }
+
+        .generation-icon.error {
+            background: #ef4444;
+        }
+
+        .generation-content {
+            flex: 1;
+        }
+
+        .generation-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .generation-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .generation-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .api-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .api-endpoints {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-code"></i> API Documentation Generation</h1>
+            <p>Automatic API documentation generation and management system for Universal Project Manager v3.2</p>
+        </div>
+
+        <div class="api-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-link"></i></div>
+                <div class="overview-value">47</div>
+                <div class="overview-label">API Endpoints</div>
+                <div class="overview-trend trend-up">+5 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-file-code"></i></div>
+                <div class="overview-value">98%</div>
+                <div class="overview-label">Auto Generated</div>
+                <div class="overview-trend trend-up">+2% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-clock"></i></div>
+                <div class="overview-value">1.2s</div>
+                <div class="overview-label">Avg Gen Time</div>
+                <div class="overview-trend trend-down">-0.3s faster</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="overview-value">100%</div>
+                <div class="overview-label">Success Rate</div>
+                <div class="overview-trend trend-stable">No change</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-language"></i></div>
+                <div class="overview-value">3</div>
+                <div class="overview-label">Formats</div>
+                <div class="overview-trend trend-stable">No change</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">96%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+1.5% improvement</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="generation-section">
+                <h2><i class="fas fa-chart-area"></i> API Documentation Status</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Documentation Generation Trends</div>
+                    <canvas id="generationChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Endpoint Coverage by Method</div>
+                    <canvas id="coverageChart"></canvas>
+                </div>
+
+                <div class="api-endpoints">
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-method method-get">GET</div>
+                            <div class="endpoint-path">/api/v3.2/projects</div>
+                        </div>
+                        <div class="endpoint-description">Retrieve all projects with pagination and filtering options</div>
+                        <div class="endpoint-params">
+                            <div class="params-title">Parameters:</div>
+                            <div class="param-item">
+                                <div class="param-name">page</div>
+                                <div class="param-type">integer</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-name">limit</div>
+                                <div class="param-type">integer</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-name">status</div>
+                                <div class="param-type">string</div>
+                            </div>
+                        </div>
+                        <div class="endpoint-actions">
+                            <button class="action-btn">Test</button>
+                            <button class="action-btn secondary">View Docs</button>
+                        </div>
+                    </div>
+
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-method method-post">POST</div>
+                            <div class="endpoint-path">/api/v3.2/projects</div>
+                        </div>
+                        <div class="endpoint-description">Create a new project with AI-powered configuration</div>
+                        <div class="endpoint-params">
+                            <div class="params-title">Body Parameters:</div>
+                            <div class="param-item">
+                                <div class="param-name">name</div>
+                                <div class="param-type">string (required)</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-name">type</div>
+                                <div class="param-type">string</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-name">description</div>
+                                <div class="param-type">string</div>
+                            </div>
+                        </div>
+                        <div class="endpoint-actions">
+                            <button class="action-btn">Test</button>
+                            <button class="action-btn secondary">View Docs</button>
+                        </div>
+                    </div>
+
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-method method-put">PUT</div>
+                            <div class="endpoint-path">/api/v3.2/projects/{id}</div>
+                        </div>
+                        <div class="endpoint-description">Update an existing project with validation</div>
+                        <div class="endpoint-params">
+                            <div class="params-title">Path Parameters:</div>
+                            <div class="param-item">
+                                <div class="param-name">id</div>
+                                <div class="param-type">string (required)</div>
+                            </div>
+                            <div class="params-title">Body Parameters:</div>
+                            <div class="param-item">
+                                <div class="param-name">name</div>
+                                <div class="param-type">string</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-name">status</div>
+                                <div class="param-type">string</div>
+                            </div>
+                        </div>
+                        <div class="endpoint-actions">
+                            <button class="action-btn">Test</button>
+                            <button class="action-btn secondary">View Docs</button>
+                        </div>
+                    </div>
+
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-method method-delete">DELETE</div>
+                            <div class="endpoint-path">/api/v3.2/projects/{id}</div>
+                        </div>
+                        <div class="endpoint-description">Delete a project and all associated data</div>
+                        <div class="endpoint-params">
+                            <div class="params-title">Path Parameters:</div>
+                            <div class="param-item">
+                                <div class="param-name">id</div>
+                                <div class="param-type">string (required)</div>
+                            </div>
+                        </div>
+                        <div class="endpoint-actions">
+                            <button class="action-btn">Test</button>
+                            <button class="action-btn secondary">View Docs</button>
+                        </div>
+                    </div>
+
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-method method-get">GET</div>
+                            <div class="endpoint-path">/api/v3.2/ai/analyze</div>
+                        </div>
+                        <div class="endpoint-description">AI-powered project analysis and recommendations</div>
+                        <div class="endpoint-params">
+                            <div class="params-title">Query Parameters:</div>
+                            <div class="param-item">
+                                <div class="param-name">project_id</div>
+                                <div class="param-type">string (required)</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-name">analysis_type</div>
+                                <div class="param-type">string</div>
+                            </div>
+                        </div>
+                        <div class="endpoint-actions">
+                            <button class="action-btn">Test</button>
+                            <button class="action-btn secondary">View Docs</button>
+                        </div>
+                    </div>
+
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-method method-post">POST</div>
+                            <div class="endpoint-path">/api/v3.2/ai/generate</div>
+                        </div>
+                        <div class="endpoint-description">Generate code, documentation, or reports using AI</div>
+                        <div class="endpoint-params">
+                            <div class="params-title">Body Parameters:</div>
+                            <div class="param-item">
+                                <div class="param-name">prompt</div>
+                                <div class="param-type">string (required)</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-name">type</div>
+                                <div class="param-type">string</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-name">context</div>
+                                <div class="param-type">object</div>
+                            </div>
+                        </div>
+                        <div class="endpoint-actions">
+                            <button class="action-btn">Test</button>
+                            <button class="action-btn secondary">View Docs</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="generation-controls">
+                <h2><i class="fas fa-cogs"></i> Generation Controls</h2>
+                
+                <div class="generation-actions">
+                    <button class="control-btn" onclick="generateDocs()">
+                        <i class="fas fa-play"></i> Generate Docs
+                    </button>
+                    <button class="control-btn secondary" onclick="updateDocs()">
+                        <i class="fas fa-sync"></i> Update Docs
+                    </button>
+                    <button class="control-btn secondary" onclick="exportDocs()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+
+                <div class="control-section">
+                    <div class="control-title">Generation Options</div>
+                    <div class="control-options">
+                        <div class="option-item">
+                            <input type="checkbox" class="option-checkbox" checked>
+                            <div class="option-label">OpenAPI 3.0</div>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" class="option-checkbox" checked>
+                            <div class="option-label">Swagger UI</div>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" class="option-checkbox">
+                            <div class="option-label">Postman Collection</div>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" class="option-checkbox" checked>
+                            <div class="option-label">Markdown</div>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" class="option-checkbox">
+                            <div class="option-label">PDF Export</div>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" class="option-checkbox" checked>
+                            <div class="option-label">Interactive Examples</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="generation-status">
+                    <div class="status-title">Generation Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Last Generation</div>
+                        <div class="status-value">2 minutes ago</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Next Scheduled</div>
+                        <div class="status-value">In 5 minutes</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Endpoints Processed</div>
+                        <div class="status-value">47/47</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Generation Time</div>
+                        <div class="status-value">1.2 seconds</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Success Rate</div>
+                        <div class="status-value">100%</div>
+                    </div>
+                </div>
+
+                <div class="recent-generations">
+                    <div class="generations-title">Recent Generations</div>
+                    <div class="generation-item">
+                        <div class="generation-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="generation-content">
+                            <div class="generation-title">API v3.2 Documentation</div>
+                            <div class="generation-description">Generated complete API documentation with 47 endpoints</div>
+                        </div>
+                        <div class="generation-time">2 minutes ago</div>
+                    </div>
+                    <div class="generation-item">
+                        <div class="generation-icon success">
+                            <i class="fas fa-sync"></i>
+                        </div>
+                        <div class="generation-content">
+                            <div class="generation-title">Swagger UI Update</div>
+                            <div class="generation-description">Updated interactive API documentation</div>
+                        </div>
+                        <div class="generation-time">5 minutes ago</div>
+                    </div>
+                    <div class="generation-item">
+                        <div class="generation-icon success">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="generation-content">
+                            <div class="generation-title">Markdown Export</div>
+                            <div class="generation-description">Exported API docs to Markdown format</div>
+                        </div>
+                        <div class="generation-time">8 minutes ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI Generation Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        API documentation generation accuracy improved by 15% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Some endpoints missing detailed parameter descriptions
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI models available for enhanced documentation generation
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let generationChart, coverageChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Generation Chart
+            const genCtx = document.getElementById('generationChart').getContext('2d');
+            generationChart = new Chart(genCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(7),
+                    datasets: [{
+                        label: 'Endpoints Generated',
+                        data: [42, 44, 45, 43, 46, 47, 47],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Generation Time (s)',
+                        data: [1.5, 1.3, 1.4, 1.2, 1.1, 1.2, 1.2],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Coverage Chart
+            const covCtx = document.getElementById('coverageChart').getContext('2d');
+            coverageChart = new Chart(covCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['GET', 'POST', 'PUT', 'DELETE'],
+                    datasets: [{
+                        data: [20, 15, 8, 4],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels(days) {
+            const labels = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function generateDocs() {
+            alert('Generating API documentation...');
+        }
+
+        function updateDocs() {
+            alert('Updating API documentation...');
+        }
+
+        function exportDocs() {
+            alert('Exporting API documentation...');
+        }
+    </script>
+</body>
+</html>

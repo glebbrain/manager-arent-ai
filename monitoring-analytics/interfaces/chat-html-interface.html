@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header i {
+            margin-right: 0.5rem;
+            color: #2563eb;
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .chat-item {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .chat-item:hover {
+            background: #f3f4f6;
+        }
+
+        .chat-item.active {
+            background: #eff6ff;
+            border-color: #2563eb;
+        }
+
+        .chat-item h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .chat-item p {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .new-chat-btn {
+            margin: 1rem;
+            padding: 0.75rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .new-chat-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8fafc;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: #2563eb;
+            color: white;
+        }
+
+        .message.ai .message-avatar {
+            background: #10b981;
+            color: white;
+        }
+
+        .message-content {
+            max-width: 70%;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .message-content {
+            background: #2563eb;
+            color: white;
+        }
+
+        .message-text {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        .file-attachment {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-attachment i {
+            color: #6b7280;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .file-size {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #6b7280;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .input-container {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .input-area {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.75rem;
+        }
+
+        .attachment-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .attachment-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #6b7280;
+        }
+
+        .attachment-btn:hover {
+            background: #f3f4f6;
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        .message-input {
+            flex: 1;
+            min-height: 40px;
+            max-height: 120px;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: none;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .send-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .send-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .file-upload-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .file-upload-modal {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .file-upload-modal h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .file-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .file-type-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-type-card:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .file-type-card i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #2563eb;
+        }
+
+        .file-type-card h4 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            color: #1f2937;
+        }
+
+        .file-type-card p {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .file-drop-zone {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .file-drop-zone.dragover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .file-drop-zone i {
+            font-size: 2rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .file-drop-zone p {
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .voice-recording {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .recording-indicator {
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .recording-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .recording-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .recording-btn.pause {
+            background: #f59e0b;
+        }
+
+        .recording-btn.stop {
+            background: #ef4444;
+        }
+
+        .recording-btn.delete {
+            background: #6b7280;
+        }
+
+        .recording-btn:hover {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 200px;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .main-chat {
+                height: calc(100vh - 200px);
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .file-type-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-robot"></i> AI Assistant</h2>
+            </div>
+            <button class="new-chat-btn" onclick="startNewChat()">
+                <i class="fas fa-plus"></i> Новый чат
+            </button>
+            <div class="chat-list" id="chatList">
+                <div class="chat-item active" onclick="switchChat(1)">
+                    <h3>React + TypeScript</h3>
+                    <p>Как создать компонент с валидацией...</p>
+                </div>
+                <div class="chat-item" onclick="switchChat(2)">
+                    <h3>Python FastAPI</h3>
+                    <p>Настройка асинхронных эндпоинтов...</p>
+                </div>
+                <div class="chat-item" onclick="switchChat(3)">
+                    <h3>Vue.js + Composition API</h3>
+                    <p>Оптимизация производительности...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-chat">
+            <div class="chat-header">
+                <div class="chat-title">React + TypeScript</div>
+                <div class="chat-actions">
+                    <button class="btn btn-secondary" onclick="clearChat()">
+                        <i class="fas fa-trash"></i> Очистить
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportChat()">
+                        <i class="fas fa-download"></i> Экспорт
+                    </button>
+                    <button class="btn btn-primary" onclick="openSettings()">
+                        <i class="fas fa-cog"></i> Настройки
+                    </button>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <div class="message user">
+                    <div class="message-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-text">Как создать React компонент с TypeScript и добавить валидацию пропсов?</div>
+                        <div class="message-time">14:32</div>
+                    </div>
+                </div>
+
+                <div class="message ai">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-text">Вот пример создания React компонента с TypeScript и валидацией пропсов:</div>
+                        <div class="code-block">
+                            <pre><code>import React from 'react';
+import PropTypes from 'prop-types';
+
+interface ButtonProps {
+  title: string;
+  onClick: () => void;
+  disabled?: boolean;
+  variant?: 'primary' | 'secondary';
+}
+
+const Button: React.FC&lt;ButtonProps&gt; = ({
+  title,
+  onClick,
+  disabled = false,
+  variant = 'primary'
+}) => {
+  return (
+    &lt;button
+      className={`btn btn-${variant}`}
+      onClick={onClick}
+      disabled={disabled}
+    &gt;
+      {title}
+    &lt;/button&gt;
+  );
+};
+
+export default Button;</code></pre>
+                        </div>
+                        <div class="message-actions">
+                            <button class="action-btn" onclick="copyCode(this)">Копировать</button>
+                            <button class="action-btn" onclick="runCode(this)">Запустить</button>
+                            <button class="action-btn" onclick="saveCode(this)">Сохранить</button>
+                            <button class="action-btn" onclick="explainCode(this)">Объяснить</button>
+                        </div>
+                        <div class="message-time">14:33</div>
+                    </div>
+                </div>
+
+                <div class="message user">
+                    <div class="message-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="file-attachment">
+                            <i class="fas fa-image"></i>
+                            <div class="file-info">
+                                <div class="file-name">screenshot.png</div>
+                                <div class="file-size">1.2 MB</div>
+                            </div>
+                            <button onclick="removeAttachment(this)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="message-text">Можешь проанализировать этот код?</div>
+                        <div class="message-time">14:35</div>
+                    </div>
+                </div>
+
+                <div class="message ai">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="typing-indicator">
+                            <span>Анализирую изображение...</span>
+                            <div class="typing-dots">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
+                        </div>
+                        <div class="message-time">14:35</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <div class="attachment-buttons">
+                    <button class="attachment-btn" onclick="openFileUpload('document')" title="Документы">
+                        <i class="fas fa-file-alt"></i>
+                    </button>
+                    <button class="attachment-btn" onclick="openFileUpload('image')" title="Изображения">
+                        <i class="fas fa-image"></i>
+                    </button>
+                    <button class="attachment-btn" onclick="openFileUpload('audio')" title="Аудио">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="attachment-btn" onclick="openFileUpload('video')" title="Видео">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="attachment-btn" onclick="openFileUpload('code')" title="Код">
+                        <i class="fas fa-code"></i>
+                    </button>
+                    <button class="attachment-btn" onclick="openFileUpload('data')" title="Данные">
+                        <i class="fas fa-database"></i>
+                    </button>
+                </div>
+                <div class="input-area">
+                    <textarea 
+                        class="message-input" 
+                        placeholder="Введите сообщение или загрузите файл..."
+                        id="messageInput"
+                        rows="1"
+                        onkeydown="handleKeyDown(event)"
+                        oninput="autoResize(this)"
+                    ></textarea>
+                    <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Upload Modal -->
+    <div class="file-upload-overlay" id="fileUploadOverlay">
+        <div class="file-upload-modal">
+            <h3>Загрузка файла</h3>
+            <div class="file-type-grid">
+                <div class="file-type-card" onclick="selectFileType('document')">
+                    <i class="fas fa-file-alt"></i>
+                    <h4>Документы</h4>
+                    <p>.pdf, .docx, .txt</p>
+                </div>
+                <div class="file-type-card" onclick="selectFileType('image')">
+                    <i class="fas fa-image"></i>
+                    <h4>Изображения</h4>
+                    <p>.jpg, .png, .gif</p>
+                </div>
+                <div class="file-type-card" onclick="selectFileType('audio')">
+                    <i class="fas fa-microphone"></i>
+                    <h4>Аудио</h4>
+                    <p>.mp3, .wav, .m4a</p>
+                </div>
+                <div class="file-type-card" onclick="selectFileType('video')">
+                    <i class="fas fa-video"></i>
+                    <h4>Видео</h4>
+                    <p>.mp4, .avi, .mov</p>
+                </div>
+                <div class="file-type-card" onclick="selectFileType('code')">
+                    <i class="fas fa-code"></i>
+                    <h4>Код</h4>
+                    <p>.js, .ts, .py, .java</p>
+                </div>
+                <div class="file-type-card" onclick="selectFileType('data')">
+                    <i class="fas fa-database"></i>
+                    <h4>Данные</h4>
+                    <p>.json, .csv, .xml</p>
+                </div>
+            </div>
+            <div class="file-drop-zone" id="fileDropZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Перетащите файлы сюда или нажмите для выбора</p>
+                <button class="btn btn-primary" onclick="triggerFileInput()">Выбрать файлы</button>
+            </div>
+            <input type="file" class="file-input" id="fileInput" multiple onchange="handleFileSelect(event)">
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button class="btn btn-secondary" onclick="closeFileUpload()">Отмена</button>
+                <button class="btn btn-primary" onclick="uploadFiles()">Загрузить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Recording Overlay -->
+    <div class="voice-recording" id="voiceRecording">
+        <div class="recording-indicator"></div>
+        <span>Запись: <span id="recordingTime">00:15</span></span>
+        <div class="recording-controls">
+            <button class="recording-btn pause" onclick="pauseRecording()">
+                <i class="fas fa-pause"></i>
+            </button>
+            <button class="recording-btn stop" onclick="stopRecording()">
+                <i class="fas fa-stop"></i>
+            </button>
+            <button class="recording-btn delete" onclick="deleteRecording()">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentChatId = 1;
+        let selectedFileType = null;
+        let isRecording = false;
+        let recordingStartTime = null;
+        let recordingInterval = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadChatHistory();
+        });
+
+        function setupEventListeners() {
+            // Auto-resize textarea
+            const messageInput = document.getElementById('messageInput');
+            messageInput.addEventListener('input', function() {
+                autoResize(this);
+            });
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+
+            // Add user message
+            addMessage('user', message);
+            messageInput.value = '';
+            autoResize(messageInput);
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Simulate AI response
+            setTimeout(() => {
+                hideTypingIndicator();
+                addAIResponse(message);
+            }, 2000);
+        }
+
+        function addMessage(sender, content, attachments = []) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+
+            const avatar = sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
+            const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+
+            let attachmentsHtml = '';
+            if (attachments.length > 0) {
+                attachmentsHtml = attachments.map(attachment => `
+                    <div class="file-attachment">
+                        <i class="fas fa-file"></i>
+                        <div class="file-info">
+                            <div class="file-name">${attachment.name}</div>
+                            <div class="file-size">${formatFileSize(attachment.size)}</div>
+                        </div>
+                        <button onclick="removeAttachment(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            messageDiv.innerHTML = `
+                <div class="message-avatar">
+                    <i class="${avatar}"></i>
+                </div>
+                <div class="message-content">
+                    ${attachmentsHtml}
+                    <div class="message-text">${content}</div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function addAIResponse(userMessage) {
+            const responses = [
+                "Вот решение для вашего вопроса:",
+                "Отличный вопрос! Вот что я рекомендую:",
+                "Позвольте мне помочь вам с этим:",
+                "Вот несколько вариантов решения:"
+            ];
+
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ai';
+            messageDiv.innerHTML = `
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-text">${randomResponse}</div>
+                    <div class="code-block">
+                        <pre><code>// Пример кода
+function example() {
+    console.log('Hello, World!');
+}</code></pre>
+                    </div>
+                    <div class="message-actions">
+                        <button class="action-btn" onclick="copyCode(this)">Копировать</button>
+                        <button class="action-btn" onclick="runCode(this)">Запустить</button>
+                        <button class="action-btn" onclick="saveCode(this)">Сохранить</button>
+                        <button class="action-btn" onclick="explainCode(this)">Объяснить</button>
+                    </div>
+                    <div class="message-time">${new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
+            `;
+
+            document.getElementById('messagesContainer').appendChild(messageDiv);
+            document.getElementById('messagesContainer').scrollTop = document.getElementById('messagesContainer').scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message ai';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <span>AI печатает...</span>
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function switchChat(chatId) {
+            currentChatId = chatId;
+            
+            // Update active chat
+            document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.chat-item').classList.add('active');
+            
+            // Load chat messages
+            loadChatMessages(chatId);
+        }
+
+        function startNewChat() {
+            currentChatId = Date.now();
+            document.getElementById('messagesContainer').innerHTML = '';
+            
+            // Add to chat list
+            const chatList = document.getElementById('chatList');
+            const newChatItem = document.createElement('div');
+            newChatItem.className = 'chat-item active';
+            newChatItem.innerHTML = `
+                <h3>Новый чат</h3>
+                <p>Начните новый разговор с AI</p>
+            `;
+            newChatItem.onclick = () => switchChat(currentChatId);
+            chatList.insertBefore(newChatItem, chatList.firstChild);
+        }
+
+        function clearChat() {
+            if (confirm('Вы уверены, что хотите очистить чат?')) {
+                document.getElementById('messagesContainer').innerHTML = '';
+            }
+        }
+
+        function exportChat() {
+            const messages = document.querySelectorAll('.message');
+            let chatText = 'Universal Project Manager v3.1 - AI Chat Export\n\n';
+            
+            messages.forEach(message => {
+                const sender = message.classList.contains('user') ? 'Пользователь' : 'AI Assistant';
+                const text = message.querySelector('.message-text').textContent;
+                const time = message.querySelector('.message-time').textContent;
+                chatText += `[${time}] ${sender}: ${text}\n\n`;
+            });
+            
+            const blob = new Blob([chatText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `chat-export-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function openSettings() {
+            alert('Открытие настроек AI Assistant...');
+        }
+
+        function openFileUpload(type) {
+            selectedFileType = type;
+            document.getElementById('fileUploadOverlay').style.display = 'flex';
+        }
+
+        function selectFileType(type) {
+            selectedFileType = type;
+            document.querySelectorAll('.file-type-card').forEach(card => card.classList.remove('selected'));
+            event.target.closest('.file-type-card').classList.add('selected');
+        }
+
+        function closeFileUpload() {
+            document.getElementById('fileUploadOverlay').style.display = 'none';
+            selectedFileType = null;
+        }
+
+        function triggerFileInput() {
+            document.getElementById('fileInput').click();
+        }
+
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            handleFiles(files);
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            event.target.classList.remove('dragover');
+            const files = Array.from(event.dataTransfer.files);
+            handleFiles(files);
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.target.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.target.classList.remove('dragover');
+        }
+
+        function handleFiles(files) {
+            files.forEach(file => {
+                addMessage('user', `Загружен файл: ${file.name}`, [file]);
+            });
+            closeFileUpload();
+        }
+
+        function uploadFiles() {
+            const fileInput = document.getElementById('fileInput');
+            const files = Array.from(fileInput.files);
+            if (files.length > 0) {
+                handleFiles(files);
+            }
+        }
+
+        function removeAttachment(button) {
+            button.closest('.file-attachment').remove();
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.closest('.message-content').querySelector('.code-block code');
+            navigator.clipboard.writeText(codeBlock.textContent);
+            button.textContent = 'Скопировано!';
+            setTimeout(() => button.textContent = 'Копировать', 2000);
+        }
+
+        function runCode(button) {
+            alert('Запуск кода...');
+        }
+
+        function saveCode(button) {
+            alert('Сохранение кода...');
+        }
+
+        function explainCode(button) {
+            alert('Объяснение кода...');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function loadChatHistory() {
+            // Load chat history from localStorage or API
+        }
+
+        function loadChatMessages(chatId) {
+            // Load specific chat messages
+        }
+    </script>
+</body>
+</html>

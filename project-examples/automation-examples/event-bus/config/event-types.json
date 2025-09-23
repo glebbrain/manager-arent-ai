@@ -1,0 +1,275 @@
+{
+  "project.created": {
+    "description": "Project created event",
+    "handlers": ["notification-service", "analytics-service", "audit-service"],
+    "priority": "high",
+    "retention": 2592000000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "createdBy": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["projectId", "name", "type", "createdBy"]
+    },
+    "routing": {
+      "strategy": "broadcast",
+      "timeout": 30000,
+      "retry": true
+    }
+  },
+  "project.updated": {
+    "description": "Project updated event",
+    "handlers": ["notification-service", "analytics-service", "audit-service"],
+    "priority": "medium",
+    "retention": 2592000000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" },
+        "name": { "type": "string" },
+        "updatedBy": { "type": "string" },
+        "changes": { "type": "array" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["projectId", "updatedBy"]
+    },
+    "routing": {
+      "strategy": "broadcast",
+      "timeout": 30000,
+      "retry": true
+    }
+  },
+  "project.deleted": {
+    "description": "Project deleted event",
+    "handlers": ["notification-service", "analytics-service", "audit-service", "cleanup-service"],
+    "priority": "high",
+    "retention": 2592000000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" },
+        "name": { "type": "string" },
+        "deletedBy": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["projectId", "deletedBy"]
+    },
+    "routing": {
+      "strategy": "broadcast",
+      "timeout": 30000,
+      "retry": true
+    }
+  },
+  "task.created": {
+    "description": "Task created event",
+    "handlers": ["notification-service", "ai-planner", "workflow-orchestrator"],
+    "priority": "medium",
+    "retention": 1209600000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "taskId": { "type": "string" },
+        "projectId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "assignedTo": { "type": "string" },
+        "createdBy": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["taskId", "projectId", "title", "priority", "createdBy"]
+    },
+    "routing": {
+      "strategy": "broadcast",
+      "timeout": 30000,
+      "retry": true
+    }
+  },
+  "task.completed": {
+    "description": "Task completed event",
+    "handlers": ["notification-service", "analytics-service", "ai-planner"],
+    "priority": "medium",
+    "retention": 1209600000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "taskId": { "type": "string" },
+        "projectId": { "type": "string" },
+        "completedBy": { "type": "string" },
+        "duration": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["taskId", "projectId", "completedBy"]
+    },
+    "routing": {
+      "strategy": "broadcast",
+      "timeout": 30000,
+      "retry": true
+    }
+  },
+  "workflow.started": {
+    "description": "Workflow started event",
+    "handlers": ["notification-service", "monitoring-service", "audit-service"],
+    "priority": "high",
+    "retention": 1209600000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "workflowId": { "type": "string" },
+        "workflowName": { "type": "string" },
+        "projectId": { "type": "string" },
+        "startedBy": { "type": "string" },
+        "parameters": { "type": "object" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["workflowId", "workflowName", "startedBy"]
+    },
+    "routing": {
+      "strategy": "broadcast",
+      "timeout": 30000,
+      "retry": true
+    }
+  },
+  "workflow.completed": {
+    "description": "Workflow completed event",
+    "handlers": ["notification-service", "analytics-service", "monitoring-service"],
+    "priority": "high",
+    "retention": 1209600000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "workflowId": { "type": "string" },
+        "workflowName": { "type": "string" },
+        "projectId": { "type": "string" },
+        "status": { "type": "string", "enum": ["success", "partial", "failed"] },
+        "duration": { "type": "number" },
+        "results": { "type": "object" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["workflowId", "workflowName", "status"]
+    },
+    "routing": {
+      "strategy": "broadcast",
+      "timeout": 30000,
+      "retry": true
+    }
+  },
+  "workflow.failed": {
+    "description": "Workflow failed event",
+    "handlers": ["notification-service", "error-handler", "monitoring-service"],
+    "priority": "critical",
+    "retention": 2592000000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "workflowId": { "type": "string" },
+        "workflowName": { "type": "string" },
+        "projectId": { "type": "string" },
+        "error": { "type": "string" },
+        "errorCode": { "type": "string" },
+        "stackTrace": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["workflowId", "workflowName", "error"]
+    },
+    "routing": {
+      "strategy": "broadcast",
+      "timeout": 30000,
+      "retry": true
+    }
+  },
+  "notification.sent": {
+    "description": "Notification sent event",
+    "handlers": ["analytics-service", "audit-service"],
+    "priority": "low",
+    "retention": 604800000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "notificationId": { "type": "string" },
+        "type": { "type": "string" },
+        "recipient": { "type": "string" },
+        "channel": { "type": "string", "enum": ["email", "sms", "push", "slack"] },
+        "status": { "type": "string", "enum": ["sent", "delivered", "failed"] },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["notificationId", "type", "recipient", "channel", "status"]
+    },
+    "routing": {
+      "strategy": "broadcast",
+      "timeout": 30000,
+      "retry": false
+    }
+  },
+  "user.authenticated": {
+    "description": "User authenticated event",
+    "handlers": ["analytics-service", "audit-service", "session-manager"],
+    "priority": "medium",
+    "retention": 604800000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "username": { "type": "string" },
+        "ipAddress": { "type": "string" },
+        "userAgent": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "username"]
+    },
+    "routing": {
+      "strategy": "broadcast",
+      "timeout": 30000,
+      "retry": false
+    }
+  },
+  "error.occurred": {
+    "description": "Error occurred event",
+    "handlers": ["error-handler", "notification-service", "monitoring-service"],
+    "priority": "critical",
+    "retention": 2592000000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "errorId": { "type": "string" },
+        "service": { "type": "string" },
+        "error": { "type": "string" },
+        "errorCode": { "type": "string" },
+        "stackTrace": { "type": "string" },
+        "context": { "type": "object" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["errorId", "service", "error"]
+    },
+    "routing": {
+      "strategy": "broadcast",
+      "timeout": 30000,
+      "retry": true
+    }
+  },
+  "system.health": {
+    "description": "System health check event",
+    "handlers": ["monitoring-service", "alert-service"],
+    "priority": "low",
+    "retention": 604800000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "service": { "type": "string" },
+        "status": { "type": "string", "enum": ["healthy", "degraded", "unhealthy"] },
+        "metrics": { "type": "object" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["service", "status"]
+    },
+    "routing": {
+      "strategy": "broadcast",
+      "timeout": 30000,
+      "retry": false
+    }
+  }
+}

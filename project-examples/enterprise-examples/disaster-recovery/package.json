@@ -1,0 +1,55 @@
+{
+  "name": "disaster-recovery-system",
+  "version": "2.0.0",
+  "description": "AI-powered disaster recovery system with intelligent backup and recovery management",
+  "main": "ai-backup/ai-backup-engine.js",
+  "scripts": {
+    "start": "node ai-backup/ai-backup-engine.js",
+    "start:backup": "node ai-backup/ai-backup-engine.js",
+    "start:recovery": "node recovery/recovery-manager.js",
+    "test": "jest",
+    "test:backup": "jest ai-backup/",
+    "test:recovery": "jest recovery/",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:comprehensive": "npm run test:backup && npm run test:recovery && npm run test:integration",
+    "docker:build": "docker build -t disaster-recovery-system .",
+    "docker:run": "docker run -p 3005:3005 -p 3006:3006 disaster-recovery-system",
+    "docker:compose": "docker-compose up -d",
+    "deploy": "./deploy-disaster-recovery.ps1",
+    "test:deployment": "./test-disaster-recovery.ps1"
+  },
+  "keywords": [
+    "disaster-recovery",
+    "backup",
+    "recovery",
+    "ai",
+    "business-continuity",
+    "rto",
+    "rpo"
+  ],
+  "author": "ManagerAgentAI",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "winston": "^3.10.0",
+    "axios": "^1.5.0",
+    "dotenv": "^16.3.1",
+    "crypto": "^1.0.1",
+    "fs-extra": "^11.1.1",
+    "archiver": "^6.0.1",
+    "node-cron": "^3.0.2",
+    "redis": "^4.6.8",
+    "mongodb": "^6.1.0",
+    "aws-sdk": "^2.1457.0",
+    "@azure/storage-blob": "^12.17.0",
+    "@google-cloud/storage": "^7.3.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

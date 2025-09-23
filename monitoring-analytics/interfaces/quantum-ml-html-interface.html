@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum ML - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f0f23; color: #e2e8f0; }
+        .quantum-ml { display: flex; height: 100vh; }
+        .sidebar { width: 280px; background: #1a1a2e; border-right: 1px solid #16213e; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background: #1a1a2e; padding: 1rem 2rem; border-bottom: 1px solid #16213e; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .quantum-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; position: relative; overflow: hidden; }
+        .quantum-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="quantum" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23quantum)"/></svg>'); opacity: 0.3; }
+        .quantum-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; position: relative; z-index: 1; }
+        .quantum-subtitle { font-size: 1.1rem; opacity: 0.9; margin-bottom: 1.5rem; position: relative; z-index: 1; }
+        .quantum-stats { display: flex; gap: 2rem; position: relative; z-index: 1; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-label { font-size: 0.9rem; opacity: 0.8; }
+        .quantum-canvas { background: #1a1a2e; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .canvas-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .canvas-title { font-size: 1.2rem; font-weight: 600; color: #e2e8f0; }
+        .canvas-controls { display: flex; gap: 0.5rem; }
+        .quantum-visualization { width: 100%; height: 400px; background: #0f0f23; border: 2px solid #16213e; border-radius: 8px; position: relative; overflow: hidden; }
+        .quantum-circuit { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .quantum-gate { width: 60px; height: 60px; border: 2px solid #667eea; border-radius: 8px; background: rgba(102, 126, 234, 0.1); display: flex; align-items: center; justify-content: center; margin: 10px; position: relative; }
+        .quantum-gate::before { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; background: linear-gradient(45deg, #667eea, #764ba2); border-radius: 8px; z-index: -1; }
+        .quantum-gate i { font-size: 1.5rem; color: #667eea; }
+        .quantum-wire { position: absolute; height: 2px; background: linear-gradient(90deg, #667eea, #764ba2); }
+        .quantum-wire.horizontal { width: 100px; }
+        .quantum-wire.vertical { width: 2px; height: 50px; }
+        .algorithms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .algorithm-card { background: #1a1a2e; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 8px rgba(0,0,0,0.3); transition: all 0.3s ease; }
+        .algorithm-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.4); }
+        .algorithm-header { display: flex; align-items: center; margin-bottom: 1rem; }
+        .algorithm-icon { width: 50px; height: 50px; border-radius: 10px; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 1rem; }
+        .algorithm-info { flex: 1; }
+        .algorithm-name { font-size: 1.1rem; font-weight: 600; color: #e2e8f0; margin-bottom: 0.25rem; }
+        .algorithm-type { color: #94a3b8; font-size: 0.9rem; }
+        .algorithm-status { padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500; }
+        .status-running { background: #dcfce7; color: #166534; }
+        .status-ready { background: #dbeafe; color: #1e40af; }
+        .status-error { background: #fef2f2; color: #dc2626; }
+        .algorithm-description { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.5; }
+        .algorithm-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+        .algorithm-metric { text-align: center; }
+        .algorithm-metric-value { font-size: 1.2rem; font-weight: 600; color: #e2e8f0; }
+        .algorithm-metric-label { color: #94a3b8; font-size: 0.8rem; }
+        .algorithm-actions { display: flex; gap: 0.5rem; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        .nav { padding: 1rem; }
+        .nav-item { display: block; padding: 0.75rem; color: #94a3b8; text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .nav-item:hover, .nav-item.active { background: #16213e; color: #667eea; }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-section-title { font-size: 0.8rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; padding: 0 0.75rem; }
+        .results-section { background: #1a1a2e; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .results-title { font-size: 1.2rem; font-weight: 600; color: #e2e8f0; }
+        .results-actions { display: flex; gap: 0.5rem; }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        .result-card { background: #0f0f23; border: 1px solid #16213e; border-radius: 8px; padding: 1rem; }
+        .result-title { font-weight: 600; color: #e2e8f0; margin-bottom: 0.5rem; }
+        .result-value { font-size: 1.5rem; font-weight: 700; color: #667eea; margin-bottom: 0.25rem; }
+        .result-description { color: #94a3b8; font-size: 0.9rem; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .chart-container { background: #1a1a2e; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .chart-title { font-size: 1.2rem; font-weight: 600; color: #e2e8f0; margin-bottom: 1rem; }
+        .chart-canvas { width: 100%; height: 300px; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: #1a1a2e; border-radius: 12px; padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; border: 1px solid #16213e; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-title { font-size: 1.3rem; font-weight: 600; color: #e2e8f0; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: #e2e8f0; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #16213e; border-radius: 6px; font-size: 1rem; background: #0f0f23; color: #e2e8f0; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .quantum-particles { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; }
+        .particle { position: absolute; width: 4px; height: 4px; background: #667eea; border-radius: 50%; animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; } 50% { transform: translateY(-20px) rotate(180deg); opacity: 1; } }
+        .filters { background: #1a1a2e; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .filters-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .filter-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .filter-group label { font-size: 0.9rem; font-weight: 500; color: #e2e8f0; }
+        .filter-select { padding: 0.5rem; border: 1px solid #16213e; border-radius: 6px; background: #0f0f23; color: #e2e8f0; font-size: 0.9rem; }
+        .search-input { padding: 0.5rem; border: 1px solid #16213e; border-radius: 6px; background: #0f0f23; color: #e2e8f0; width: 200px; }
+        @media (max-width: 768px) {
+            .quantum-ml { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .charts-grid, .algorithms-grid { grid-template-columns: 1fr; }
+            .filters-row { flex-direction: column; align-items: stretch; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="quantum-ml">
+        <div class="sidebar">
+            <div class="nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Квантовые алгоритмы</div>
+                    <a href="#" class="nav-item active"><i class="fas fa-atom"></i> Обзор</a>
+                    <a href="#" class="nav-item"><i class="fas fa-brain"></i> Нейронные сети</a>
+                    <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Оптимизация</a>
+                    <a href="#" class="nav-item"><i class="fas fa-search"></i> Поиск</a>
+                    <a href="#" class="nav-item"><i class="fas fa-shield-alt"></i> Криптография</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Квантовые ворота</div>
+                    <a href="#" class="nav-item"><i class="fas fa-square"></i> Pauli-X</a>
+                    <a href="#" class="nav-item"><i class="fas fa-square"></i> Pauli-Y</a>
+                    <a href="#" class="nav-item"><i class="fas fa-square"></i> Pauli-Z</a>
+                    <a href="#" class="nav-item"><i class="fas fa-square"></i> Hadamard</a>
+                    <a href="#" class="nav-item"><i class="fas fa-square"></i> CNOT</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Результаты</div>
+                    <a href="#" class="nav-item"><i class="fas fa-chart-bar"></i> Аналитика</a>
+                    <a href="#" class="nav-item"><i class="fas fa-download"></i> Экспорт</a>
+                    <a href="#" class="nav-item"><i class="fas fa-history"></i> История</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-atom"></i> Quantum Machine Learning</h1>
+                <div>
+                    <button class="btn btn-primary" onclick="openAlgorithmModal()">
+                        <i class="fas fa-plus"></i> Новый алгоритм
+                    </button>
+                    <button class="btn btn-secondary" onclick="runQuantumSimulation()">
+                        <i class="fas fa-play"></i> Запустить симуляцию
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="quantum-header">
+                    <div class="quantum-particles">
+                        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+                        <div class="particle" style="left: 30%; animation-delay: 1s;"></div>
+                        <div class="particle" style="left: 50%; animation-delay: 2s;"></div>
+                        <div class="particle" style="left: 70%; animation-delay: 3s;"></div>
+                        <div class="particle" style="left: 90%; animation-delay: 4s;"></div>
+                    </div>
+                    <div class="quantum-title">Квантовое машинное обучение</div>
+                    <div class="quantum-subtitle">Использование квантовых вычислений для решения задач машинного обучения</div>
+                    <div class="quantum-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Активных алгоритмов</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">156</div>
+                            <div class="stat-label">Квантовых ворот</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">99.7%</div>
+                            <div class="stat-label">Точность</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">2.3s</div>
+                            <div class="stat-label">Время выполнения</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filters">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label>Тип алгоритма</label>
+                            <select class="filter-select" id="algorithmFilter">
+                                <option value="all">Все алгоритмы</option>
+                                <option value="neural">Квантовые нейронные сети</option>
+                                <option value="optimization">Квантовая оптимизация</option>
+                                <option value="search">Квантовый поиск</option>
+                                <option value="crypto">Квантовая криптография</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Статус</label>
+                            <select class="filter-select" id="statusFilter">
+                                <option value="all">Все статусы</option>
+                                <option value="running">Выполняется</option>
+                                <option value="ready">Готов</option>
+                                <option value="error">Ошибка</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Поиск</label>
+                            <input type="text" class="search-input" placeholder="Поиск алгоритмов...">
+                        </div>
+                        <button class="btn btn-primary" onclick="applyFilters()">Применить</button>
+                    </div>
+                </div>
+                
+                <div class="quantum-canvas">
+                    <div class="canvas-header">
+                        <div class="canvas-title">Квантовая схема</div>
+                        <div class="canvas-controls">
+                            <button class="btn btn-sm btn-primary" onclick="addQuantumGate('H')">H</button>
+                            <button class="btn btn-sm btn-primary" onclick="addQuantumGate('X')">X</button>
+                            <button class="btn btn-sm btn-primary" onclick="addQuantumGate('Y')">Y</button>
+                            <button class="btn btn-sm btn-primary" onclick="addQuantumGate('Z')">Z</button>
+                            <button class="btn btn-sm btn-primary" onclick="addQuantumGate('CNOT')">CNOT</button>
+                            <button class="btn btn-sm btn-danger" onclick="clearCircuit()">Очистить</button>
+                        </div>
+                    </div>
+                    <div class="quantum-visualization" id="quantumCanvas">
+                        <div class="quantum-circuit" id="quantumCircuit">
+                            <!-- Quantum gates will be added here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="algorithms-grid">
+                    <div class="algorithm-card">
+                        <div class="algorithm-header">
+                            <div class="algorithm-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="algorithm-info">
+                                <div class="algorithm-name">Квантовая нейронная сеть</div>
+                                <div class="algorithm-type">QNN</div>
+                            </div>
+                            <span class="algorithm-status status-running">Выполняется</span>
+                        </div>
+                        <div class="algorithm-description">
+                            Квантовая нейронная сеть для классификации изображений с использованием квантовых ворот.
+                        </div>
+                        <div class="algorithm-metrics">
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">94.2%</div>
+                                <div class="algorithm-metric-label">Точность</div>
+                            </div>
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">1.2s</div>
+                                <div class="algorithm-metric-label">Время</div>
+                            </div>
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">8</div>
+                                <div class="algorithm-metric-label">Кубиты</div>
+                            </div>
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">156</div>
+                                <div class="algorithm-metric-label">Ворота</div>
+                            </div>
+                        </div>
+                        <div class="algorithm-actions">
+                            <button class="btn btn-sm btn-primary" onclick="viewAlgorithm('qnn')">Просмотр</button>
+                            <button class="btn btn-sm btn-warning" onclick="pauseAlgorithm('qnn')">Пауза</button>
+                            <button class="btn btn-sm btn-danger" onclick="stopAlgorithm('qnn')">Остановить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="algorithm-card">
+                        <div class="algorithm-header">
+                            <div class="algorithm-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="algorithm-info">
+                                <div class="algorithm-name">Квантовая оптимизация</div>
+                                <div class="algorithm-type">QAOA</div>
+                            </div>
+                            <span class="algorithm-status status-ready">Готов</span>
+                        </div>
+                        <div class="algorithm-description">
+                            Квантовый алгоритм приближенной оптимизации для решения задач комбинаторной оптимизации.
+                        </div>
+                        <div class="algorithm-metrics">
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">87.5%</div>
+                                <div class="algorithm-metric-label">Точность</div>
+                            </div>
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">0.8s</div>
+                                <div class="algorithm-metric-label">Время</div>
+                            </div>
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">6</div>
+                                <div class="algorithm-metric-label">Кубиты</div>
+                            </div>
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">89</div>
+                                <div class="algorithm-metric-label">Ворота</div>
+                            </div>
+                        </div>
+                        <div class="algorithm-actions">
+                            <button class="btn btn-sm btn-success" onclick="runAlgorithm('qaoa')">Запустить</button>
+                            <button class="btn btn-sm btn-primary" onclick="viewAlgorithm('qaoa')">Просмотр</button>
+                            <button class="btn btn-sm btn-secondary" onclick="configureAlgorithm('qaoa')">Настроить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="algorithm-card">
+                        <div class="algorithm-header">
+                            <div class="algorithm-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="algorithm-info">
+                                <div class="algorithm-name">Квантовый поиск</div>
+                                <div class="algorithm-type">Grover</div>
+                            </div>
+                            <span class="algorithm-status status-ready">Готов</span>
+                        </div>
+                        <div class="algorithm-description">
+                            Алгоритм Гровера для поиска в неструктурированной базе данных с квадратичным ускорением.
+                        </div>
+                        <div class="algorithm-metrics">
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">99.1%</div>
+                                <div class="algorithm-metric-label">Точность</div>
+                            </div>
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">0.3s</div>
+                                <div class="algorithm-metric-label">Время</div>
+                            </div>
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">4</div>
+                                <div class="algorithm-metric-label">Кубиты</div>
+                            </div>
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-label">45</div>
+                                <div class="algorithm-metric-label">Ворота</div>
+                            </div>
+                        </div>
+                        <div class="algorithm-actions">
+                            <button class="btn btn-sm btn-success" onclick="runAlgorithm('grover')">Запустить</button>
+                            <button class="btn btn-sm btn-primary" onclick="viewAlgorithm('grover')">Просмотр</button>
+                            <button class="btn btn-sm btn-secondary" onclick="configureAlgorithm('grover')">Настроить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="algorithm-card">
+                        <div class="algorithm-header">
+                            <div class="algorithm-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="algorithm-info">
+                                <div class="algorithm-name">Квантовая криптография</div>
+                                <div class="algorithm-type">BB84</div>
+                            </div>
+                            <span class="algorithm-status status-error">Ошибка</span>
+                        </div>
+                        <div class="algorithm-description">
+                            Протокол BB84 для квантового распределения ключей с гарантированной безопасностью.
+                        </div>
+                        <div class="algorithm-metrics">
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">0%</div>
+                                <div class="algorithm-metric-label">Точность</div>
+                            </div>
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">-</div>
+                                <div class="algorithm-metric-label">Время</div>
+                            </div>
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">2</div>
+                                <div class="algorithm-metric-label">Кубиты</div>
+                            </div>
+                            <div class="algorithm-metric">
+                                <div class="algorithm-metric-value">0</div>
+                                <div class="algorithm-metric-label">Ворота</div>
+                            </div>
+                        </div>
+                        <div class="algorithm-actions">
+                            <button class="btn btn-sm btn-primary" onclick="viewAlgorithm('bb84')">Просмотр</button>
+                            <button class="btn btn-sm btn-success" onclick="restartAlgorithm('bb84')">Перезапуск</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewLogs('bb84')">Логи</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">Производительность алгоритмов</div>
+                        <canvas id="performanceChart" class="chart-canvas"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">Использование квантовых ресурсов</div>
+                        <canvas id="resourcesChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="results-section">
+                    <div class="results-header">
+                        <div class="results-title">Результаты квантовых вычислений</div>
+                        <div class="results-actions">
+                            <button class="btn btn-sm btn-primary" onclick="refreshResults()">Обновить</button>
+                            <button class="btn btn-sm btn-secondary" onclick="exportResults()">Экспорт</button>
+                        </div>
+                    </div>
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-title">Квантовая запутанность</div>
+                            <div class="result-value">0.847</div>
+                            <div class="result-description">Мера квантовой запутанности между кубитами</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-title">Квантовая интерференция</div>
+                            <div class="result-value">0.623</div>
+                            <div class="result-description">Уровень квантовой интерференции в схеме</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-title">Квантовая декогеренция</div>
+                            <div class="result-value">0.156</div>
+                            <div class="result-description">Уровень декогеренции квантовой системы</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-title">Квантовая точность</div>
+                            <div class="result-value">99.7%</div>
+                            <div class="result-description">Общая точность квантовых вычислений</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Algorithm Modal -->
+    <div id="algorithmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Новый квантовый алгоритм</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="algorithmForm">
+                <div class="form-group">
+                    <label for="algorithmName">Название алгоритма</label>
+                    <input type="text" id="algorithmName" placeholder="Введите название алгоритма" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="algorithmType">Тип алгоритма</label>
+                        <select id="algorithmType" required>
+                            <option value="">Выберите тип</option>
+                            <option value="neural">Квантовая нейронная сеть</option>
+                            <option value="optimization">Квантовая оптимизация</option>
+                            <option value="search">Квантовый поиск</option>
+                            <option value="crypto">Квантовая криптография</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="qubits">Количество кубитов</label>
+                        <input type="number" id="qubits" min="1" max="20" value="4" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="algorithmDescription">Описание</label>
+                    <textarea id="algorithmDescription" placeholder="Описание алгоритма"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="quantumCode">Квантовый код</label>
+                    <textarea id="quantumCode" placeholder="QASM код или описание квантовой схемы"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Создать алгоритм</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let quantumGates = [];
+        let gateId = 0;
+        
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            setupEventListeners();
+        });
+        
+        function initializeCharts() {
+            // Performance Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(performanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['QNN', 'QAOA', 'Grover', 'BB84', 'VQE', 'QFT'],
+                    datasets: [{
+                        label: 'Точность (%)',
+                        data: [94.2, 87.5, 99.1, 0, 92.3, 96.8],
+                        backgroundColor: '#667eea',
+                        borderRadius: 4
+                    }, {
+                        label: 'Время (сек)',
+                        data: [1.2, 0.8, 0.3, 0, 1.5, 0.9],
+                        backgroundColor: '#764ba2',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Resources Chart
+            const resourcesCtx = document.getElementById('resourcesChart').getContext('2d');
+            new Chart(resourcesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Кубиты', 'Ворота', 'Измерения', 'Запутанность'],
+                    datasets: [{
+                        data: [20, 45, 15, 20],
+                        backgroundColor: ['#667eea', '#764ba2', '#10b981', '#f59e0b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function setupEventListeners() {
+            // Form submission
+            document.getElementById('algorithmForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                createAlgorithm();
+            });
+        }
+        
+        function addQuantumGate(type) {
+            const circuit = document.getElementById('quantumCircuit');
+            const gate = document.createElement('div');
+            gate.className = 'quantum-gate';
+            gate.id = `gate-${gateId}`;
+            gate.innerHTML = `<i class="fas fa-${getGateIcon(type)}"></i>`;
+            gate.style.left = `${quantumGates.length * 80 + 20}px`;
+            gate.style.top = '20px';
+            gate.onclick = () => removeQuantumGate(gateId);
+            
+            circuit.appendChild(gate);
+            quantumGates.push({ id: gateId, type: type, element: gate });
+            gateId++;
+            
+            // Add wire if not first gate
+            if (quantumGates.length > 1) {
+                addQuantumWire();
+            }
+        }
+        
+        function getGateIcon(type) {
+            const icons = {
+                'H': 'square',
+                'X': 'times',
+                'Y': 'square',
+                'Z': 'square',
+                'CNOT': 'square'
+            };
+            return icons[type] || 'square';
+        }
+        
+        function addQuantumWire() {
+            const circuit = document.getElementById('quantumCircuit');
+            const wire = document.createElement('div');
+            wire.className = 'quantum-wire horizontal';
+            wire.style.left = `${(quantumGates.length - 1) * 80 + 60}px`;
+            wire.style.top = '50px';
+            circuit.appendChild(wire);
+        }
+        
+        function removeQuantumGate(id) {
+            const gateIndex = quantumGates.findIndex(gate => gate.id === id);
+            if (gateIndex !== -1) {
+                quantumGates[gateIndex].element.remove();
+                quantumGates.splice(gateIndex, 1);
+                
+                // Remove corresponding wire
+                const wires = document.querySelectorAll('.quantum-wire');
+                if (wires.length > 0) {
+                    wires[wires.length - 1].remove();
+                }
+            }
+        }
+        
+        function clearCircuit() {
+            const circuit = document.getElementById('quantumCircuit');
+            circuit.innerHTML = '';
+            quantumGates = [];
+            gateId = 0;
+        }
+        
+        function openAlgorithmModal() {
+            document.getElementById('algorithmModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+        
+        function createAlgorithm() {
+            const form = document.getElementById('algorithmForm');
+            const formData = new FormData(form);
+            
+            // Simulate algorithm creation
+            alert('Квантовый алгоритм создан!');
+            form.reset();
+            closeModal();
+        }
+        
+        function runQuantumSimulation() {
+            alert('Квантовая симуляция запущена!');
+        }
+        
+        function runAlgorithm(algorithm) {
+            alert(`Запуск алгоритма: ${algorithm}`);
+        }
+        
+        function viewAlgorithm(algorithm) {
+            alert(`Просмотр алгоритма: ${algorithm}`);
+        }
+        
+        function configureAlgorithm(algorithm) {
+            alert(`Настройка алгоритма: ${algorithm}`);
+        }
+        
+        function pauseAlgorithm(algorithm) {
+            alert(`Пауза алгоритма: ${algorithm}`);
+        }
+        
+        function stopAlgorithm(algorithm) {
+            if (confirm(`Остановить алгоритм ${algorithm}?`)) {
+                alert(`Алгоритм ${algorithm} остановлен!`);
+            }
+        }
+        
+        function restartAlgorithm(algorithm) {
+            alert(`Перезапуск алгоритма: ${algorithm}`);
+        }
+        
+        function viewLogs(algorithm) {
+            alert(`Логи алгоритма: ${algorithm}`);
+        }
+        
+        function refreshResults() {
+            alert('Результаты обновлены!');
+        }
+        
+        function exportResults() {
+            alert('Экспорт результатов...');
+        }
+        
+        function applyFilters() {
+            const algorithm = document.getElementById('algorithmFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            console.log('Applying filters:', { algorithm, status });
+            alert('Фильтры применены!');
+        }
+        
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

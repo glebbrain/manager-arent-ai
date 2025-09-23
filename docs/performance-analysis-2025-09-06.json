@@ -1,0 +1,50 @@
+{
+  "Issues": [
+    "Frontend: Missing performance optimization dependencies",
+    "Frontend: No performance configuration files found",
+    "Backend: ETL processes may lack performance optimizations",
+    "Database: SQL queries may lack performance optimizations",
+    "Infrastructure: Docker configuration lacks performance settings",
+    "Infrastructure: No caching configuration found",
+    "Testing: No performance tests found",
+    "Monitoring: No performance monitoring configuration found"
+  ],
+  "Recommendations": [
+    "Add performance optimization dependencies (next-optimized-images, next-bundle-analyzer)",
+    "Configure Next.js performance optimizations in next.config.mjs",
+    "Add Lighthouse CI configuration for performance monitoring",
+    "Implement async/await patterns in ETL processes",
+    "Add batch processing for large datasets",
+    "Implement connection pooling for database operations",
+    "Add database indexes for frequently queried columns",
+    "Implement query optimization and partitioning",
+    "Add database performance monitoring",
+    "Configure Docker resource limits and performance settings",
+    "Implement Redis caching for frequently accessed data",
+    "Add load balancing configuration",
+    "Add performance tests for critical paths",
+    "Implement load testing with K6 or similar tools",
+    "Add performance regression testing",
+    "Implement performance metrics collection",
+    "Add auto-scaling configuration",
+    "Set up performance alerting"
+  ],
+  "Tests": {
+    "HasPerformanceTests": false,
+    "PerformanceTests": []
+  },
+  "Database": {},
+  "Monitoring": {
+    "HasMonitoring": false,
+    "ConfigFiles": []
+  },
+  "Backend": {},
+  "Infrastructure": {
+    "HasPerformanceSettings": false,
+    "CacheFiles": [],
+    "HasDocker": true
+  },
+  "Frontend": {
+    "PerformanceFiles": []
+  }
+}

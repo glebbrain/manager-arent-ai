@@ -1,0 +1,181 @@
+# ===========================================
+# ManagerAgentAI .gitignore
+# ===========================================
+
+# ===========================================
+# Logs and temporary files
+# ===========================================
+logs/
+*.log
+*.log.*
+*.tmp
+*.temp
+temp/
+tmp/
+
+# ===========================================
+# Node.js dependencies
+# ===========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# ===========================================
+# Build outputs and distributions
+# ===========================================
+dist/
+build/
+out/
+target/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# ===========================================
+# IDE and Editor files
+# ===========================================
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===========================================
+# Environment and configuration files
+# ===========================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+config/local.json
+config/secrets.json
+
+# ===========================================
+# Cache and temporary data
+# ===========================================
+.cache/
+*.cache
+*.pid
+*.seed
+*.pid.lock
+
+# ===========================================
+# Test coverage and results
+# ===========================================
+coverage/
+.nyc_output/
+test-results/
+*.lcov
+junit.xml
+
+# ===========================================
+# Export and backup files
+# ===========================================
+exports/
+backups/
+*.backup
+*.bak
+*.old
+
+# ===========================================
+# Print output and temporary content
+# ===========================================
+print_output/
+epub_temp/
+
+# ===========================================
+# PowerShell specific
+# ===========================================
+*.ps1.bak
+*.ps1.old
+PowerShell_ISE_History.txt
+
+# ===========================================
+# Database files
+# ===========================================
+*.db
+*.sqlite
+*.sqlite3
+*.mdb
+*.accdb
+
+# ===========================================
+# Archive files
+# ===========================================
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# ===========================================
+# OS generated files
+# ===========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===========================================
+# Security and sensitive files
+# ===========================================
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+private/
+credentials/
+
+# ===========================================
+# Monitoring and metrics data
+# ===========================================
+monitoring/metrics/
+monitoring/reports/
+performance-scaling/metrics/
+cost-optimization/reports/
+
+# ===========================================
+# AI model files (large binary files)
+# ===========================================
+*.model
+*.pkl
+*.h5
+*.onnx
+*.tflite
+ai-models/
+models/
+
+# ===========================================
+# Quantum computing temporary files
+# ===========================================
+quantum-*/
+*.quantum
+
+# ===========================================
+# Project specific exclusions
+# ===========================================
+# Exclude large project manager files if they contain generated content
+projectsManagerFiles/
+
+# Core project directories - ALLOW ALL FILES
+# These contain the foundation of the project
+# (No exclusions - all files in these directories are tracked)
+
+# ===========================================
+# Development and testing
+# ===========================================
+.dev/
+.test/
+debug/
+debug.log

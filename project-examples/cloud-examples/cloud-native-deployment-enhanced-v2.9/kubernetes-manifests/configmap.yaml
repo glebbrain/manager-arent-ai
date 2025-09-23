@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: manager-agent-ai-config
+  namespace: manager-agent-ai-v2.9
+  labels:
+    app: manager-agent-ai
+    version: "2.9.0"
+    component: configuration
+data:
+  # Application Configuration
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  API_VERSION: "2.9.0"
+  
+  # Database Configuration
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "manager_agent_ai"
+  DB_SSL: "true"
+  
+  # Redis Configuration
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  REDIS_SSL: "true"
+  
+  # API Gateway Configuration
+  API_GATEWAY_PORT: "3000"
+  API_GATEWAY_TIMEOUT: "30000"
+  API_GATEWAY_RATE_LIMIT: "1000"
+  
+  # Analytics Dashboard Configuration
+  ANALYTICS_PORT: "3001"
+  ANALYTICS_WEBSOCKET_ENABLED: "true"
+  ANALYTICS_REAL_TIME_ENABLED: "true"
+  
+  # Orchestrator Configuration
+  ORCHESTRATOR_PORT: "8080"
+  ORCHESTRATOR_HEALTH_CHECK_INTERVAL: "30"
+  ORCHESTRATOR_METRICS_INTERVAL: "60"
+  
+  # Service Mesh Configuration
+  SERVICE_MESH_ENABLED: "true"
+  CIRCUIT_BREAKER_ENABLED: "true"
+  LOAD_BALANCING_STRATEGY: "least-connections"
+  
+  # Monitoring Configuration
+  MONITORING_ENABLED: "true"
+  METRICS_ENABLED: "true"
+  TRACING_ENABLED: "true"
+  
+  # Security Configuration
+  SECURITY_ENABLED: "true"
+  JWT_SECRET_KEY: "manager-agent-ai-jwt-secret-2025"
+  CORS_ENABLED: "true"
+  RATE_LIMITING_ENABLED: "true"
+  
+  # Cloud Configuration
+  CLOUD_PROVIDER: "multi-cloud"
+  REGION: "us-east-1"
+  AVAILABILITY_ZONE: "us-east-1a"
+  
+  # Scaling Configuration
+  AUTO_SCALING_ENABLED: "true"
+  MIN_REPLICAS: "2"
+  MAX_REPLICAS: "10"
+  TARGET_CPU_UTILIZATION: "70"
+  TARGET_MEMORY_UTILIZATION: "80"
+  
+  # Resource Configuration
+  CPU_REQUEST: "250m"
+  CPU_LIMIT: "500m"
+  MEMORY_REQUEST: "512Mi"
+  MEMORY_LIMIT: "1Gi"
+  
+  # Health Check Configuration
+  HEALTH_CHECK_PATH: "/health"
+  READINESS_CHECK_PATH: "/ready"
+  LIVENESS_CHECK_PATH: "/live"
+  
+  # Logging Configuration
+  LOG_FORMAT: "json"
+  LOG_OUTPUT: "stdout"
+  LOG_ROTATION_ENABLED: "true"
+  
+  # Feature Flags
+  AI_ENHANCEMENT_ENABLED: "true"
+  QUANTUM_ML_ENABLED: "true"
+  MULTI_MODAL_AI_ENABLED: "true"
+  EDGE_COMPUTING_ENABLED: "true"
+  SERVERLESS_ENABLED: "true"

@@ -1,0 +1,65 @@
+{
+  "name": "cost-optimization-system",
+  "version": "2.0.0",
+  "description": "AI-driven cost optimization system with intelligent resource management and cost analysis",
+  "main": "ai-optimizer/ai-optimizer.js",
+  "scripts": {
+    "start": "node ai-optimizer/ai-optimizer.js",
+    "start:optimizer": "node ai-optimizer/ai-optimizer.js",
+    "start:monitor": "node resource-monitoring/resource-monitor.js",
+    "start:analysis": "node cost-analysis/cost-analyzer.js",
+    "test": "jest",
+    "test:optimizer": "jest ai-optimizer/",
+    "test:monitoring": "jest resource-monitoring/",
+    "test:analysis": "jest cost-analysis/",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:comprehensive": "npm run test:optimizer && npm run test:monitoring && npm run test:analysis && npm run test:integration",
+    "analyze:costs": "node cost-analysis/cost-analyzer.js --analyze",
+    "optimize:resources": "node ai-optimizer/ai-optimizer.js --optimize",
+    "docker:build": "docker build -t cost-optimization-system .",
+    "docker:run": "docker run -p 3007:3007 -p 3008:3008 cost-optimization-system",
+    "docker:compose": "docker-compose up -d",
+    "deploy": "./deploy-cost-optimization.ps1",
+    "test:deployment": "./test-cost-optimization.ps1"
+  },
+  "keywords": [
+    "cost-optimization",
+    "resource-management",
+    "ai",
+    "cloud-costs",
+    "optimization",
+    "monitoring"
+  ],
+  "author": "ManagerAgentAI",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "winston": "^3.10.0",
+    "axios": "^1.5.0",
+    "dotenv": "^16.3.1",
+    "node-cron": "^3.0.2",
+    "redis": "^4.6.8",
+    "mongodb": "^6.1.0",
+    "aws-sdk": "^2.1457.0",
+    "@azure/arm-compute": "^18.0.0",
+    "@azure/arm-monitor": "^8.0.0",
+    "@google-cloud/monitoring": "^4.0.0",
+    "@google-cloud/compute": "^4.0.0",
+    "prometheus-client": "^15.0.0",
+    "grafana-api": "^1.0.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.1.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "nodemon": "^3.0.1",
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

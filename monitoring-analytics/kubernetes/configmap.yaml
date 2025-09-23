@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: manager-agent-ai-config
+  namespace: manager-agent-ai
+data:
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  EVENT_BUS_URL: "http://event-bus:4000"
+  DATABASE_URL: "postgresql://postgres:password@postgres:5432/manager_agent_ai"
+  REDIS_URL: "redis://redis:6379"
+  PROMETHEUS_URL: "http://prometheus:9090"
+  GRAFANA_URL: "http://grafana:3000"

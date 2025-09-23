@@ -1,0 +1,324 @@
+# Advanced Security Scanner Kubernetes Configuration
+# Complete deployment with service, ingress, and monitoring
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: security-scanner
+  labels:
+    name: security-scanner
+    app: advanced-security-scanner
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: advanced-security-scanner-config
+  namespace: security-scanner
+data:
+  NODE_ENV: "production"
+  PORT: "3009"
+  BANDIT_ENABLED: "true"
+  ESLINT_ENABLED: "true"
+  SEMGREP_ENABLED: "true"
+  TRIVY_ENABLED: "true"
+  NUCLEI_ENABLED: "true"
+  AI_ANALYSIS_ENABLED: "true"
+  GDPR_ENABLED: "true"
+  HIPAA_ENABLED: "true"
+  SOC2_ENABLED: "true"
+  PCI_DSS_ENABLED: "true"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: advanced-security-scanner-secrets
+  namespace: security-scanner
+type: Opaque
+data:
+  JWT_SECRET: <base64-encoded-jwt-secret>
+  API_KEY: <base64-encoded-api-key>
+  DB_PASSWORD: <base64-encoded-db-password>
+  REDIS_PASSWORD: <base64-encoded-redis-password>
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: advanced-security-scanner
+  namespace: security-scanner
+  labels:
+    app: advanced-security-scanner
+    version: "2.5.0"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: advanced-security-scanner
+  template:
+    metadata:
+      labels:
+        app: advanced-security-scanner
+        version: "2.5.0"
+    spec:
+      serviceAccountName: advanced-security-scanner
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: advanced-security-scanner
+        image: advanced-security-scanner:2.5.0
+        ports:
+        - containerPort: 3009
+          name: http
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: advanced-security-scanner-config
+              key: NODE_ENV
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: advanced-security-scanner-config
+              key: PORT
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: advanced-security-scanner-secrets
+              key: JWT_SECRET
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: advanced-security-scanner-secrets
+              key: API_KEY
+        - name: BANDIT_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: advanced-security-scanner-config
+              key: BANDIT_ENABLED
+        - name: ESLINT_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: advanced-security-scanner-config
+              key: ESLINT_ENABLED
+        - name: SEMGREP_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: advanced-security-scanner-config
+              key: SEMGREP_ENABLED
+        - name: TRIVY_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: advanced-security-scanner-config
+              key: TRIVY_ENABLED
+        - name: NUCLEI_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: advanced-security-scanner-config
+              key: NUCLEI_ENABLED
+        - name: AI_ANALYSIS_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: advanced-security-scanner-config
+              key: AI_ANALYSIS_ENABLED
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3009
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3009
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1001
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: cache
+          mountPath: /app/cache
+        - name: logs
+          mountPath: /app/logs
+        - name: reports
+          mountPath: /app/reports
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: cache
+        emptyDir: {}
+      - name: logs
+        emptyDir: {}
+      - name: reports
+        emptyDir: {}
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - key: "security-scanner"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: advanced-security-scanner-service
+  namespace: security-scanner
+  labels:
+    app: advanced-security-scanner
+spec:
+  selector:
+    app: advanced-security-scanner
+  ports:
+  - name: http
+    port: 3009
+    targetPort: 3009
+    protocol: TCP
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: advanced-security-scanner
+  namespace: security-scanner
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: security-scanner
+  name: advanced-security-scanner-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: advanced-security-scanner-rolebinding
+  namespace: security-scanner
+subjects:
+- kind: ServiceAccount
+  name: advanced-security-scanner
+  namespace: security-scanner
+roleRef:
+  kind: Role
+  name: advanced-security-scanner-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: advanced-security-scanner-ingress
+  namespace: security-scanner
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - security-scanner.example.com
+    secretName: advanced-security-scanner-tls
+  rules:
+  - host: security-scanner.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: advanced-security-scanner-service
+            port:
+              number: 3009
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: advanced-security-scanner-monitor
+  namespace: security-scanner
+  labels:
+    app: advanced-security-scanner
+spec:
+  selector:
+    matchLabels:
+      app: advanced-security-scanner
+  endpoints:
+  - port: http
+    interval: 30s
+    path: /metrics
+
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: advanced-security-scanner-pdb
+  namespace: security-scanner
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: advanced-security-scanner
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: advanced-security-scanner-hpa
+  namespace: security-scanner
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: advanced-security-scanner
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

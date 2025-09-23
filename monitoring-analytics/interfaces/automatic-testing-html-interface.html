@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatic Testing - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .testing-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .testing-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .testing-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .test-suites {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .suite-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .suite-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .suite-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .suite-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .suite-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-passing {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-failing {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-running {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .suite-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .suite-tests {
+            margin-bottom: 15px;
+        }
+
+        .test-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .test-icon {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .test-text {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .test-status {
+            margin-left: auto;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .test-passed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .test-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .test-pending {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .suite-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .suite-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .testing-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .testing-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .testing-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .testing-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recent-tests {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tests-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .test-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .test-item:hover {
+            background: #f8f9fa;
+        }
+
+        .test-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .test-icon.passed {
+            background: #10b981;
+        }
+
+        .test-icon.failed {
+            background: #ef4444;
+        }
+
+        .test-icon.running {
+            background: #3b82f6;
+        }
+
+        .test-content {
+            flex: 1;
+        }
+
+        .test-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .test-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .test-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .testing-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .test-suites {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-vial"></i> Automatic Testing</h1>
+            <p>Extended automatic testing system for Universal Project Manager v3.2</p>
+        </div>
+
+        <div class="testing-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="overview-value">1,247</div>
+                <div class="overview-label">Tests Passed</div>
+                <div class="overview-trend trend-up">+23 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-times-circle"></i></div>
+                <div class="overview-value">12</div>
+                <div class="overview-label">Tests Failed</div>
+                <div class="overview-trend trend-down">-3 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="overview-value">99%</div>
+                <div class="overview-label">Success Rate</div>
+                <div class="overview-trend trend-up">+1% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-clock"></i></div>
+                <div class="overview-value">2.3m</div>
+                <div class="overview-label">Avg Test Time</div>
+                <div class="overview-trend trend-down">-0.2m faster</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-layer-group"></i></div>
+                <div class="overview-value">8</div>
+                <div class="overview-label">Test Suites</div>
+                <div class="overview-trend trend-stable">No change</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">97%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+2% improvement</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="testing-section">
+                <h2><i class="fas fa-chart-area"></i> Test Suites</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Test Results Over Time</div>
+                    <canvas id="testChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Test Coverage by Module</div>
+                    <canvas id="coverageChart"></canvas>
+                </div>
+
+                <div class="test-suites">
+                    <div class="suite-card">
+                        <div class="suite-header">
+                            <div class="suite-title">Unit Tests</div>
+                            <div class="suite-status status-passing">Passing</div>
+                        </div>
+                        <div class="suite-description">Individual component testing with AI-generated test cases</div>
+                        <div class="suite-tests">
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Function Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Class Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Module Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                        </div>
+                        <div class="suite-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">456</div>
+                                <div class="metric-label">Tests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">99%</div>
+                                <div class="metric-label">Passed</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">1.2m</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="suite-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">View</button>
+                        </div>
+                    </div>
+
+                    <div class="suite-card">
+                        <div class="suite-header">
+                            <div class="suite-title">Integration Tests</div>
+                            <div class="suite-status status-passing">Passing</div>
+                        </div>
+                        <div class="suite-description">API and service integration testing with automated scenarios</div>
+                        <div class="suite-tests">
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">API Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Database Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                            <div class="test-item">
+                                <i class="fas fa-times test-icon"></i>
+                                <span class="test-text">Service Tests</span>
+                                <span class="test-status test-failed">Failed</span>
+                            </div>
+                        </div>
+                        <div class="suite-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">234</div>
+                                <div class="metric-label">Tests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">97%</div>
+                                <div class="metric-label">Passed</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">3.1m</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="suite-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">View</button>
+                        </div>
+                    </div>
+
+                    <div class="suite-card">
+                        <div class="suite-header">
+                            <div class="suite-title">E2E Tests</div>
+                            <div class="suite-status status-passing">Passing</div>
+                        </div>
+                        <div class="suite-description">End-to-end user journey testing with AI-powered scenarios</div>
+                        <div class="suite-tests">
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">User Flows</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">UI Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Cross-browser</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                        </div>
+                        <div class="suite-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">89</div>
+                                <div class="metric-label">Tests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Passed</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">5.2m</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="suite-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">View</button>
+                        </div>
+                    </div>
+
+                    <div class="suite-card">
+                        <div class="suite-header">
+                            <div class="suite-title">Performance Tests</div>
+                            <div class="suite-status status-passing">Passing</div>
+                        </div>
+                        <div class="suite-description">Load and stress testing with AI-optimized scenarios</div>
+                        <div class="suite-tests">
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Load Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Stress Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Memory Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                        </div>
+                        <div class="suite-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">67</div>
+                                <div class="metric-label">Tests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">98%</div>
+                                <div class="metric-label">Passed</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">8.5m</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="suite-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">View</button>
+                        </div>
+                    </div>
+
+                    <div class="suite-card">
+                        <div class="suite-header">
+                            <div class="suite-title">Security Tests</div>
+                            <div class="suite-status status-passing">Passing</div>
+                        </div>
+                        <div class="suite-description">Security vulnerability testing with AI-powered threat detection</div>
+                        <div class="suite-tests">
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Vulnerability Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Penetration Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Auth Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                        </div>
+                        <div class="suite-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">123</div>
+                                <div class="metric-label">Tests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Passed</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.1m</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="suite-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">View</button>
+                        </div>
+                    </div>
+
+                    <div class="suite-card">
+                        <div class="suite-header">
+                            <div class="suite-title">AI Tests</div>
+                            <div class="suite-status status-running">Running</div>
+                        </div>
+                        <div class="suite-description">AI model and algorithm testing with automated validation</div>
+                        <div class="suite-tests">
+                            <div class="test-item">
+                                <i class="fas fa-spinner test-icon"></i>
+                                <span class="test-text">Model Tests</span>
+                                <span class="test-status test-pending">Running</span>
+                            </div>
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Accuracy Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                            <div class="test-item">
+                                <i class="fas fa-check test-icon"></i>
+                                <span class="test-text">Performance Tests</span>
+                                <span class="test-status test-passed">Passed</span>
+                            </div>
+                        </div>
+                        <div class="suite-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">78</div>
+                                <div class="metric-label">Tests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">95%</div>
+                                <div class="metric-label">Passed</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">6.3m</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="suite-actions">
+                            <button class="action-btn">Stop</button>
+                            <button class="action-btn secondary">View</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testing-controls">
+                <h2><i class="fas fa-cogs"></i> Testing Controls</h2>
+                
+                <div class="testing-actions">
+                    <button class="control-btn" onclick="runAllTests()">
+                        <i class="fas fa-play"></i> Run All Tests
+                    </button>
+                    <button class="control-btn secondary" onclick="generateTests()">
+                        <i class="fas fa-plus"></i> Generate Tests
+                    </button>
+                    <button class="control-btn secondary" onclick="exportReport()">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                </div>
+
+                <div class="testing-status">
+                    <div class="status-title">Testing Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Last Run</div>
+                        <div class="status-value">3 minutes ago</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Total Tests</div>
+                        <div class="status-value">1,247 tests</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Passed</div>
+                        <div class="status-value">1,235 tests</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Failed</div>
+                        <div class="status-value">12 tests</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Success Rate</div>
+                        <div class="status-value">99.0%</div>
+                    </div>
+                </div>
+
+                <div class="recent-tests">
+                    <div class="tests-title">Recent Test Runs</div>
+                    <div class="test-item">
+                        <div class="test-icon passed">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="test-content">
+                            <div class="test-title">Unit Tests Suite</div>
+                            <div class="test-description">456 tests passed, 0 failed</div>
+                        </div>
+                        <div class="test-time">3 minutes ago</div>
+                    </div>
+                    <div class="test-item">
+                        <div class="test-icon passed">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="test-content">
+                            <div class="test-title">Integration Tests Suite</div>
+                            <div class="test-description">234 tests passed, 1 failed</div>
+                        </div>
+                        <div class="test-time">5 minutes ago</div>
+                    </div>
+                    <div class="test-item">
+                        <div class="test-icon running">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                        <div class="test-content">
+                            <div class="test-title">AI Tests Suite</div>
+                            <div class="test-description">78 tests running...</div>
+                        </div>
+                        <div class="test-time">8 minutes ago</div>
+                    </div>
+                    <div class="test-item">
+                        <div class="test-icon passed">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="test-content">
+                            <div class="test-title">E2E Tests Suite</div>
+                            <div class="test-description">89 tests passed, 0 failed</div>
+                        </div>
+                        <div class="test-time">12 minutes ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI Testing Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        Test generation accuracy improved by 25% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Some test suites need optimization for better performance
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI test patterns available for better coverage
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testChart, coverageChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Test Chart
+            const testCtx = document.getElementById('testChart').getContext('2d');
+            testChart = new Chart(testCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(7),
+                    datasets: [{
+                        label: 'Tests Passed',
+                        data: [1200, 1210, 1205, 1220, 1230, 1240, 1247],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Tests Failed',
+                        data: [15, 12, 18, 10, 8, 5, 12],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Coverage Chart
+            const coverageCtx = document.getElementById('coverageChart').getContext('2d');
+            coverageChart = new Chart(coverageCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Unit Tests', 'Integration Tests', 'E2E Tests', 'Performance Tests', 'Security Tests', 'AI Tests'],
+                    datasets: [{
+                        data: [456, 234, 89, 67, 123, 78],
+                        backgroundColor: ['#667eea', '#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels(days) {
+            const labels = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function runAllTests() {
+            alert('Running all test suites...');
+        }
+
+        function generateTests() {
+            alert('Generating new test cases...');
+        }
+
+        function exportReport() {
+            alert('Exporting test report...');
+        }
+    </script>
+</body>
+</html>

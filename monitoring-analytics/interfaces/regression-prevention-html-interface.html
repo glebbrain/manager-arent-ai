@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regression Prevention - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .regression-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .regression-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .regression-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .prevention-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .category-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .category-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .category-features {
+            margin-bottom: 15px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .feature-icon {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .feature-text {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .feature-status {
+            margin-left: auto;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .feature-enabled {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .feature-disabled {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .feature-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .category-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .regression-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .regression-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .regression-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .regression-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recent-checks {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .checks-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .check-item:hover {
+            background: #f8f9fa;
+        }
+
+        .check-item:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .check-icon.success {
+            background: #10b981;
+        }
+
+        .check-icon.warning {
+            background: #f59e0b;
+        }
+
+        .check-icon.error {
+            background: #ef4444;
+        }
+
+        .check-content {
+            flex: 1;
+        }
+
+        .check-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .check-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .check-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .regression-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .prevention-categories {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shield-virus"></i> Regression Prevention</h1>
+            <p>System for preventing code regressions in Universal Project Manager v3.2</p>
+        </div>
+
+        <div class="regression-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="overview-value">98.5%</div>
+                <div class="overview-label">Prevention Rate</div>
+                <div class="overview-trend trend-up">+1.2% this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-bug"></i></div>
+                <div class="overview-value">3</div>
+                <div class="overview-label">Regressions Caught</div>
+                <div class="overview-trend trend-down">-2 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="overview-value">99.2%</div>
+                <div class="overview-label">Test Coverage</div>
+                <div class="overview-trend trend-up">+0.8% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-clock"></i></div>
+                <div class="overview-value">0.3s</div>
+                <div class="overview-label">Detection Time</div>
+                <div class="overview-trend trend-down">-0.1s faster</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-tools"></i></div>
+                <div class="overview-value">12</div>
+                <div class="overview-label">Prevention Tools</div>
+                <div class="overview-trend trend-stable">No change</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">97%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+2% improvement</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="regression-section">
+                <h2><i class="fas fa-chart-area"></i> Prevention Categories</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Regression Detection by Type</div>
+                    <canvas id="regressionChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Prevention Effectiveness Over Time</div>
+                    <canvas id="effectivenessChart"></canvas>
+                </div>
+
+                <div class="prevention-categories">
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">Automated Testing</div>
+                            <div class="category-status status-active">Active</div>
+                        </div>
+                        <div class="category-description">Comprehensive test suite to catch regressions before deployment</div>
+                        <div class="category-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Unit Tests</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Integration Tests</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">E2E Tests</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Performance Tests</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                        </div>
+                        <div class="category-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">1,247</div>
+                                <div class="metric-label">Tests</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">99.2%</div>
+                                <div class="metric-label">Coverage</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0.2s</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">Configure</button>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">Code Analysis</div>
+                            <div class="category-status status-active">Active</div>
+                        </div>
+                        <div class="category-description">Static analysis to detect potential regression-causing changes</div>
+                        <div class="category-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">AST Analysis</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Dependency Analysis</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">API Contract Analysis</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Breaking Changes</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                        </div>
+                        <div class="category-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">234</div>
+                                <div class="metric-label">Checks</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">98%</div>
+                                <div class="metric-label">Accuracy</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0.5s</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">Configure</button>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">Performance Monitoring</div>
+                            <div class="category-status status-active">Active</div>
+                        </div>
+                        <div class="category-description">Continuous performance monitoring to detect performance regressions</div>
+                        <div class="category-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Response Time</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Memory Usage</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">CPU Usage</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Database Queries</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                        </div>
+                        <div class="category-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">89</div>
+                                <div class="metric-label">Metrics</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">97%</div>
+                                <div class="metric-label">Accuracy</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0.1s</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">Configure</button>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">API Contract Testing</div>
+                            <div class="category-status status-active">Active</div>
+                        </div>
+                        <div class="category-description">API contract validation to prevent breaking changes</div>
+                        <div class="category-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Schema Validation</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Response Validation</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Version Compatibility</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Backward Compatibility</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                        </div>
+                        <div class="category-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">67</div>
+                                <div class="metric-label">Contracts</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">99%</div>
+                                <div class="metric-label">Valid</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0.3s</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">Configure</button>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">Database Schema</div>
+                            <div class="category-status status-warning">Warning</div>
+                        </div>
+                        <div class="category-description">Database schema change detection and validation</div>
+                        <div class="category-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Schema Diff</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-exclamation-triangle feature-icon"></i>
+                                <span class="feature-text">Migration Validation</span>
+                                <span class="feature-status feature-warning">Warning</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Data Integrity</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Index Validation</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                        </div>
+                        <div class="category-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">45</div>
+                                <div class="metric-label">Tables</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">92%</div>
+                                <div class="metric-label">Valid</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0.8s</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">Fix</button>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">AI Regression Detection</div>
+                            <div class="category-status status-active">Active</div>
+                        </div>
+                        <div class="category-description">AI-powered regression detection using machine learning</div>
+                        <div class="category-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Pattern Recognition</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Anomaly Detection</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Predictive Analysis</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check feature-icon"></i>
+                                <span class="feature-text">Learning Models</span>
+                                <span class="feature-status feature-enabled">Enabled</span>
+                            </div>
+                        </div>
+                        <div class="category-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">78</div>
+                                <div class="metric-label">Models</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">97%</div>
+                                <div class="metric-label">Accuracy</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">1.2s</div>
+                                <div class="metric-label">Time</div>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn">Run</button>
+                            <button class="action-btn secondary">Train</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="regression-controls">
+                <h2><i class="fas fa-cogs"></i> Prevention Controls</h2>
+                
+                <div class="regression-actions">
+                    <button class="control-btn" onclick="runPreventionChecks()">
+                        <i class="fas fa-shield-virus"></i> Run Prevention Checks
+                    </button>
+                    <button class="control-btn secondary" onclick="configurePrevention()">
+                        <i class="fas fa-cog"></i> Configure
+                    </button>
+                    <button class="control-btn secondary" onclick="exportReport()">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                </div>
+
+                <div class="regression-status">
+                    <div class="status-title">Prevention Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Last Check</div>
+                        <div class="status-value">1 minute ago</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Prevention Rate</div>
+                        <div class="status-value">98.5%</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Regressions Caught</div>
+                        <div class="status-value">3 issues</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Test Coverage</div>
+                        <div class="status-value">99.2%</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Detection Time</div>
+                        <div class="status-value">0.3 seconds</div>
+                    </div>
+                </div>
+
+                <div class="recent-checks">
+                    <div class="checks-title">Recent Prevention Checks</div>
+                    <div class="check-item">
+                        <div class="check-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="check-content">
+                            <div class="check-title">Automated Testing</div>
+                            <div class="check-description">All 1,247 tests passed, no regressions detected</div>
+                        </div>
+                        <div class="check-time">1 minute ago</div>
+                    </div>
+                    <div class="check-item">
+                        <div class="check-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="check-content">
+                            <div class="check-title">Code Analysis</div>
+                            <div class="check-description">234 checks completed, no breaking changes found</div>
+                        </div>
+                        <div class="check-time">3 minutes ago</div>
+                    </div>
+                    <div class="check-item">
+                        <div class="check-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="check-content">
+                            <div class="check-title">Database Schema</div>
+                            <div class="check-description">Migration validation warning detected</div>
+                        </div>
+                        <div class="check-time">5 minutes ago</div>
+                    </div>
+                    <div class="check-item">
+                        <div class="check-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="check-content">
+                            <div class="check-title">API Contract Testing</div>
+                            <div class="check-description">67 contracts validated, all compatible</div>
+                        </div>
+                        <div class="check-time">8 minutes ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI Prevention Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        Regression prevention accuracy improved by 15% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Some database migrations need manual review
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI models available for better regression detection
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let regressionChart, effectivenessChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Regression Chart
+            const regressionCtx = document.getElementById('regressionChart').getContext('2d');
+            regressionChart = new Chart(regressionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Automated Testing', 'Code Analysis', 'Performance', 'API Contracts', 'Database', 'AI Detection'],
+                    datasets: [{
+                        data: [1, 0, 1, 0, 1, 0],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444', '#667eea'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Effectiveness Chart
+            const effectivenessCtx = document.getElementById('effectivenessChart').getContext('2d');
+            effectivenessChart = new Chart(effectivenessCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(7),
+                    datasets: [{
+                        label: 'Prevention Rate',
+                        data: [97, 97.5, 98, 98.2, 98.3, 98.4, 98.5],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Test Coverage',
+                        data: [98, 98.2, 98.5, 98.8, 99, 99.1, 99.2],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels(days) {
+            const labels = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function runPreventionChecks() {
+            alert('Running regression prevention checks...');
+        }
+
+        function configurePrevention() {
+            alert('Opening prevention configuration...');
+        }
+
+        function exportReport() {
+            alert('Exporting prevention report...');
+        }
+    </script>
+</body>
+</html>

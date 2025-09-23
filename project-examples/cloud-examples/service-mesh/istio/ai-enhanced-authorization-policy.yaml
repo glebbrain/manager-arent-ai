@@ -1,0 +1,54 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: ai-enhanced-auth-policy
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: api-gateway-service
+  rules:
+  # AI Analytics Access
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/ai-analytics"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/api/v1/analytics/*"]
+  
+  # Admin Access
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/admin"]
+    to:
+    - operation:
+        methods: ["*"]
+        paths: ["*"]
+  
+  # Service Mesh Orchestrator
+  - from:
+    - source:
+        principals: ["cluster.local/ns/manager-agent-ai/sa/service-mesh-orchestrator"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        paths: ["/api/v1/*"]
+  
+  # External API Access
+  - from:
+    - source:
+        namespaces: ["external-apis"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/api/v1/public/*"]
+  
+  # Health Check Access
+  - from:
+    - source:
+        principals: ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/health", "/ready"]

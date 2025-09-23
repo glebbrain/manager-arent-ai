@@ -1,0 +1,155 @@
+{
+  "templates": {
+    "version": "1.0.0",
+    "description": "Universal Project Templates Collection",
+    "author": "ManagerAgentAI",
+    "created": "2025-01-31",
+    "lastUpdated": "2025-01-31",
+    "available": [
+      {
+        "id": "web",
+        "name": "Web Application",
+        "description": "Modern web applications with React, TypeScript, and Node.js",
+        "category": "frontend",
+        "tags": ["react", "typescript", "nodejs", "express", "mongodb"],
+        "path": "web/template.json",
+        "popularity": 95,
+        "complexity": "medium"
+      },
+      {
+        "id": "mobile",
+        "name": "Mobile Application",
+        "description": "Cross-platform mobile apps with React Native and Expo",
+        "category": "mobile",
+        "tags": ["react-native", "expo", "typescript", "redux"],
+        "path": "mobile/template.json",
+        "popularity": 90,
+        "complexity": "medium"
+      },
+      {
+        "id": "ai-ml",
+        "name": "AI/ML Project",
+        "description": "Machine Learning and AI projects with Python ecosystem",
+        "category": "artificial-intelligence",
+        "tags": ["python", "tensorflow", "pytorch", "scikit-learn", "jupyter"],
+        "path": "ai-ml/template.json",
+        "popularity": 85,
+        "complexity": "high"
+      },
+      {
+        "id": "api",
+        "name": "API Service",
+        "description": "RESTful API services with Express and TypeScript",
+        "category": "backend",
+        "tags": ["nodejs", "express", "typescript", "mongodb", "jwt"],
+        "path": "api/template.json",
+        "popularity": 88,
+        "complexity": "medium"
+      },
+      {
+        "id": "library",
+        "name": "Library Package",
+        "description": "Reusable libraries and npm packages",
+        "category": "package",
+        "tags": ["typescript", "npm", "rollup", "jest"],
+        "path": "library/template.json",
+        "popularity": 75,
+        "complexity": "low"
+      },
+      {
+        "id": "game",
+        "name": "Game Development",
+        "description": "Unity-based game development projects",
+        "category": "gaming",
+        "tags": ["unity", "csharp", "game-development", "2d", "3d"],
+        "path": "game/template.json",
+        "popularity": 80,
+        "complexity": "high"
+      },
+      {
+        "id": "blockchain",
+        "name": "Blockchain Project",
+        "description": "Web3 and blockchain applications with Solidity",
+        "category": "web3",
+        "tags": ["ethereum", "solidity", "web3", "hardhat", "typescript"],
+        "path": "blockchain/template.json",
+        "popularity": 70,
+        "complexity": "high"
+      },
+      {
+        "id": "desktop",
+        "name": "Desktop Application",
+        "description": "Cross-platform desktop apps with Electron",
+        "category": "desktop",
+        "tags": ["electron", "typescript", "react", "nodejs"],
+        "path": "desktop/template.json",
+        "popularity": 65,
+        "complexity": "medium"
+      }
+    ],
+    "categories": [
+      {
+        "id": "frontend",
+        "name": "Frontend Development",
+        "description": "User interface and client-side applications",
+        "templates": ["web"]
+      },
+      {
+        "id": "mobile",
+        "name": "Mobile Development",
+        "description": "Mobile and cross-platform applications",
+        "templates": ["mobile"]
+      },
+      {
+        "id": "backend",
+        "name": "Backend Development",
+        "description": "Server-side applications and APIs",
+        "templates": ["api"]
+      },
+      {
+        "id": "artificial-intelligence",
+        "name": "AI/ML",
+        "description": "Artificial Intelligence and Machine Learning",
+        "templates": ["ai-ml"]
+      },
+      {
+        "id": "package",
+        "name": "Libraries & Packages",
+        "description": "Reusable code libraries and packages",
+        "templates": ["library"]
+      },
+      {
+        "id": "gaming",
+        "name": "Game Development",
+        "description": "Game development and interactive applications",
+        "templates": ["game"]
+      },
+      {
+        "id": "web3",
+        "name": "Web3 & Blockchain",
+        "description": "Decentralized applications and blockchain projects",
+        "templates": ["blockchain"]
+      },
+      {
+        "id": "desktop",
+        "name": "Desktop Applications",
+        "description": "Native and cross-platform desktop applications",
+        "templates": ["desktop"]
+      }
+    ],
+    "features": {
+      "typescript_support": true,
+      "testing_framework": true,
+      "linting": true,
+      "formatting": true,
+      "hot_reload": true,
+      "documentation": true,
+      "ci_cd": true,
+      "docker_support": false,
+      "kubernetes_support": false,
+      "monitoring": false,
+      "logging": true,
+      "error_tracking": false
+    }
+  }
+}

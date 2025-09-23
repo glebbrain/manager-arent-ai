@@ -1,0 +1,107 @@
+{
+  "name": "Build and Deploy",
+  "description": "Complete build and deployment workflow with testing and validation",
+  "version": "1.0.0",
+  "author": "ManagerAgentAI",
+  "steps": [
+    {
+      "name": "Pre-build Validation",
+      "type": "condition",
+      "condition": "{{projectPath}} && {{deployTarget}}",
+      "onError": "stop"
+    },
+    {
+      "name": "Install Dependencies",
+      "type": "command",
+      "command": "cd {{projectPath}} && npm ci",
+      "onError": "stop"
+    },
+    {
+      "name": "Run Code Quality Checks",
+      "type": "parallel",
+      "steps": [
+        {
+          "name": "Lint Code",
+          "type": "command",
+          "command": "cd {{projectPath}} && npm run lint",
+          "onError": "continue"
+        },
+        {
+          "name": "Type Check",
+          "type": "command",
+          "command": "cd {{projectPath}} && npm run type-check",
+          "onError": "continue"
+        },
+        {
+          "name": "Security Audit",
+          "type": "command",
+          "command": "cd {{projectPath}} && npm audit --audit-level moderate",
+          "onError": "continue"
+        }
+      ]
+    },
+    {
+      "name": "Run Tests",
+      "type": "command",
+      "command": "cd {{projectPath}} && npm test",
+      "onError": "stop"
+    },
+    {
+      "name": "Build Application",
+      "type": "command",
+      "command": "cd {{projectPath}} && npm run build",
+      "onError": "stop"
+    },
+    {
+      "name": "Create Build Artifacts",
+      "type": "file",
+      "operation": {
+        "operation": "write",
+        "path": "{{projectPath}}/build-info.json",
+        "content": "{\n  \"buildTime\": \"{{buildTime}}\",\n  \"version\": \"{{version}}\",\n  \"commit\": \"{{commit}}\",\n  \"branch\": \"{{branch}}\"\n}"
+      }
+    },
+    {
+      "name": "Deploy to Target",
+      "type": "command",
+      "command": "{{deployCommand}}",
+      "onError": "retry",
+      "maxRetries": 3,
+      "retryDelay": 10000
+    },
+    {
+      "name": "Health Check",
+      "type": "http",
+      "request": {
+        "method": "GET",
+        "url": "{{healthCheckUrl}}",
+        "timeout": 30000
+      },
+      "onError": "retry",
+      "maxRetries": 5,
+      "retryDelay": 5000
+    },
+    {
+      "name": "Update Deployment Status",
+      "type": "file",
+      "operation": {
+        "operation": "write",
+        "path": "{{projectPath}}/deployment-status.json",
+        "content": "{\n  \"status\": \"deployed\",\n  \"timestamp\": \"{{deployTime}}\",\n  \"target\": \"{{deployTarget}}\",\n  \"version\": \"{{version}}\"\n}"
+      }
+    },
+    {
+      "name": "Send Deployment Notification",
+      "type": "notification",
+      "notification": {
+        "message": "Deployment successful to {{deployTarget}}",
+        "type": "success",
+        "details": {
+          "version": "{{version}}",
+          "buildTime": "{{buildTime}}",
+          "healthCheck": "{{healthCheckUrl}}"
+        }
+      }
+    }
+  ]
+}

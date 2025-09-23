@@ -1,0 +1,269 @@
+{
+  "version": "4.8-dev",
+  "description": "Конфигурация разработки для ManagerAgentAI проекта",
+  "environment": "development",
+  "project": {
+    "name": "ManagerAgentAI",
+    "type": "Universal Automation Platform",
+    "version": "4.8",
+    "status": "Production Ready - AI Enhanced",
+    "currentPath": "${workspaceFolder}",
+    "description": "Универсальная платформа автоматизации с AI интеграцией для мультиплатформенной разработки"
+  },
+  "controlFiles": {
+    "description": "Управляющие файлы проекта и их назначение",
+    "rootFiles": {
+      "TODO.md": {
+        "path": "${workspaceFolder}\\TODO.md",
+        "purpose": "Основной список задач проекта",
+        "description": "Содержит текущие задачи для версии 4.8+, включая Enterprise Features, Advanced Research & Development, Future Technologies",
+        "status": "active",
+        "lastUpdated": "2025-01-31",
+        "keySections": [
+          "Project Scanner (Auto-run)",
+          "Current Tasks for Version 4.8+",
+          "Enterprise Features",
+          "Advanced Research & Development v4.5",
+          "Future Technologies v4.6"
+        ]
+      },
+      "COMPLETED.md": {
+        "path": "${workspaceFolder}\\reports\\COMPLETED.md",
+        "purpose": "Архив выполненных задач",
+        "description": "Содержит историю всех выполненных задач с версиями и датами завершения",
+        "status": "active",
+        "lastUpdated": "2025-01-31",
+        "version": "5.2.0",
+        "keyAchievements": [
+          "Universal Project Manager v5.2",
+          "Advanced Performance & Security v4.0",
+          "Next-Generation Technologies v4.1",
+          "UI/UX Design and Wireframes v3.1",
+          "Project Analysis & Documentation Update v3.5"
+        ]
+      }
+    },
+    "managerFiles": {
+      "IDEA.md": {
+        "path": "${workspaceFolder}\\.manager\\control-files\\IDEA.md",
+        "purpose": "Центральный документ проекта - сердце проекта",
+        "description": "Содержит архитектурные решения, цели, технические требования и полное описание проекта",
+        "status": "active",
+        "lastUpdated": "2025-01-31",
+        "version": "2.1.0",
+        "keySections": [
+          "Basic Project Information",
+          "Architecture and Technical Requirements",
+          "Goals and Requirements",
+          "User Requirements",
+          "Architectural Decisions",
+          "Project Constraints",
+          "Testing Strategy",
+          "Development Plan",
+          "Production Readiness"
+        ],
+        "projectType": "Universal Automation Platform",
+        "targetPlatforms": ["Windows", "Linux", "macOS", "Docker", "Kubernetes"],
+        "technologies": ["PowerShell 5.1+", "Python 3.8+", "JavaScript/TypeScript"],
+        "features": [
+          "80+ PowerShell automation scripts",
+          "15 AI-powered optimization modules",
+          "Universal project type support",
+          "Intelligent build optimization",
+          "Comprehensive testing framework",
+          "Enterprise-grade security",
+          "Multi-platform deployment",
+          "Real-time monitoring and analytics"
+        ]
+      },
+      "TODO.md": {
+        "path": "${workspaceFolder}\\.manager\\control-files\\TODO.md.backup.20250904-225113",
+        "purpose": "Резервная копия задач менеджера",
+        "description": "Резервная копия файла задач от 2025-09-04",
+        "status": "backup",
+        "lastUpdated": "2025-09-04"
+      },
+      "COMPLETED.md": {
+        "path": "${workspaceFolder}\\.manager\\control-files\\COMPLETED.md",
+        "purpose": "Выполненные задачи менеджера",
+        "description": "Содержит детальную историю выполненных задач с версиями и достижениями",
+        "status": "active",
+        "lastUpdated": "2025-01-31",
+        "version": "5.2.0",
+        "totalTasks": "209/209 (100%)",
+        "keyMilestones": [
+          "Core Development: 100% completed",
+          "AI Integration: 100% completed",
+          "Enterprise Features: 100% completed",
+          "Cloud Integration: 100% completed",
+          "Advanced AI Enhancement: 100% completed"
+        ]
+      },
+      "ERRORS.md": {
+        "path": "${workspaceFolder}\\.manager\\control-files\\ERRORS.md",
+        "purpose": "База знаний об ошибках и их решениях",
+        "description": "Универсальная база знаний для отслеживания и решения ошибок любого типа проекта",
+        "status": "active",
+        "lastUpdated": "2025-01-31",
+        "keySections": [
+          "ERROR RESOLUTION STATUS",
+          "CRITICAL ERRORS (Production Blockers)",
+          "HIGH PRIORITY ERRORS (Important Issues)",
+          "MEDIUM PRIORITY ERRORS (Enhancement Issues)",
+          "LOW PRIORITY ERRORS (Nice-to-Fix Issues)",
+          "ERROR RESOLUTION WORKFLOW",
+          "ERROR METRICS & ANALYTICS",
+          "COMMON ERROR PATTERNS",
+          "ERROR RESOLUTION BEST PRACTICES"
+        ],
+        "errorCategories": [
+          "Runtime Errors",
+          "Build Errors", 
+          "Logic Errors",
+          "Integration Errors",
+          "UI/UX Errors",
+          "Performance Errors",
+          "Documentation Errors",
+          "Test Errors"
+        ]
+      },
+      "INSTRUCTIONS-v4.4.md": {
+        "path": "${workspaceFolder}\\.manager\\control-files\\INSTRUCTIONS-v4.4.md",
+        "purpose": "Инструкции по работе с проектом",
+        "description": "Подробные инструкции по использованию платформы автоматизации",
+        "status": "active",
+        "lastUpdated": "2025-01-31",
+        "version": "4.4"
+      },
+      "start.md": {
+        "path": "${workspaceFolder}\\.manager\\start.md",
+        "purpose": "Руководство по быстрому старту",
+        "description": "Содержит команды быстрого старта и основные инструкции",
+        "status": "active",
+        "lastUpdated": "2025-01-31"
+      }
+    },
+    "automationFiles": {
+      "description": "Файлы автоматизации в папке .automation",
+      "scriptsPath": "${workspaceFolder}\\.automation\\scripts",
+      "configPath": "${workspaceFolder}\\.automation\\config",
+      "keyScripts": [
+        "New-Aliases-v4.8.ps1",
+        "start-smart.bat",
+        "Project-Analysis-Optimizer-v4.8.ps1",
+        "Quick-Access-Optimized-v4.8.ps1",
+        "AI-Enhanced-Features-Manager-v4.8.ps1"
+      ]
+    },
+    "configFiles": {
+      "description": "Конфигурационные файлы проекта",
+      "cursorJson": {
+        "path": "${workspaceFolder}\\cursor.json",
+        "purpose": "Конфигурация Cursor IDE",
+        "description": "Настройки IDE, алиасы, команды быстрого доступа"
+      },
+      "deploymentConfig": {
+        "path": "${workspaceFolder}\\deployment-config.json",
+        "purpose": "Конфигурация развертывания",
+        "description": "Настройки для развертывания в различных средах"
+      },
+      "startSmartConfig": {
+        "path": "${workspaceFolder}\\start-smart-config.json",
+        "purpose": "Конфигурация умного копирования",
+        "description": "Настройки для автоматического копирования и синхронизации файлов"
+      }
+    }
+  },
+  "developmentSettings": {
+    "environment": "development",
+    "debugMode": true,
+    "verboseLogging": true,
+    "hotReload": true,
+    "liveReload": true,
+    "autoSave": true,
+    "watchMode": true,
+    "testMode": true,
+    "description": "Настройки среды разработки"
+  },
+  "projectStructure": {
+    "description": "Структура проекта ManagerAgentAI",
+    "mainDirectories": {
+      ".automation": "Скрипты автоматизации и конфигурации",
+      ".manager": "Управляющие файлы и документация",
+      "config": "Конфигурационные файлы",
+      "docs": "Документация проекта",
+      "scripts": "Основные скрипты",
+      "reports": "Отчеты и аналитика",
+      "interfaces": "HTML интерфейсы",
+      "kubernetes": "Kubernetes манифесты",
+      "monitoring": "Мониторинг и метрики",
+      "security": "Настройки безопасности",
+      "project-examples": "Примеры проектов",
+      "project-types": "Типы проектов и модули",
+      "wireframes": "Wireframes и макеты"
+    }
+  },
+  "workflow": {
+    "description": "Рабочий процесс разработки",
+    "steps": [
+      "1. Изучить IDEA.md для понимания архитектуры",
+      "2. Проверить TODO.md для текущих задач",
+      "3. Использовать скрипты из .automation для автоматизации",
+      "4. Обновлять COMPLETED.md при завершении задач",
+      "5. Записывать ошибки в ERRORS.md с решениями",
+      "6. Следовать инструкциям из INSTRUCTIONS-v4.4.md"
+    ]
+  },
+  "quickCommands": {
+    "description": "Быстрые команды для работы с проектом",
+    "aliases": {
+      "mpo": "Maximum-Performance-Optimizer-v4.8.ps1",
+      "mmo": "Advanced-Monitoring-System-v4.8.ps1", 
+      "qai": "Project-Analysis-Optimizer-v4.8.ps1",
+      "qaq": "Quick-Access-Optimized-v4.8.ps1",
+      "qap": "AI-Enhanced-Features-Manager-v4.8.ps1"
+    },
+    "paths": {
+      "automation": ".automation",
+      "manager": ".manager",
+      "config": "config",
+      "docs": "docs",
+      "scripts": "scripts"
+    }
+  },
+  "features": {
+    "ai": true,
+    "quantum": true,
+    "blockchain": true,
+    "edge": true,
+    "vr": true,
+    "ar": true,
+    "5g": true,
+    "iot": true,
+    "debug": true,
+    "testing": true,
+    "hotReload": true,
+    "liveReload": true,
+    "description": "Включенные функции для разработки"
+  },
+  "notifications": {
+    "enabled": true,
+    "console": true,
+    "description": "Уведомления для разработки"
+  },
+  "security": {
+    "devMode": true,
+    "verifyChecksums": false,
+    "encryptBackups": false,
+    "signFiles": false,
+    "description": "Настройки безопасности для разработки"
+  },
+  "performance": {
+    "parallelCopy": 5,
+    "chunkSize": "512KB",
+    "retryAttempts": 5,
+    "retryDelay": 2,
+    "cacheEnabled": true,
+    "description": "Настройки производительности для разработки"
+  }
+}

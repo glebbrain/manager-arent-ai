@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatic README Updates - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .readme-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .readme-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .readme-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .readme-files {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .readme-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .readme-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .readme-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .readme-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .readme-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-updated {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-outdated {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-synced {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .readme-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .readme-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .readme-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .update-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .update-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .update-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .option-item:hover {
+            background: #e5e7eb;
+        }
+
+        .option-checkbox {
+            margin-right: 10px;
+        }
+
+        .option-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .update-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .update-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recent-updates {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .updates-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .update-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .update-item:hover {
+            background: #f8f9fa;
+        }
+
+        .update-item:last-child {
+            border-bottom: none;
+        }
+
+        .update-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .update-icon.updated {
+            background: #10b981;
+        }
+
+        .update-icon.created {
+            background: #3b82f6;
+        }
+
+        .update-icon.error {
+            background: #ef4444;
+        }
+
+        .update-content {
+            flex: 1;
+        }
+
+        .update-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .update-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .update-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .readme-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .readme-files {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-file-text"></i> Automatic README Updates</h1>
+            <p>Automatic README file generation and update system for Universal Project Manager v3.2</p>
+        </div>
+
+        <div class="readme-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-file-alt"></i></div>
+                <div class="overview-value">47</div>
+                <div class="overview-label">README Files</div>
+                <div class="overview-trend trend-up">+5 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-sync"></i></div>
+                <div class="overview-value">96%</div>
+                <div class="overview-label">Auto Update Rate</div>
+                <div class="overview-trend trend-up">+3% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-clock"></i></div>
+                <div class="overview-value">1.8s</div>
+                <div class="overview-label">Avg Update Time</div>
+                <div class="overview-trend trend-down">-0.4s faster</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="overview-value">98%</div>
+                <div class="overview-label">Success Rate</div>
+                <div class="overview-trend trend-stable">No change</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-language"></i></div>
+                <div class="overview-value">8</div>
+                <div class="overview-label">Languages</div>
+                <div class="overview-trend trend-up">+1 this month</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">97%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+2% improvement</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="readme-section">
+                <h2><i class="fas fa-chart-area"></i> README Management</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">README Update Trends</div>
+                    <canvas id="updateChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">README Status Distribution</div>
+                    <canvas id="statusChart"></canvas>
+                </div>
+
+                <div class="readme-files">
+                    <div class="readme-card">
+                        <div class="readme-header">
+                            <div class="readme-title">Main README.md</div>
+                            <div class="readme-status status-updated">Updated</div>
+                        </div>
+                        <div class="readme-description">Main project documentation with latest features and setup instructions</div>
+                        <div class="readme-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">1.2s</div>
+                                <div class="metric-label">Last Update</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">98%</div>
+                                <div class="stat-label">Sync Status</div>
+                            </div>
+                        </div>
+                        <div class="readme-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="readme-card">
+                        <div class="readme-header">
+                            <div class="readme-title">API README.md</div>
+                            <div class="readme-status status-synced">Synced</div>
+                        </div>
+                        <div class="readme-description">API documentation with endpoints, examples, and usage instructions</div>
+                        <div class="readme-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">0.8s</div>
+                                <div class="metric-label">Last Update</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Sync Status</div>
+                            </div>
+                        </div>
+                        <div class="readme-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Refresh</button>
+                        </div>
+                    </div>
+
+                    <div class="readme-card">
+                        <div class="readme-header">
+                            <div class="readme-title">Installation README.md</div>
+                            <div class="readme-status status-updated">Updated</div>
+                        </div>
+                        <div class="readme-description">Installation guide with platform-specific instructions and requirements</div>
+                        <div class="readme-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">2.1s</div>
+                                <div class="metric-label">Last Update</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">95%</div>
+                                <div class="metric-label">Sync Status</div>
+                            </div>
+                        </div>
+                        <div class="readme-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="readme-card">
+                        <div class="readme-header">
+                            <div class="readme-title">Contributing README.md</div>
+                            <div class="readme-status status-outdated">Outdated</div>
+                        </div>
+                        <div class="readme-description">Contributing guidelines and development setup instructions</div>
+                        <div class="readme-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">3.2h</div>
+                                <div class="metric-label">Last Update</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">67%</div>
+                                <div class="metric-label">Sync Status</div>
+                            </div>
+                        </div>
+                        <div class="readme-actions">
+                            <button class="action-btn">Update</button>
+                            <button class="action-btn secondary">Review</button>
+                        </div>
+                    </div>
+
+                    <div class="readme-card">
+                        <div class="readme-header">
+                            <div class="readme-title">Changelog README.md</div>
+                            <div class="readme-status status-synced">Synced</div>
+                        </div>
+                        <div class="readme-description">Automatically generated changelog with version history and updates</div>
+                        <div class="readme-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">0.5s</div>
+                                <div class="metric-label">Last Update</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Sync Status</div>
+                            </div>
+                        </div>
+                        <div class="readme-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Export</button>
+                        </div>
+                    </div>
+
+                    <div class="readme-card">
+                        <div class="readme-header">
+                            <div class="readme-title">Security README.md</div>
+                            <div class="readme-status status-error">Error</div>
+                        </div>
+                        <div class="readme-description">Security guidelines and vulnerability reporting instructions</div>
+                        <div class="readme-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">2.1h</div>
+                                <div class="metric-label">Last Update</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">0%</div>
+                                <div class="metric-label">Sync Status</div>
+                            </div>
+                        </div>
+                        <div class="readme-actions">
+                            <button class="action-btn">Fix</button>
+                            <button class="action-btn secondary">Retry</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="update-controls">
+                <h2><i class="fas fa-cogs"></i> Update Controls</h2>
+                
+                <div class="update-actions">
+                    <button class="control-btn" onclick="updateAll()">
+                        <i class="fas fa-sync"></i> Update All
+                    </button>
+                    <button class="control-btn secondary" onclick="generateNew()">
+                        <i class="fas fa-plus"></i> Generate New
+                    </button>
+                    <button class="control-btn secondary" onclick="exportReadmes()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+
+                <div class="control-section">
+                    <div class="control-title">Update Options</div>
+                    <div class="update-options">
+                        <div class="option-item">
+                            <input type="checkbox" class="option-checkbox" checked>
+                            <div class="option-label">Auto Update on Changes</div>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" class="option-checkbox" checked>
+                            <div class="option-label">Include Dependencies</div>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" class="option-checkbox" checked>
+                            <div class="option-label">Update Version Numbers</div>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" class="option-checkbox">
+                            <div class="option-label">Include Screenshots</div>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" class="option-checkbox" checked>
+                            <div class="option-label">Generate Badges</div>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" class="option-checkbox">
+                            <div class="option-label">Include License Info</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="update-status">
+                    <div class="status-title">Update Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Auto Update</div>
+                        <div class="status-value">Enabled</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Last Full Update</div>
+                        <div class="status-value">3 minutes ago</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Files in Queue</div>
+                        <div class="status-value">2 files</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Update Speed</div>
+                        <div class="status-value">1.8s per file</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Success Rate</div>
+                        <div class="status-value">98.2%</div>
+                    </div>
+                </div>
+
+                <div class="recent-updates">
+                    <div class="updates-title">Recent Updates</div>
+                    <div class="update-item">
+                        <div class="update-icon updated">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="update-content">
+                            <div class="update-title">Main README.md Updated</div>
+                            <div class="update-description">Added new v3.2 features and installation instructions</div>
+                        </div>
+                        <div class="update-time">3 minutes ago</div>
+                    </div>
+                    <div class="update-item">
+                        <div class="update-icon created">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="update-content">
+                            <div class="update-title">API README.md Created</div>
+                            <div class="update-content">Generated new API documentation with examples</div>
+                        </div>
+                        <div class="update-time">8 minutes ago</div>
+                    </div>
+                    <div class="update-item">
+                        <div class="update-icon updated">
+                            <i class="fas fa-sync"></i>
+                        </div>
+                        <div class="update-content">
+                            <div class="update-title">Changelog README.md Synced</div>
+                            <div class="update-description">Auto-synced with latest git commits</div>
+                        </div>
+                        <div class="update-time">12 minutes ago</div>
+                    </div>
+                    <div class="update-item">
+                        <div class="update-icon error">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="update-content">
+                            <div class="update-title">Security README.md Failed</div>
+                            <div class="update-description">Update failed due to parsing error</div>
+                        </div>
+                        <div class="update-time">15 minutes ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI README Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        README update accuracy improved by 15% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Some README files need manual review for accuracy
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI templates available for better README generation
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let updateChart, statusChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Update Chart
+            const updateCtx = document.getElementById('updateChart').getContext('2d');
+            updateChart = new Chart(updateCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(7),
+                    datasets: [{
+                        label: 'README Updates',
+                        data: [12, 15, 18, 14, 16, 20, 22],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Auto Updates',
+                        data: [8, 12, 15, 11, 13, 17, 19],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Status Chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            statusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Updated', 'Synced', 'Outdated', 'Error'],
+                    datasets: [{
+                        data: [25, 15, 5, 2],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels(days) {
+            const labels = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function updateAll() {
+            alert('Updating all README files...');
+        }
+
+        function generateNew() {
+            alert('Generating new README files...');
+        }
+
+        function exportReadmes() {
+            alert('Exporting README files...');
+        }
+    </script>
+</body>
+</html>

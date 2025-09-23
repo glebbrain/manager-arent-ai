@@ -1,0 +1,101 @@
+{
+  "port": 4000,
+  "host": "localhost",
+  "maxEvents": 10000,
+  "retentionPeriod": 86400000,
+  "persistence": {
+    "enabled": true,
+    "file": "events.json",
+    "backupInterval": 3600000,
+    "compression": true,
+    "encryption": true
+  },
+  "security": {
+    "enabled": true,
+    "authToken": "event-bus-secret-key-2025",
+    "encryption": true,
+    "algorithm": "aes-256-gcm",
+    "keyRotation": 86400000,
+    "accessLogging": true
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics": true,
+    "health": true,
+    "interval": 30000,
+    "retention": 86400000,
+    "alerts": {
+      "enabled": true,
+      "highLatency": 5000,
+      "highErrorRate": 0.1,
+      "queueOverflow": 0.8
+    }
+  },
+  "routing": {
+    "strategy": "broadcast",
+    "retryAttempts": 3,
+    "retryDelay": 1000,
+    "timeout": 30000,
+    "circuitBreaker": {
+      "enabled": true,
+      "failureThreshold": 5,
+      "resetTimeout": 60000,
+      "monitoringPeriod": 10000
+    },
+    "loadBalancing": {
+      "enabled": false,
+      "strategy": "round-robin",
+      "healthCheck": true
+    }
+  },
+  "performance": {
+    "batchSize": 100,
+    "batchTimeout": 1000,
+    "parallelProcessing": true,
+    "maxConcurrentHandlers": 10,
+    "memoryLimit": "512MB",
+    "gcThreshold": 0.8
+  },
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "file": "event-bus.log",
+    "maxSize": "10MB",
+    "maxFiles": 5,
+    "datePattern": "YYYY-MM-DD",
+    "format": "combined",
+    "includeStack": true
+  },
+  "clustering": {
+    "enabled": false,
+    "nodes": [],
+    "replication": {
+      "enabled": false,
+      "factor": 2,
+      "consistency": "eventual"
+    },
+    "partitioning": {
+      "enabled": false,
+      "strategy": "hash",
+      "partitions": 4
+    }
+  },
+  "backup": {
+    "enabled": true,
+    "interval": 3600000,
+    "retention": 7,
+    "compression": true,
+    "encryption": true,
+    "location": "backups"
+  },
+  "notifications": {
+    "enabled": true,
+    "channels": ["email", "slack", "webhook"],
+    "events": ["error", "warning", "info"],
+    "throttling": {
+      "enabled": true,
+      "maxPerMinute": 60,
+      "cooldown": 300000
+    }
+  }
+}

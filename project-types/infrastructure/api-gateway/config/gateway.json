@@ -1,0 +1,108 @@
+{
+  "port": 3000,
+  "host": "localhost",
+  "timeout": 30000,
+  "retries": 3,
+  "rateLimit": {
+    "enabled": true,
+    "requests": 1000,
+    "window": 3600000,
+    "perIp": true,
+    "skipSuccessfulRequests": false,
+    "skipFailedRequests": false
+  },
+  "cors": {
+    "enabled": true,
+    "origins": ["*"],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    "headers": ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
+    "credentials": true,
+    "maxAge": 86400
+  },
+  "auth": {
+    "enabled": true,
+    "type": "jwt",
+    "secret": "manager-agent-ai-secret-key-2025",
+    "expiresIn": "24h",
+    "refreshExpiresIn": "7d",
+    "algorithm": "HS256",
+    "issuer": "manager-agent-ai",
+    "audience": "api-gateway"
+  },
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "file": "api-gateway.log",
+    "maxSize": "10MB",
+    "maxFiles": 5,
+    "datePattern": "YYYY-MM-DD",
+    "format": "combined"
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics": true,
+    "health": true,
+    "prometheus": false,
+    "interval": 30000,
+    "retention": 86400000
+  },
+  "security": {
+    "helmet": true,
+    "xssProtection": true,
+    "noSniff": true,
+    "frameguard": true,
+    "hsts": true,
+    "contentSecurityPolicy": {
+      "enabled": true,
+      "directives": {
+        "defaultSrc": ["'self'"],
+        "scriptSrc": ["'self'", "'unsafe-inline'"],
+        "styleSrc": ["'self'", "'unsafe-inline'"],
+        "imgSrc": ["'self'", "data:", "https:"],
+        "connectSrc": ["'self'"],
+        "fontSrc": ["'self'"],
+        "objectSrc": ["'none'"],
+        "mediaSrc": ["'self'"],
+        "frameSrc": ["'none'"]
+      }
+    }
+  },
+  "circuitBreaker": {
+    "enabled": true,
+    "failureThreshold": 5,
+    "resetTimeout": 30000,
+    "monitoringPeriod": 10000,
+    "minimumRequestCount": 10
+  },
+  "loadBalancing": {
+    "enabled": false,
+    "strategy": "round-robin",
+    "healthCheck": true,
+    "healthCheckInterval": 30000
+  },
+  "caching": {
+    "enabled": true,
+    "ttl": 300000,
+    "maxSize": 1000,
+    "strategy": "lru"
+  },
+  "compression": {
+    "enabled": true,
+    "threshold": 1024,
+    "level": 6,
+    "memLevel": 8
+  },
+  "timeouts": {
+    "connect": 5000,
+    "request": 30000,
+    "response": 30000,
+    "keepAlive": 5000
+  },
+  "retry": {
+    "enabled": true,
+    "attempts": 3,
+    "delay": 1000,
+    "backoff": "exponential",
+    "maxDelay": 10000
+  }
+}

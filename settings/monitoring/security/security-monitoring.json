@@ -1,0 +1,75 @@
+{
+  "version": "4.8.0",
+  "systemName": "Advanced-Security-Monitoring-v4.8",
+  "alerts": {
+    "anomalyDetection": {
+      "severity": "warning",
+      "enabled": true,
+      "aiGenerated": {
+        "IsPresent": true
+      }
+    },
+    "threatDetection": {
+      "severity": "critical",
+      "enabled": true,
+      "aiGenerated": {
+        "IsPresent": true
+      }
+    },
+    "complianceViolation": {
+      "severity": "critical",
+      "enabled": true,
+      "aiGenerated": {
+        "IsPresent": true
+      }
+    }
+  },
+  "monitoring": {
+    "access": {
+      "quantumVerification": {
+        "IsPresent": true
+      },
+      "aiAnalysis": {
+        "IsPresent": true
+      },
+      "enabled": true
+    },
+    "anomalies": {
+      "quantumAnalysis": {
+        "IsPresent": true
+      },
+      "aiAnalysis": {
+        "IsPresent": true
+      },
+      "enabled": true
+    },
+    "compliance": {
+      "aiAnalysis": {
+        "IsPresent": true
+      },
+      "enabled": true,
+      "frameworks": [
+        "GDPR",
+        "HIPAA",
+        "SOX",
+        "ISO27001"
+      ]
+    },
+    "threats": {
+      "aiAnalysis": {
+        "IsPresent": true
+      },
+      "quantumDetection": {
+        "IsPresent": true
+      },
+      "enabled": true
+    }
+  },
+  "capabilities": [
+    "threat-detection",
+    "anomaly-detection",
+    "access-monitoring",
+    "compliance-monitoring",
+    "quantum-security-monitoring"
+  ]
+}

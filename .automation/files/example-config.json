@@ -1,0 +1,58 @@
+{
+  "Items": [
+    {
+      "Name": "ProjectRoot",
+      "Type": "directory",
+      "Children": [
+        {
+          "Name": "src",
+          "Type": "directory",
+          "Children": [
+            {
+              "Name": "main.py",
+              "Type": "file",
+              "Content": "#!/usr/bin/env python3\n# Main application entry point\nprint('Hello World!')"
+            },
+            {
+              "Name": "utils.py",
+              "Type": "file",
+              "Content": "#!/usr/bin/env python3\n# Utility functions\ndef helper_function():\n    pass"
+            }
+          ]
+        },
+        {
+          "Name": "docs",
+          "Type": "directory",
+          "Children": [
+            {
+              "Name": "README.md",
+              "Type": "file",
+              "Content": "# Project Documentation\n\nThis is a sample project created with batch-create.ps1"
+            }
+          ]
+        },
+        {
+          "Name": "tests",
+          "Type": "directory",
+          "Children": [
+            {
+              "Name": "test_main.py",
+              "Type": "file",
+              "Content": "#!/usr/bin/env python3\nimport unittest\n\nclass TestMain(unittest.TestCase):\n    def test_basic(self):\n        self.assertTrue(True)\n\nif __name__ == '__main__':\n    unittest.main()"
+            }
+          ]
+        },
+        {
+          "Name": "config.json",
+          "Type": "file",
+          "Content": "{\n  \"name\": \"MyProject\",\n  \"version\": \"1.0.0\",\n  \"description\": \"A sample project\"\n}"
+        },
+        {
+          "Name": ".gitignore",
+          "Type": "file",
+          "Content": "__pycache__/\n*.pyc\n*.pyo\n*.pyd\n.Python\nenv/\nvenv/\n.venv/\n.env\n.idea/\n.vscode/\n*.log"
+        }
+      ]
+    }
+  ]
+}

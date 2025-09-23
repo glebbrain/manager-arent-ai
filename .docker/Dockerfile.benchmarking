@@ -1,0 +1,45 @@
+# ManagerAgentAI Benchmarking Service Dockerfile v2.4
+# Multi-stage build for production-ready benchmarking service
+
+# Stage 1: Build stage
+FROM node:18-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY benchmarking/package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Stage 2: Production stage
+FROM node:18-alpine AS production
+
+# Create app user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S benchmarking -u 1001
+
+# Set working directory
+WORKDIR /app
+
+# Copy built application from builder stage
+COPY --from=builder /app/node_modules ./node_modules
+COPY benchmarking/ ./
+
+# Create necessary directories
+RUN mkdir -p logs reports config backups && \
+    chown -R benchmarking:nodejs /app
+
+# Switch to non-root user
+USER benchmarking
+
+# Expose port
+EXPOSE 3014
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:3014/health || exit 1
+
+# Start the application
+CMD ["node", "server.js"]

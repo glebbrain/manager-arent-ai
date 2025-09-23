@@ -1,0 +1,67 @@
+{
+  "version": "4.8.0",
+  "systemName": "Advanced-Alerting-System-v4.8",
+  "channels": {
+    "email": {
+      "aiFiltering": {
+        "IsPresent": true
+      },
+      "enabled": true
+    },
+    "slack": {
+      "aiFiltering": {
+        "IsPresent": true
+      },
+      "enabled": true
+    },
+    "sms": {
+      "aiFiltering": {
+        "IsPresent": true
+      },
+      "enabled": true
+    },
+    "webhook": {
+      "aiFiltering": {
+        "IsPresent": true
+      },
+      "enabled": true
+    }
+  },
+  "alertRules": {
+    "warning": {
+      "aiAnalysis": {
+        "IsPresent": true
+      },
+      "immediate": false,
+      "threshold": 75
+    },
+    "critical": {
+      "aiAnalysis": {
+        "IsPresent": true
+      },
+      "immediate": true,
+      "threshold": 90
+    },
+    "info": {
+      "aiAnalysis": {
+        "IsPresent": true
+      },
+      "immediate": false,
+      "threshold": 50
+    }
+  },
+  "aiFeatures": {
+    "quantumOptimization": {
+      "IsPresent": true
+    },
+    "predictiveAlerts": {
+      "IsPresent": true
+    },
+    "intelligentFiltering": {
+      "IsPresent": true
+    },
+    "priorityScoring": {
+      "IsPresent": true
+    }
+  }
+}

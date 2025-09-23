@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Dashboard - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .security-dashboard { display: flex; height: 100vh; }
+        .sidebar { width: 280px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .security-header { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; }
+        .security-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .security-subtitle { font-size: 1.1rem; opacity: 0.9; margin-bottom: 1.5rem; }
+        .security-stats { display: flex; gap: 2rem; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-label { font-size: 0.9rem; opacity: 0.8; }
+        .threats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .threat-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .threat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .threat-title { font-size: 0.9rem; font-weight: 500; color: #6b7280; }
+        .threat-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .threat-value { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+        .threat-change { font-size: 0.8rem; display: flex; align-items: center; gap: 0.25rem; }
+        .threat-change.positive { color: #10b981; }
+        .threat-change.negative { color: #ef4444; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .chart-container { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .chart-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem; }
+        .chart-canvas { width: 100%; height: 300px; }
+        .incidents-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .incidents-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .incidents-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .incidents-actions { display: flex; gap: 0.5rem; }
+        .incident-item { display: flex; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 8px; margin-bottom: 1rem; }
+        .incident-item:last-child { margin-bottom: 0; }
+        .incident-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem; font-size: 1.2rem; }
+        .incident-content { flex: 1; }
+        .incident-title { font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; }
+        .incident-description { color: #6b7280; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .incident-time { color: #6b7280; font-size: 0.8rem; }
+        .incident-severity { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 500; margin-left: 0.5rem; }
+        .severity-critical { background: #fef2f2; color: #dc2626; }
+        .severity-high { background: #fef3c7; color: #92400e; }
+        .severity-medium { background: #dbeafe; color: #1e40af; }
+        .severity-low { background: #dcfce7; color: #166534; }
+        .vulnerabilities-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .vulnerabilities-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .vulnerabilities-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .vulnerabilities-table { width: 100%; border-collapse: collapse; }
+        .vulnerabilities-table th, .vulnerabilities-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .vulnerabilities-table th { background: #f8fafc; font-weight: 600; color: #374151; }
+        .vulnerabilities-table tbody tr:hover { background: #f8fafc; }
+        .vulnerability-cve { font-family: 'Monaco', 'Consolas', monospace; font-size: 0.9rem; color: #2563eb; }
+        .vulnerability-score { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 500; }
+        .score-critical { background: #fef2f2; color: #dc2626; }
+        .score-high { background: #fef3c7; color: #92400e; }
+        .score-medium { background: #dbeafe; color: #1e40af; }
+        .score-low { background: #dcfce7; color: #166534; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        .nav { padding: 1rem; }
+        .nav-item { display: block; padding: 0.75rem; color: #6b7280; text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .nav-item:hover, .nav-item.active { background: #eff6ff; color: #2563eb; }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-section-title { font-size: 0.8rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; padding: 0 0.75rem; }
+        .filters { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .filters-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .filter-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .filter-group label { font-size: 0.9rem; font-weight: 500; color: #374151; }
+        .filter-select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; font-size: 0.9rem; }
+        .search-input { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; width: 200px; }
+        .security-status { display: flex; align-items: center; gap: 0.5rem; color: #10b981; font-size: 0.9rem; }
+        .status-indicator { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @media (max-width: 768px) {
+            .security-dashboard { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .filters-row { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <div class="security-dashboard">
+        <div class="sidebar">
+            <div class="nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Безопасность</div>
+                    <a href="#" class="nav-item active"><i class="fas fa-shield-alt"></i> Обзор</a>
+                    <a href="#" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Угрозы</a>
+                    <a href="#" class="nav-item"><i class="fas fa-bug"></i> Уязвимости</a>
+                    <a href="#" class="nav-item"><i class="fas fa-user-shield"></i> Доступы</a>
+                    <a href="#" class="nav-item"><i class="fas fa-lock"></i> Шифрование</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Мониторинг</div>
+                    <a href="#" class="nav-item"><i class="fas fa-eye"></i> Логи</a>
+                    <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Аналитика</a>
+                    <a href="#" class="nav-item"><i class="fas fa-bell"></i> Алерты</a>
+                    <a href="#" class="nav-item"><i class="fas fa-history"></i> История</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Настройки</div>
+                    <a href="#" class="nav-item"><i class="fas fa-cog"></i> Конфигурация</a>
+                    <a href="#" class="nav-item"><i class="fas fa-key"></i> Ключи</a>
+                    <a href="#" class="nav-item"><i class="fas fa-certificate"></i> Сертификаты</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-shield-alt"></i> Security Dashboard</h1>
+                <div>
+                    <div class="security-status">
+                        <div class="status-indicator"></div>
+                        <span>Система защищена</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="refreshSecurity()">
+                        <i class="fas fa-sync"></i> Обновить
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="security-header">
+                    <div class="security-title">Панель безопасности</div>
+                    <div class="security-subtitle">Мониторинг угроз и защита системы</div>
+                    <div class="security-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Активных угроз</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Уязвимости</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">99.9%</div>
+                            <div class="stat-label">Защищенность</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">24/7</div>
+                            <div class="stat-label">Мониторинг</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filters">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label>Период</label>
+                            <select class="filter-select" id="timeFilter">
+                                <option value="1h">Последний час</option>
+                                <option value="24h" selected>Последние 24 часа</option>
+                                <option value="7d">Последние 7 дней</option>
+                                <option value="30d">Последние 30 дней</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Тип угрозы</label>
+                            <select class="filter-select" id="threatFilter">
+                                <option value="all">Все угрозы</option>
+                                <option value="malware">Малвар</option>
+                                <option value="phishing">Фишинг</option>
+                                <option value="ddos">DDoS</option>
+                                <option value="bruteforce">Брутфорс</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Поиск</label>
+                            <input type="text" class="search-input" placeholder="Поиск угроз...">
+                        </div>
+                        <button class="btn btn-primary" onclick="applyFilters()">Применить</button>
+                    </div>
+                </div>
+                
+                <div class="threats-grid">
+                    <div class="threat-card">
+                        <div class="threat-header">
+                            <span class="threat-title">Блокированные атаки</span>
+                            <div class="threat-icon" style="background: #10b981; color: white;">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                        </div>
+                        <div class="threat-value">1,247</div>
+                        <div class="threat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +12 за час
+                        </div>
+                    </div>
+                    <div class="threat-card">
+                        <div class="threat-header">
+                            <span class="threat-title">Подозрительная активность</span>
+                            <div class="threat-icon" style="background: #f59e0b; color: white;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                        <div class="threat-value">23</div>
+                        <div class="threat-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            -5 за час
+                        </div>
+                    </div>
+                    <div class="threat-card">
+                        <div class="threat-header">
+                            <span class="threat-title">Уязвимости</span>
+                            <div class="threat-icon" style="background: #ef4444; color: white;">
+                                <i class="fas fa-bug"></i>
+                            </div>
+                        </div>
+                        <div class="threat-value">3</div>
+                        <div class="threat-change negative">
+                            <i class="fas fa-arrow-up"></i>
+                            +1 за день
+                        </div>
+                    </div>
+                    <div class="threat-card">
+                        <div class="threat-header">
+                            <span class="threat-title">Защищенные данные</span>
+                            <div class="threat-icon" style="background: #2563eb; color: white;">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                        </div>
+                        <div class="threat-value">99.9%</div>
+                        <div class="threat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +0.1% за день
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">Угрозы по типам</div>
+                        <canvas id="threatsChart" class="chart-canvas"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">Активность атак</div>
+                        <canvas id="attacksChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="incidents-section">
+                    <div class="incidents-header">
+                        <div class="incidents-title">Последние инциденты</div>
+                        <div class="incidents-actions">
+                            <button class="btn btn-sm btn-primary" onclick="refreshIncidents()">Обновить</button>
+                            <button class="btn btn-sm btn-secondary" onclick="clearIncidents()">Очистить</button>
+                        </div>
+                    </div>
+                    <div class="incident-item">
+                        <div class="incident-icon" style="background: #ef4444; color: white;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="incident-content">
+                            <div class="incident-title">Попытка DDoS атаки</div>
+                            <div class="incident-description">Обнаружена попытка DDoS атаки с IP 192.168.1.100. Атака успешно заблокирована.</div>
+                            <div class="incident-time">2 часа назад</div>
+                        </div>
+                        <span class="incident-severity severity-critical">Критический</span>
+                    </div>
+                    <div class="incident-item">
+                        <div class="incident-icon" style="background: #f59e0b; color: white;">
+                            <i class="fas fa-user-times"></i>
+                        </div>
+                        <div class="incident-content">
+                            <div class="incident-title">Неудачная попытка входа</div>
+                            <div class="incident-description">Множественные неудачные попытки входа с IP 10.0.0.50. Аккаунт временно заблокирован.</div>
+                            <div class="incident-time">4 часа назад</div>
+                        </div>
+                        <span class="incident-severity severity-high">Высокий</span>
+                    </div>
+                    <div class="incident-item">
+                        <div class="incident-icon" style="background: #2563eb; color: white;">
+                            <i class="fas fa-info"></i>
+                        </div>
+                        <div class="incident-content">
+                            <div class="incident-title">Обновление антивируса</div>
+                            <div class="incident-description">Антивирусная база данных успешно обновлена. Добавлены новые сигнатуры угроз.</div>
+                            <div class="incident-time">6 часов назад</div>
+                        </div>
+                        <span class="incident-severity severity-low">Низкий</span>
+                    </div>
+                </div>
+                
+                <div class="vulnerabilities-section">
+                    <div class="vulnerabilities-header">
+                        <div class="vulnerabilities-title">Уязвимости безопасности</div>
+                        <div class="incidents-actions">
+                            <button class="btn btn-sm btn-primary" onclick="refreshVulnerabilities()">Обновить</button>
+                            <button class="btn btn-sm btn-success" onclick="scanVulnerabilities()">Сканировать</button>
+                        </div>
+                    </div>
+                    <table class="vulnerabilities-table">
+                        <thead>
+                            <tr>
+                                <th>CVE ID</th>
+                                <th>Описание</th>
+                                <th>Сервер</th>
+                                <th>Критичность</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="vulnerability-cve">CVE-2024-1234</span></td>
+                                <td>SQL Injection в веб-приложении</td>
+                                <td>Web Server 01</td>
+                                <td><span class="vulnerability-score score-critical">9.8</span></td>
+                                <td><span class="incident-severity severity-critical">Критический</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" onclick="fixVulnerability('CVE-2024-1234')">Исправить</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="vulnerability-cve">CVE-2024-5678</span></td>
+                                <td>Cross-Site Scripting (XSS)</td>
+                                <td>Web Server 02</td>
+                                <td><span class="vulnerability-score score-high">7.5</span></td>
+                                <td><span class="incident-severity severity-high">Высокий</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning" onclick="fixVulnerability('CVE-2024-5678')">Исправить</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="vulnerability-cve">CVE-2024-9012</span></td>
+                                <td>Устаревшая версия библиотеки</td>
+                                <td>Database Server</td>
+                                <td><span class="vulnerability-score score-medium">5.2</span></td>
+                                <td><span class="incident-severity severity-medium">Средний</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="fixVulnerability('CVE-2024-9012')">Исправить</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            setupEventListeners();
+        });
+        
+        function initializeCharts() {
+            // Threats Chart
+            const threatsCtx = document.getElementById('threatsChart').getContext('2d');
+            new Chart(threatsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Малвар', 'Фишинг', 'DDoS', 'Брутфорс', 'Другие'],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#2563eb', '#8b5cf6', '#6b7280']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Attacks Chart
+            const attacksCtx = document.getElementById('attacksChart').getContext('2d');
+            new Chart(attacksCtx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                    datasets: [{
+                        label: 'Блокированные атаки',
+                        data: [12, 8, 15, 23, 18, 25, 20],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Подозрительная активность',
+                        data: [3, 2, 5, 8, 6, 10, 7],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function setupEventListeners() {
+            // Auto-refresh every 30 seconds
+            setInterval(refreshSecurity, 30000);
+        }
+        
+        function refreshSecurity() {
+            console.log('Refreshing security data...');
+        }
+        
+        function refreshIncidents() {
+            alert('Инциденты обновлены!');
+        }
+        
+        function clearIncidents() {
+            if (confirm('Очистить все инциденты?')) {
+                document.querySelector('.incidents-section').innerHTML = `
+                    <div class="incidents-header">
+                        <div class="incidents-title">Последние инциденты</div>
+                        <div class="incidents-actions">
+                            <button class="btn btn-sm btn-primary" onclick="refreshIncidents()">Обновить</button>
+                            <button class="btn btn-sm btn-secondary" onclick="clearIncidents()">Очистить</button>
+                        </div>
+                    </div>
+                    <div style="text-align: center; padding: 2rem; color: #6b7280;">
+                        <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <div>Нет активных инцидентов</div>
+                    </div>
+                `;
+            }
+        }
+        
+        function refreshVulnerabilities() {
+            alert('Уязвимости обновлены!');
+        }
+        
+        function scanVulnerabilities() {
+            alert('Сканирование уязвимостей запущено...');
+        }
+        
+        function fixVulnerability(cve) {
+            if (confirm(`Исправить уязвимость ${cve}?`)) {
+                alert(`Уязвимость ${cve} исправлена!`);
+            }
+        }
+        
+        function applyFilters() {
+            const time = document.getElementById('timeFilter').value;
+            const threat = document.getElementById('threatFilter').value;
+            
+            console.log('Applying filters:', { time, threat });
+            alert('Фильтры применены!');
+        }
+    </script>
+</body>
+</html>

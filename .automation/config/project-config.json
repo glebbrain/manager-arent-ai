@@ -1,0 +1,194 @@
+{
+  "version": "2.9.0",
+  "ai": {
+    "enabled": true,
+    "provider": "openai",
+    "model": "gpt-4o",
+    "cloudIntegration": true,
+    "predictiveAnalytics": true,
+    "multiModalAI": true,
+    "quantumML": true
+  },
+  "projectTypes": {
+    "nodejs": {
+      "name": "Node.js Project",
+      "detectionFiles": ["package.json", "node_modules"],
+      "buildCommand": "npm run build",
+      "testCommand": "npm test",
+      "devCommand": "npm run dev",
+      "installCommand": "npm install",
+      "configFiles": ["package.json", "tsconfig.json", "next.config.mjs", "webpack.config.js"],
+      "sourceDirs": ["src", "lib", "app"],
+      "testDirs": ["tests", "test", "__tests__"],
+      "buildDir": "dist",
+      "dependencies": {
+        "required": ["node", "npm"],
+        "optional": ["docker", "docker-compose"]
+      }
+    },
+    "python": {
+      "name": "Python Project",
+      "detectionFiles": ["requirements.txt", "pyproject.toml", "setup.py", "Pipfile"],
+      "buildCommand": "python -m build",
+      "testCommand": "pytest",
+      "devCommand": "python -m uvicorn main:app --reload",
+      "installCommand": "pip install -r requirements.txt",
+      "configFiles": ["requirements.txt", "pyproject.toml", "setup.py", "Pipfile", "tox.ini"],
+      "sourceDirs": ["src", "app", "main"],
+      "testDirs": ["tests", "test", "tests_"],
+      "buildDir": "dist",
+      "dependencies": {
+        "required": ["python", "pip"],
+        "optional": ["docker", "docker-compose", "poetry", "conda"]
+      }
+    },
+    "cpp": {
+      "name": "C++ Project",
+      "detectionFiles": ["CMakeLists.txt", "Makefile", "vcpkg.json", "conanfile.txt"],
+      "buildCommand": "cmake --build build",
+      "testCommand": "ctest --test-dir build",
+      "devCommand": "cmake --build build --target run",
+      "installCommand": "vcpkg install",
+      "configFiles": ["CMakeLists.txt", "Makefile", "vcpkg.json", "conanfile.txt"],
+      "sourceDirs": ["src", "source", "lib"],
+      "testDirs": ["tests", "test", "unit_tests"],
+      "buildDir": "build",
+      "dependencies": {
+        "required": ["cmake", "gcc", "g++"],
+        "optional": ["vcpkg", "conan", "docker", "docker-compose"]
+      }
+    },
+    "dotnet": {
+      "name": ".NET Project",
+      "detectionFiles": ["*.csproj", "*.sln", "*.fsproj", "*.vbproj"],
+      "buildCommand": "dotnet build",
+      "testCommand": "dotnet test",
+      "devCommand": "dotnet run",
+      "installCommand": "dotnet restore",
+      "configFiles": ["*.csproj", "*.sln", "*.fsproj", "*.vbproj", "appsettings.json"],
+      "sourceDirs": ["src", "Source"],
+      "testDirs": ["tests", "Tests", "test", "Test"],
+      "buildDir": "bin",
+      "dependencies": {
+        "required": ["dotnet"],
+        "optional": ["docker", "docker-compose"]
+      }
+    },
+    "java": {
+      "name": "Java Project",
+      "detectionFiles": ["pom.xml", "build.gradle", "build.gradle.kts"],
+      "buildCommand": "mvn compile",
+      "testCommand": "mvn test",
+      "devCommand": "mvn spring-boot:run",
+      "installCommand": "mvn install",
+      "configFiles": ["pom.xml", "build.gradle", "build.gradle.kts", "application.properties"],
+      "sourceDirs": ["src/main/java", "src"],
+      "testDirs": ["src/test/java", "test"],
+      "buildDir": "target",
+      "dependencies": {
+        "required": ["java", "maven"],
+        "optional": ["gradle", "docker", "docker-compose"]
+      }
+    },
+    "go": {
+      "name": "Go Project",
+      "detectionFiles": ["go.mod", "go.sum", "main.go"],
+      "buildCommand": "go build",
+      "testCommand": "go test ./...",
+      "devCommand": "go run main.go",
+      "installCommand": "go mod download",
+      "configFiles": ["go.mod", "go.sum", "go.work"],
+      "sourceDirs": [".", "cmd", "internal", "pkg"],
+      "testDirs": ["test", "tests"],
+      "buildDir": "bin",
+      "dependencies": {
+        "required": ["go"],
+        "optional": ["docker", "docker-compose"]
+      }
+    },
+    "rust": {
+      "name": "Rust Project",
+      "detectionFiles": ["Cargo.toml", "Cargo.lock"],
+      "buildCommand": "cargo build",
+      "testCommand": "cargo test",
+      "devCommand": "cargo run",
+      "installCommand": "cargo build",
+      "configFiles": ["Cargo.toml", "Cargo.lock"],
+      "sourceDirs": ["src"],
+      "testDirs": ["tests"],
+      "buildDir": "target",
+      "dependencies": {
+        "required": ["cargo", "rustc"],
+        "optional": ["docker", "docker-compose"]
+      }
+    },
+    "php": {
+      "name": "PHP Project",
+      "detectionFiles": ["composer.json", "composer.lock", "index.php"],
+      "buildCommand": "composer install --no-dev --optimize-autoloader",
+      "testCommand": "phpunit",
+      "devCommand": "php -S localhost:8000",
+      "installCommand": "composer install",
+      "configFiles": ["composer.json", "composer.lock", "phpunit.xml"],
+      "sourceDirs": ["src", "app", "public"],
+      "testDirs": ["tests", "test"],
+      "buildDir": "vendor",
+      "dependencies": {
+        "required": ["php", "composer"],
+        "optional": ["docker", "docker-compose"]
+      }
+    },
+    "multimodal-ai": {
+      "name": "Multi-Modal AI Project",
+      "detectionFiles": ["package.json", "requirements.txt", "Dockerfile"],
+      "buildCommand": "npm run build && python -m build",
+      "testCommand": "npm test && pytest",
+      "devCommand": "npm run dev && python -m uvicorn main:app --reload",
+      "installCommand": "npm install && pip install -r requirements.txt",
+      "configFiles": ["package.json", "requirements.txt", "ai-config.json"],
+      "sourceDirs": ["src", "modules", "routes"],
+      "testDirs": ["tests", "test"],
+      "buildDir": "dist",
+      "dependencies": {
+        "required": ["node", "python", "npm", "pip"],
+        "optional": ["docker", "docker-compose", "tensorflow", "pytorch"]
+      }
+    },
+    "quantum-ml": {
+      "name": "Quantum Machine Learning Project",
+      "detectionFiles": ["package.json", "requirements.txt", "quantum-config.json"],
+      "buildCommand": "npm run build && python -m build",
+      "testCommand": "npm test && pytest",
+      "devCommand": "npm run dev && python -m uvicorn main:app --reload",
+      "installCommand": "npm install && pip install -r requirements.txt",
+      "configFiles": ["package.json", "requirements.txt", "quantum-config.json"],
+      "sourceDirs": ["src", "modules", "quantum"],
+      "testDirs": ["tests", "test"],
+      "buildDir": "dist",
+      "dependencies": {
+        "required": ["node", "python", "npm", "pip"],
+        "optional": ["docker", "docker-compose", "qiskit", "cirq", "pennylane"]
+      }
+    }
+  },
+  "universalSettings": {
+    "defaultTimeout": 300,
+    "logLevel": "INFO",
+    "outputFormat": "console",
+    "enableColors": true,
+    "parallelExecution": true,
+    "maxConcurrentTasks": 4,
+    "aiOptimization": true,
+    "quantumComputing": true,
+    "multiModalProcessing": true
+  },
+  "commonTools": {
+    "versionControl": ["git"],
+    "containerization": ["docker", "docker-compose"],
+    "monitoring": ["curl", "wget"],
+    "security": ["bandit", "safety", "npm audit"],
+    "quality": ["eslint", "prettier", "black", "flake8"],
+    "ai": ["tensorflow", "pytorch", "transformers", "openai"],
+    "quantum": ["qiskit", "cirq", "pennylane", "qsharp"]
+  }
+}

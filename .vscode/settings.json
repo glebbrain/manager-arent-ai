@@ -1,0 +1,18 @@
+{
+    "files.include": {
+      "**/*.md": true,
+      "**/*.ps1": true,
+      "**/cursor.json": true
+    },
+    "search.include": {
+      "**/*.md": true,
+      "**/*.ps1": true,
+      "**/cursor.json": true
+    },
+    "files.exclude": {
+      "**/*.md": false,
+      "**/*.ps1": false,
+      "**/cursor.json": false
+    },
+    "git.ignoreLimitWarning": true
+  }

@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edge Computing - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .edge-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .edge-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .edge-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .edge-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .edge-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .edge-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .edge-status {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .status-online {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-offline {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .edge-dashboard {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .edge-dashboard h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .dashboard-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .edge-nodes {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nodes-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .nodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .node-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .node-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .node-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .node-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .node-location {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .node-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .edge-performance {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .performance-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .performance-chart {
+            height: 200px;
+            position: relative;
+        }
+
+        .ai-edge {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .ai-edge h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .ai-suggestions {
+            margin-bottom: 25px;
+        }
+
+        .suggestion-item {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .suggestion-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .suggestion-description {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .suggestion-priority {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .suggestion-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .suggestion-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .edge-metrics {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .edge-applications {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .edge-applications h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .application-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .application-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .app-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .app-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .app-metrics {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .app-metric {
+            text-align: center;
+        }
+
+        .app-metric-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .app-metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .app-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .edge-settings {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .edge-settings h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .setting-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .setting-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .setting-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .setting-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle.active {
+            background: #667eea;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle.active::after {
+            transform: translateX(26px);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .select-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .edge-summary {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .nodes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .applications-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-microchip"></i> Edge Computing</h1>
+            <p>Distributed edge computing management with AI-powered optimization</p>
+            
+            <div class="edge-summary">
+                <div class="edge-card">
+                    <div class="edge-icon"><i class="fas fa-server"></i></div>
+                    <div class="edge-value">24</div>
+                    <div class="edge-label">Edge Nodes</div>
+                    <div class="edge-status status-online">Online</div>
+                </div>
+                <div class="edge-card">
+                    <div class="edge-icon"><i class="fas fa-globe"></i></div>
+                    <div class="edge-value">12</div>
+                    <div class="edge-label">Regions</div>
+                    <div class="edge-status status-online">Active</div>
+                </div>
+                <div class="edge-card">
+                    <div class="edge-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    <div class="edge-value">45ms</div>
+                    <div class="edge-label">Avg. Latency</div>
+                    <div class="edge-status status-online">Excellent</div>
+                </div>
+                <div class="edge-card">
+                    <div class="edge-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="edge-value">98%</div>
+                    <div class="edge-label">Uptime</div>
+                    <div class="edge-status status-online">Healthy</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="edge-dashboard">
+                <h2><i class="fas fa-tachometer-alt"></i> Edge Dashboard</h2>
+                
+                <div class="dashboard-controls">
+                    <button class="control-btn" onclick="deployNode()">
+                        <i class="fas fa-plus"></i> Deploy Node
+                    </button>
+                    <button class="control-btn" onclick="optimizeEdge()">
+                        <i class="fas fa-magic"></i> AI Optimize
+                    </button>
+                    <button class="control-btn secondary" onclick="viewMetrics()">
+                        <i class="fas fa-chart-bar"></i> View Metrics
+                    </button>
+                    <button class="control-btn secondary" onclick="exportData()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+
+                <div class="edge-nodes">
+                    <div class="nodes-title">Edge Nodes Status</div>
+                    <div class="nodes-grid">
+                        <div class="node-item">
+                            <div class="node-header">
+                                <div class="node-name">US-East-1</div>
+                                <div class="node-status status-online">Online</div>
+                            </div>
+                            <div class="node-location">Virginia, USA</div>
+                            <div class="node-metrics">
+                                <div class="metric-item">
+                                    <div class="metric-value">45ms</div>
+                                    <div class="metric-label">Latency</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-value">78%</div>
+                                    <div class="metric-label">CPU</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="node-item">
+                            <div class="node-header">
+                                <div class="node-name">EU-West-1</div>
+                                <div class="node-status status-online">Online</div>
+                            </div>
+                            <div class="node-location">Ireland</div>
+                            <div class="node-metrics">
+                                <div class="metric-item">
+                                    <div class="metric-value">52ms</div>
+                                    <div class="metric-label">Latency</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-value">65%</div>
+                                    <div class="metric-label">CPU</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="node-item">
+                            <div class="node-header">
+                                <div class="node-name">AP-Southeast-1</div>
+                                <div class="node-status status-warning">Warning</div>
+                            </div>
+                            <div class="node-location">Singapore</div>
+                            <div class="node-metrics">
+                                <div class="metric-item">
+                                    <div class="metric-value">89ms</div>
+                                    <div class="metric-label">Latency</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-value">92%</div>
+                                    <div class="metric-label">CPU</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="node-item">
+                            <div class="node-header">
+                                <div class="node-name">US-West-2</div>
+                                <div class="node-status status-online">Online</div>
+                            </div>
+                            <div class="node-location">Oregon, USA</div>
+                            <div class="node-metrics">
+                                <div class="metric-item">
+                                    <div class="metric-value">38ms</div>
+                                    <div class="metric-label">Latency</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-value">71%</div>
+                                    <div class="metric-label">CPU</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edge-performance">
+                    <div class="performance-title">Performance Metrics</div>
+                    <div class="performance-chart">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-edge">
+                <h2><i class="fas fa-brain"></i> AI Edge Assistant</h2>
+                
+                <div class="ai-suggestions">
+                    <div class="suggestion-item">
+                        <div class="suggestion-title">Load Balancing Optimization</div>
+                        <div class="suggestion-description">
+                            Your AP-Southeast-1 node is overloaded. Consider redistributing traffic to other nodes or scaling up resources.
+                        </div>
+                        <div class="suggestion-priority">Priority: High | Impact: 25% performance improvement</div>
+                        <div class="suggestion-actions">
+                            <button class="suggestion-btn">Optimize</button>
+                            <button class="suggestion-btn">View Details</button>
+                        </div>
+                    </div>
+
+                    <div class="suggestion-item">
+                        <div class="suggestion-title">New Node Deployment</div>
+                        <div class="suggestion-description">
+                            Deploy a new edge node in Asia-Pacific region to reduce latency for users in that area.
+                        </div>
+                        <div class="suggestion-priority">Priority: Medium | Impact: 40% latency reduction</div>
+                        <div class="suggestion-actions">
+                            <button class="suggestion-btn">Deploy</button>
+                            <button class="suggestion-btn">Learn More</button>
+                        </div>
+                    </div>
+
+                    <div class="suggestion-item">
+                        <div class="suggestion-title">Caching Strategy</div>
+                        <div class="suggestion-description">
+                            Implement intelligent caching at edge nodes to reduce data transfer and improve response times.
+                        </div>
+                        <div class="suggestion-priority">Priority: Low | Impact: 15% cost reduction</div>
+                        <div class="suggestion-actions">
+                            <button class="suggestion-btn">Implement</button>
+                            <button class="suggestion-btn">View Analysis</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edge-metrics">
+                    <div class="nodes-title">Edge Metrics</div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-value">45ms</div>
+                            <div class="metric-label">Avg. Latency</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">98%</div>
+                            <div class="metric-label">Uptime</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">24</div>
+                            <div class="metric-label">Active Nodes</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">12</div>
+                            <div class="metric-label">Regions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="edge-applications">
+            <h2><i class="fas fa-cubes"></i> Edge Applications</h2>
+            
+            <div class="applications-grid">
+                <div class="application-card">
+                    <div class="app-title">Real-time Analytics</div>
+                    <div class="app-description">Process streaming data at edge locations for instant insights</div>
+                    <div class="app-metrics">
+                        <div class="app-metric">
+                            <div class="app-metric-value">2.3s</div>
+                            <div class="app-metric-label">Processing Time</div>
+                        </div>
+                        <div class="app-metric">
+                            <div class="app-metric-value">15</div>
+                            <div class="app-metric-label">Nodes</div>
+                        </div>
+                    </div>
+                    <div class="app-status status-online">Running</div>
+                </div>
+
+                <div class="application-card">
+                    <div class="app-title">IoT Data Processing</div>
+                    <div class="app-description">Collect and process IoT sensor data at edge locations</div>
+                    <div class="app-metrics">
+                        <div class="app-metric">
+                            <div class="app-metric-value">1.8s</div>
+                            <div class="app-metric-label">Processing Time</div>
+                        </div>
+                        <div class="app-metric">
+                            <div class="app-metric-value">8</div>
+                            <div class="app-metric-label">Nodes</div>
+                        </div>
+                    </div>
+                    <div class="app-status status-online">Running</div>
+                </div>
+
+                <div class="application-card">
+                    <div class="app-title">Content Delivery</div>
+                    <div class="app-description">Serve static and dynamic content from edge locations</div>
+                    <div class="app-metrics">
+                        <div class="app-metric">
+                            <div class="app-metric-value">0.9s</div>
+                            <div class="app-metric-label">Response Time</div>
+                        </div>
+                        <div class="app-metric">
+                            <div class="app-metric-value">20</div>
+                            <div class="app-metric-label">Nodes</div>
+                        </div>
+                    </div>
+                    <div class="app-status status-online">Running</div>
+                </div>
+
+                <div class="application-card">
+                    <div class="app-title">Machine Learning Inference</div>
+                    <div class="app-description">Run ML models at edge for real-time predictions</div>
+                    <div class="app-metrics">
+                        <div class="app-metric">
+                            <div class="app-metric-value">3.2s</div>
+                            <div class="app-metric-label">Inference Time</div>
+                        </div>
+                        <div class="app-metric">
+                            <div class="app-metric-value">6</div>
+                            <div class="app-metric-label">Nodes</div>
+                        </div>
+                    </div>
+                    <div class="app-status status-warning">Scaling</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="edge-settings">
+            <h2><i class="fas fa-cog"></i> Edge Settings</h2>
+            
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <div class="setting-title">Auto Scaling</div>
+                    <div class="setting-description">Automatically scale edge nodes based on demand</div>
+                    <div class="setting-control">
+                        <div class="toggle active" onclick="toggleSetting(this)"></div>
+                        <span>Enabled</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">AI Optimization</div>
+                    <div class="setting-description">Use AI to optimize edge resource allocation</div>
+                    <div class="setting-control">
+                        <div class="toggle active" onclick="toggleSetting(this)"></div>
+                        <span>Enabled</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Health Monitoring</div>
+                    <div class="setting-description">Monitor edge node health and performance</div>
+                    <div class="setting-control">
+                        <div class="toggle active" onclick="toggleSetting(this)"></div>
+                        <span>Enabled</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Max Latency</div>
+                    <div class="setting-description">Maximum acceptable latency in milliseconds</div>
+                    <div class="setting-control">
+                        <input type="number" class="input-field" value="100" min="10" max="1000">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Scaling Threshold</div>
+                    <div class="setting-description">CPU usage threshold for auto scaling</div>
+                    <div class="setting-control">
+                        <input type="number" class="input-field" value="80" min="50" max="95">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Monitoring Frequency</div>
+                    <div class="setting-description">How often to check edge node status</div>
+                    <div class="setting-control">
+                        <select class="select-field">
+                            <option>Every 30 seconds</option>
+                            <option selected>Every minute</option>
+                            <option>Every 5 minutes</option>
+                            <option>Every 10 minutes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSetting(element) {
+            element.classList.toggle('active');
+            const isActive = element.classList.contains('active');
+            const span = element.nextElementSibling;
+            span.textContent = isActive ? 'Enabled' : 'Disabled';
+        }
+
+        function deployNode() {
+            alert('Starting edge node deployment... This may take several minutes.');
+            // Simulate deployment process
+            setTimeout(() => {
+                alert('Edge node deployed successfully!');
+            }, 3000);
+        }
+
+        function optimizeEdge() {
+            alert('AI is optimizing edge computing resources... This may take a few moments.');
+            // Simulate optimization process
+            setTimeout(() => {
+                alert('Edge optimization completed! Performance improved by 15%.');
+            }, 2000);
+        }
+
+        function viewMetrics() {
+            alert('Opening detailed metrics dashboard...');
+        }
+
+        function exportData() {
+            alert('Edge computing data exported successfully!');
+        }
+
+        // Initialize performance chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    datasets: [{
+                        label: 'Latency (ms)',
+                        data: [45, 42, 48, 52, 47, 44],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'CPU Usage (%)',
+                        data: [65, 70, 75, 80, 78, 72],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        });
+
+        // Auto-update edge metrics
+        setInterval(function() {
+            const edgeValues = document.querySelectorAll('.edge-value');
+            edgeValues.forEach(value => {
+                const currentValue = parseFloat(value.textContent);
+                if (!isNaN(currentValue)) {
+                    const change = (Math.random() - 0.5) * 0.02;
+                    const newValue = Math.max(0, currentValue + change);
+                    if (value.textContent.includes('ms')) {
+                        value.textContent = newValue.toFixed(0) + 'ms';
+                    } else if (value.textContent.includes('%')) {
+                        value.textContent = newValue.toFixed(0) + '%';
+                    } else {
+                        value.textContent = Math.round(newValue);
+                    }
+                }
+            });
+        }, 30000);
+    </script>
+</body>
+</html>

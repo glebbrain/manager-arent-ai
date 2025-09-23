@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dependency Optimization - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .dependency-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .dependency-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .dependency-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .dependency-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .category-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-optimized {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .category-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .category-dependencies {
+            margin-bottom: 15px;
+        }
+
+        .dependency-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .dependency-icon {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .dependency-text {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .dependency-status {
+            margin-left: auto;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-uptodate {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-outdated {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-vulnerable {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .category-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .dependency-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .dependency-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .dependency-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .dependency-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recent-updates {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .updates-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .update-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .update-item:hover {
+            background: #f8f9fa;
+        }
+
+        .update-item:last-child {
+            border-bottom: none;
+        }
+
+        .update-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .update-icon.success {
+            background: #10b981;
+        }
+
+        .update-icon.warning {
+            background: #f59e0b;
+        }
+
+        .update-icon.error {
+            background: #ef4444;
+        }
+
+        .update-content {
+            flex: 1;
+        }
+
+        .update-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .update-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .update-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .dependency-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .dependency-categories {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-cubes"></i> Dependency Optimization</h1>
+            <p>Smart dependency management for Universal Project Manager v3.2</p>
+        </div>
+
+        <div class="dependency-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-box"></i></div>
+                <div class="overview-value">247</div>
+                <div class="overview-label">Dependencies</div>
+                <div class="overview-trend trend-down">-12 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="overview-value">98.5%</div>
+                <div class="overview-label">Up to Date</div>
+                <div class="overview-trend trend-up">+2.1% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="overview-value">3</div>
+                <div class="overview-label">Vulnerabilities</div>
+                <div class="overview-trend trend-down">-5 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-clock"></i></div>
+                <div class="overview-value">2.3s</div>
+                <div class="overview-label">Install Time</div>
+                <div class="overview-trend trend-down">-0.8s faster</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-database"></i></div>
+                <div class="overview-value">45MB</div>
+                <div class="overview-label">Bundle Size</div>
+                <div class="overview-trend trend-down">-8MB reduction</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">96%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+1% improvement</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="dependency-section">
+                <h2><i class="fas fa-chart-area"></i> Dependency Categories</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Dependency Status Distribution</div>
+                    <canvas id="dependencyChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Bundle Size Optimization Over Time</div>
+                    <canvas id="bundleChart"></canvas>
+                </div>
+
+                <div class="dependency-categories">
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">Core Dependencies</div>
+                            <div class="category-status status-optimized">Optimized</div>
+                        </div>
+                        <div class="category-description">Essential framework and library dependencies</div>
+                        <div class="category-dependencies">
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">React 18.2.0</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">Node.js 18.17.0</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">TypeScript 5.1.6</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                        </div>
+                        <div class="category-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">23</div>
+                                <div class="metric-label">Dependencies</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Updated</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">12MB</div>
+                                <div class="metric-label">Size</div>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn">Update</button>
+                            <button class="action-btn secondary">Analyze</button>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">Development Tools</div>
+                            <div class="category-status status-optimized">Optimized</div>
+                        </div>
+                        <div class="category-description">Build tools, testing frameworks, and development utilities</div>
+                        <div class="category-dependencies">
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">Webpack 5.88.0</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">Jest 29.6.0</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">ESLint 8.45.0</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                        </div>
+                        <div class="category-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">45</div>
+                                <div class="metric-label">Dependencies</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">98%</div>
+                                <div class="metric-label">Updated</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">18MB</div>
+                                <div class="metric-label">Size</div>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn">Update</button>
+                            <button class="action-btn secondary">Analyze</button>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">UI Components</div>
+                            <div class="category-status status-warning">Warning</div>
+                        </div>
+                        <div class="category-description">UI libraries and component frameworks</div>
+                        <div class="category-dependencies">
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">Material-UI 5.14.0</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                            <div class="dependency-item">
+                                <i class="fas fa-exclamation-triangle dependency-icon"></i>
+                                <span class="dependency-text">Ant Design 4.24.0</span>
+                                <span class="dependency-status status-outdated">Outdated</span>
+                            </div>
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">Chart.js 4.4.0</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                        </div>
+                        <div class="category-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">67</div>
+                                <div class="metric-label">Dependencies</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">95%</div>
+                                <div class="metric-label">Updated</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">25MB</div>
+                                <div class="metric-label">Size</div>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn">Update</button>
+                            <button class="action-btn secondary">Fix</button>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">AI & ML Libraries</div>
+                            <div class="category-status status-optimized">Optimized</div>
+                        </div>
+                        <div class="category-description">Machine learning and artificial intelligence libraries</div>
+                        <div class="category-dependencies">
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">TensorFlow 2.13.0</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">PyTorch 2.0.1</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">OpenAI API 3.0.0</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                        </div>
+                        <div class="category-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">34</div>
+                                <div class="metric-label">Dependencies</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Updated</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">156MB</div>
+                                <div class="metric-label">Size</div>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn">Update</button>
+                            <button class="action-btn secondary">Analyze</button>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">Security Dependencies</div>
+                            <div class="category-status status-error">Error</div>
+                        </div>
+                        <div class="category-description">Security-related libraries and authentication tools</div>
+                        <div class="category-dependencies">
+                            <div class="dependency-item">
+                                <i class="fas fa-exclamation-triangle dependency-icon"></i>
+                                <span class="dependency-text">bcrypt 4.0.1</span>
+                                <span class="dependency-status status-vulnerable">Vulnerable</span>
+                            </div>
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">jsonwebtoken 9.0.0</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                            <div class="dependency-item">
+                                <i class="fas fa-exclamation-triangle dependency-icon"></i>
+                                <span class="dependency-text">helmet 6.0.1</span>
+                                <span class="dependency-status status-outdated">Outdated</span>
+                            </div>
+                        </div>
+                        <div class="category-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">28</div>
+                                <div class="metric-label">Dependencies</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">89%</div>
+                                <div class="metric-label">Updated</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">8MB</div>
+                                <div class="metric-label">Size</div>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn">Fix</button>
+                            <button class="action-btn secondary">Security</button>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-title">Utility Libraries</div>
+                            <div class="category-status status-optimized">Optimized</div>
+                        </div>
+                        <div class="category-description">Helper libraries and utility functions</div>
+                        <div class="category-dependencies">
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">Lodash 4.17.21</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">Moment.js 2.29.4</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                            <div class="dependency-item">
+                                <i class="fas fa-check dependency-icon"></i>
+                                <span class="dependency-text">Axios 1.4.0</span>
+                                <span class="dependency-status status-uptodate">Latest</span>
+                            </div>
+                        </div>
+                        <div class="category-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">50</div>
+                                <div class="metric-label">Dependencies</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">98%</div>
+                                <div class="metric-label">Updated</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">15MB</div>
+                                <div class="metric-label">Size</div>
+                            </div>
+                        </div>
+                        <div class="category-actions">
+                            <button class="action-btn">Update</button>
+                            <button class="action-btn secondary">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dependency-controls">
+                <h2><i class="fas fa-cogs"></i> Dependency Controls</h2>
+                
+                <div class="dependency-actions">
+                    <button class="control-btn" onclick="runOptimization()">
+                        <i class="fas fa-magic"></i> Run Optimization
+                    </button>
+                    <button class="control-btn secondary" onclick="updateAll()">
+                        <i class="fas fa-sync"></i> Update All
+                    </button>
+                    <button class="control-btn secondary" onclick="exportReport()">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                </div>
+
+                <div class="dependency-status">
+                    <div class="status-title">Dependency Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Last Check</div>
+                        <div class="status-value">2 minutes ago</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Total Dependencies</div>
+                        <div class="status-value">247 packages</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Up to Date</div>
+                        <div class="status-value">243 packages</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Outdated</div>
+                        <div class="status-value">4 packages</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Vulnerabilities</div>
+                        <div class="status-value">3 packages</div>
+                    </div>
+                </div>
+
+                <div class="recent-updates">
+                    <div class="updates-title">Recent Updates</div>
+                    <div class="update-item">
+                        <div class="update-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="update-content">
+                            <div class="update-title">React Updated</div>
+                            <div class="update-description">Updated to version 18.2.0, improved performance</div>
+                        </div>
+                        <div class="update-time">5 minutes ago</div>
+                    </div>
+                    <div class="update-item">
+                        <div class="update-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="update-content">
+                            <div class="update-title">TypeScript Updated</div>
+                            <div class="update-description">Updated to version 5.1.6, new features added</div>
+                        </div>
+                        <div class="update-time">10 minutes ago</div>
+                    </div>
+                    <div class="update-item">
+                        <div class="update-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="update-content">
+                            <div class="update-title">Security Alert</div>
+                            <div class="update-description">bcrypt vulnerability detected, update required</div>
+                        </div>
+                        <div class="update-time">15 minutes ago</div>
+                    </div>
+                    <div class="update-item">
+                        <div class="update-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="update-content">
+                            <div class="update-title">Bundle Optimized</div>
+                            <div class="update-description">Bundle size reduced by 8MB through optimization</div>
+                        </div>
+                        <div class="update-time">1 hour ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI Optimization Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        Dependency optimization improved performance by 15% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Some security dependencies need immediate updates
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI patterns available for better dependency management
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dependencyChart, bundleChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Dependency Chart
+            const dependencyCtx = document.getElementById('dependencyChart').getContext('2d');
+            dependencyChart = new Chart(dependencyCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Up to Date', 'Outdated', 'Vulnerable', 'Deprecated'],
+                    datasets: [{
+                        data: [243, 4, 3, 0],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#6b7280'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Bundle Chart
+            const bundleCtx = document.getElementById('bundleChart').getContext('2d');
+            bundleChart = new Chart(bundleCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(7),
+                    datasets: [{
+                        label: 'Bundle Size (MB)',
+                        data: [65, 62, 58, 55, 52, 48, 45],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Dependencies Count',
+                        data: [280, 275, 270, 265, 260, 255, 247],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels(days) {
+            const labels = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function runOptimization() {
+            alert('Running dependency optimization...');
+        }
+
+        function updateAll() {
+            alert('Updating all dependencies...');
+        }
+
+        function exportReport() {
+            alert('Exporting dependency report...');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Dashboard - Universal Project Manager v3.1</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #f3f4f6;
+            border-radius: 0.5rem;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            padding: 2rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 2rem;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: #f3f4f6;
+            color: #2563eb;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .ai-analytics {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .ai-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .metric {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-actions {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            background: #f3f4f6;
+            border: none;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .project-card {
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .project-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .project-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-completed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-paused {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2563eb;
+            transition: width 0.3s;
+        }
+
+        .activity-feed {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .activity-update {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .activity-complete {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .activity-ai {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .activity-performance {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .activity-deploy {
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .performance-metrics {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .metric-card {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .ai-insights {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .insight-icon {
+            font-size: 1.5rem;
+        }
+
+        .insight-suggestion {
+            color: #2563eb;
+        }
+
+        .insight-warning {
+            color: #f59e0b;
+        }
+
+        .insight-opportunity {
+            color: #10b981;
+        }
+
+        .insight-trend {
+            color: #3b82f6;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 1rem 0;
+            }
+
+            .nav-item {
+                padding: 0.5rem 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .ai-metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">🚀 Universal Project Manager v3.1</div>
+        <div class="header-actions">
+            <div class="user-info">
+                <span>👤</span>
+                <span>John Smith</span>
+            </div>
+            <button class="action-btn">⚙️</button>
+            <button class="action-btn">❓</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <nav class="sidebar">
+            <a href="#" class="nav-item active">📊 Dashboard</a>
+            <a href="#" class="nav-item">📁 Projects</a>
+            <a href="#" class="nav-item">🤖 AI Tools</a>
+            <a href="#" class="nav-item">📈 Reports</a>
+            <a href="#" class="nav-item">⚙️ Settings</a>
+            <a href="#" class="nav-item">👥 Team</a>
+            <a href="#" class="nav-item">🔧 Tools</a>
+            <a href="#" class="nav-item">📚 Help</a>
+        </nav>
+
+        <main class="main-content">
+            <!-- AI Analytics Panel -->
+            <section class="ai-analytics">
+                <h2>🤖 AI Analytics Dashboard</h2>
+                <div class="ai-metrics">
+                    <div class="metric">
+                        <div class="metric-value">95%</div>
+                        <div>Project Health</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">3</div>
+                        <div>AI Recommendations</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">2</div>
+                        <div>Risk Warnings</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">98%</div>
+                        <div>Performance</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h2>⚡ Quick Actions</h2>
+                <div class="actions-grid">
+                    <button class="action-btn">📁 New Project</button>
+                    <button class="action-btn">🤖 AI Analysis</button>
+                    <button class="action-btn">📊 Generate Report</button>
+                    <button class="action-btn">👥 Team Meeting</button>
+                    <button class="action-btn">🔍 Code Review</button>
+                    <button class="action-btn">🚀 Deploy</button>
+                    <button class="action-btn">🧪 Test</button>
+                    <button class="action-btn">📝 Documentation</button>
+                </div>
+            </section>
+
+            <!-- Project Overview Cards -->
+            <section class="projects-grid">
+                <div class="project-card">
+                    <div class="project-header">
+                        <h3 class="project-title">E-commerce Platform</h3>
+                        <span class="project-status status-active">Active</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                    <p>Team: 5 members</p>
+                    <p>AI Score: 92%</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="action-btn">View</button>
+                        <button class="action-btn">Edit</button>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <h3 class="project-title">Mobile App</h3>
+                        <span class="project-status status-active">Active</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%"></div>
+                    </div>
+                    <p>Team: 3 members</p>
+                    <p>AI Score: 78%</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="action-btn">View</button>
+                        <button class="action-btn">Edit</button>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <h3 class="project-title">API Gateway</h3>
+                        <span class="project-status status-paused">Paused</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 90%"></div>
+                    </div>
+                    <p>Team: 2 members</p>
+                    <p>AI Score: 95%</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="action-btn">View</button>
+                        <button class="action-btn">Edit</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Metrics -->
+            <section class="performance-metrics">
+                <h2>📈 Performance Metrics</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">92%</div>
+                        <div class="metric-label">Code Quality</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">85%</div>
+                        <div class="metric-label">Test Coverage</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">98%</div>
+                        <div class="metric-label">Build Success</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">95%</div>
+                        <div class="metric-label">Deployment</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity Feed -->
+            <section class="activity-feed">
+                <h2>📋 Recent Activity</h2>
+                <div class="activity-item">
+                    <div class="activity-icon activity-update">🔄</div>
+                    <div>
+                        <strong>Project "E-commerce Platform" updated</strong>
+                        <p>2 hours ago</p>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon activity-complete">✅</div>
+                    <div>
+                        <strong>Task "User Authentication" completed by John</strong>
+                        <p>4 hours ago</p>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon activity-ai">🤖</div>
+                    <div>
+                        <strong>AI generated 5 new recommendations for "Mobile App"</strong>
+                        <p>6 hours ago</p>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon activity-performance">📊</div>
+                    <div>
+                        <strong>Performance report generated for "Data Analytics"</strong>
+                        <p>8 hours ago</p>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon activity-deploy">🚀</div>
+                    <div>
+                        <strong>Deployment successful for "API Gateway"</strong>
+                        <p>12 hours ago</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Insights Panel -->
+            <section class="ai-insights">
+                <h2>🧠 AI Insights & Recommendations</h2>
+                <div class="insight-item">
+                    <div class="insight-icon insight-suggestion">💡</div>
+                    <div>
+                        <strong>Suggestion:</strong> Consider refactoring UserService class for better maintainability
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon insight-warning">⚠️</div>
+                    <div>
+                        <strong>Warning:</strong> High memory usage detected in Database module
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon insight-opportunity">🎯</div>
+                    <div>
+                        <strong>Opportunity:</strong> Add caching to improve API response time
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon insight-trend">📊</div>
+                    <div>
+                        <strong>Trend:</strong> Code quality improving by 5% this month
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add interactive functionality
+            const actionBtns = document.querySelectorAll('.action-btn');
+            actionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    console.log('Action clicked:', this.textContent);
+                    // Add actual functionality here
+                });
+            });
+
+            // Simulate real-time updates
+            setInterval(() => {
+                updateMetrics();
+            }, 30000); // Update every 30 seconds
+        });
+
+        function updateMetrics() {
+            // Simulate real-time metric updates
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                if (metric.textContent.includes('%')) {
+                    const currentValue = parseInt(metric.textContent);
+                    const change = Math.random() > 0.5 ? 1 : -1;
+                    const newValue = Math.max(0, Math.min(100, currentValue + change));
+                    metric.textContent = newValue + '%';
+                }
+            });
+        }
+
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

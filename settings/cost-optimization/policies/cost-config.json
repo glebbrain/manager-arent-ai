@@ -1,0 +1,51 @@
+{
+  "costOptimization": {
+    "enabled": true,
+    "aiPowered": {
+      "IsPresent": true
+    },
+    "quantumEnhanced": {
+      "IsPresent": true
+    },
+    "continuous": true
+  },
+  "version": "4.8.0",
+  "optimization": {
+    "compute": {
+      "enabled": true,
+      "aiOptimization": {
+        "IsPresent": true
+      },
+      "quantumOptimization": {
+        "IsPresent": true
+      }
+    },
+    "network": {
+      "enabled": true,
+      "aiOptimization": {
+        "IsPresent": true
+      },
+      "quantumOptimization": {
+        "IsPresent": true
+      }
+    },
+    "storage": {
+      "enabled": true,
+      "aiOptimization": {
+        "IsPresent": true
+      },
+      "quantumOptimization": {
+        "IsPresent": true
+      }
+    },
+    "database": {
+      "enabled": true,
+      "aiOptimization": {
+        "IsPresent": true
+      },
+      "quantumOptimization": {
+        "IsPresent": true
+      }
+    }
+  }
+}

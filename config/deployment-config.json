@@ -1,0 +1,115 @@
+{
+  "version": "4.8",
+  "description": "Конфигурация деплоя для системы управления проектом v4.8",
+  "environments": {
+    "dev": {
+      "name": "Development",
+      "description": "Среда разработки",
+      "path": ".",
+      "enabled": true
+    },
+    "prom": {
+      "name": "PROM",
+      "description": "Промежуточная среда для тестирования",
+      "path": "G:\\OSPanel\\home",
+      "enabled": true,
+      "description_ru": "Промежуточная среда для тестирования (OSPanel)"
+    },
+    "prod": {
+      "name": "PROD",
+      "description": "Продакшн среда",
+      "server": "u0488409@37.140.195.19",
+      "path": "/var/www/u0488409/data/www",
+      "enabled": true,
+      "description_ru": "Продакшн среда на удаленном сервере"
+    }
+  },
+  "deployment": {
+    "archivePath": ".\\deploy-archives",
+    "backupEnabled": true,
+    "backupSuffix": "backup",
+    "timestampFormat": "yyyy-MM-dd-HH-mm-ss",
+    "maxBackups": 5,
+    "compressionEnabled": true,
+    "excludePatterns": [
+      "node_modules",
+      ".git",
+      ".vs",
+      "bin",
+      "obj",
+      "dist",
+      "build",
+      "*.log",
+      "*.tmp",
+      ".DS_Store",
+      "Thumbs.db",
+      "deploy-archives",
+      "backup-*"
+    ]
+  },
+  "ssh": {
+    "timeout": 10,
+    "batchMode": true,
+    "keyPath": "",
+    "knownHosts": ""
+  },
+  "logging": {
+    "enabled": true,
+    "level": "INFO",
+    "file": "deployment.log",
+    "maxSize": "10MB",
+    "maxFiles": 5
+  },
+  "notifications": {
+    "enabled": false,
+    "email": "",
+    "webhook": "",
+    "slack": ""
+  },
+  "validation": {
+    "checkDiskSpace": true,
+    "minDiskSpaceGB": 1,
+    "checkNetwork": true,
+    "checkSSH": true,
+    "checkPaths": true
+  },
+  "scripts": {
+    "paths": {
+      "automation": ".automation",
+      "manager": ".manager",
+      "config": "config",
+      "docs": "docs",
+      "scripts": "scripts",
+      "reports": ".automation\\reports"
+    },
+    "aliases": {
+      "mpo": "Maximum-Performance-Optimizer-v4.8.ps1",
+      "mmo": "Advanced-Monitoring-System-v4.8.ps1",
+      "qai": "Project-Analysis-Optimizer-v4.8.ps1",
+      "qaq": "Quick-Access-Optimized-v4.8.ps1",
+      "qap": "AI-Enhanced-Features-Manager-v4.8.ps1"
+    }
+  },
+  "features": {
+    "ai": true,
+    "quantum": true,
+    "blockchain": true,
+    "edge": true,
+    "vr": true,
+    "ar": true,
+    "5g": true,
+    "iot": true
+  },
+  "security": {
+    "encryptArchives": false,
+    "signArchives": false,
+    "verifyChecksums": true,
+    "useTLS": true
+  },
+  "performance": {
+    "parallelUploads": 3,
+    "chunkSize": "1MB",
+    "retryAttempts": 3,
+    "retryDelay": 5
+  }
+}

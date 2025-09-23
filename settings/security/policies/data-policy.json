@@ -1,0 +1,37 @@
+{
+  "dataClassification": {
+    "aiClassification": {
+      "IsPresent": true
+    },
+    "quantumDataAnalysis": {
+      "IsPresent": true
+    },
+    "levels": [
+      "public",
+      "internal",
+      "confidential",
+      "restricted"
+    ]
+  },
+  "dataLossPrevention": {
+    "realTimeMonitoring": true,
+    "aiContentAnalysis": {
+      "IsPresent": true
+    },
+    "quantumPatternDetection": {
+      "IsPresent": true
+    }
+  },
+  "encryption": {
+    "inTransit": {
+      "protocol": "quantum-tls",
+      "aiTrafficAnalysis": {
+        "IsPresent": true
+      }
+    },
+    "atRest": {
+      "algorithm": "quantum-resistant",
+      "keyManagement": "quantum-key-distribution"
+    }
+  }
+}

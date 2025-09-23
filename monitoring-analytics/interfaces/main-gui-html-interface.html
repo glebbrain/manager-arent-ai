@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Project Manager v3.1 - Main Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .dashboard { display: flex; height: 100vh; }
+        .sidebar { width: 280px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .welcome-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; }
+        .welcome-section h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        .welcome-section p { font-size: 1.2rem; opacity: 0.9; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; }
+        .stat-card i { font-size: 2rem; color: #2563eb; margin-bottom: 1rem; }
+        .stat-card h3 { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+        .stat-card p { color: #6b7280; }
+        .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .action-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .action-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .action-card i { font-size: 2.5rem; color: #2563eb; margin-bottom: 1rem; }
+        .action-card h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; color: #1f2937; }
+        .action-card p { color: #6b7280; font-size: 0.9rem; }
+        .projects-section { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .projects-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .projects-header h2 { font-size: 1.5rem; font-weight: 600; color: #1f2937; }
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        .project-card { background: #f8fafc; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; transition: all 0.3s ease; cursor: pointer; }
+        .project-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); border-color: #2563eb; }
+        .project-card h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; color: #1f2937; }
+        .project-card p { color: #6b7280; margin-bottom: 1rem; }
+        .project-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .project-rating { display: flex; align-items: center; gap: 0.5rem; }
+        .stars { color: #fbbf24; }
+        .project-actions { display: flex; gap: 0.5rem; }
+        .btn { padding: 0.5rem 1rem; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.8rem; }
+        .ai-recommendations { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+        .ai-recommendations h3 { color: #1e40af; margin-bottom: 1rem; display: flex; align-items: center; }
+        .ai-recommendations h3 i { margin-right: 0.5rem; }
+        .recommendations-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        .recommendation-card { background: white; border: 1px solid #dbeafe; border-radius: 8px; padding: 1rem; }
+        .recommendation-card h4 { color: #1f2937; margin-bottom: 0.5rem; }
+        .recommendation-card p { color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem; }
+        .recommendation-card .confidence { color: #10b981; font-size: 0.8rem; font-weight: 500; }
+        .nav { padding: 1rem; }
+        .nav-item { display: block; padding: 0.75rem; color: #6b7280; text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .nav-item:hover, .nav-item.active { background: #eff6ff; color: #2563eb; }
+        .recent-projects { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .recent-projects h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; color: #1f2937; }
+        .recent-item { display: flex; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; }
+        .recent-item:last-child { border-bottom: none; }
+        .recent-item i { color: #2563eb; margin-right: 0.75rem; }
+        .recent-item-info { flex: 1; }
+        .recent-item-name { font-weight: 500; color: #1f2937; }
+        .recent-item-time { font-size: 0.8rem; color: #6b7280; }
+        @media (max-width: 768px) {
+            .dashboard { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .stats-grid, .quick-actions, .projects-grid, .recommendations-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="nav">
+                <a href="#" class="nav-item active"><i class="fas fa-home"></i> Главная</a>
+                <a href="discovery-html-interface.html" class="nav-item"><i class="fas fa-search"></i> Discovery</a>
+                <a href="chat-html-interface.html" class="nav-item"><i class="fas fa-comments"></i> AI Чат</a>
+                <a href="moderator-dashboard-html-interface.html" class="nav-item"><i class="fas fa-user-shield"></i> Модератор</a>
+                <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Аналитика</a>
+                <a href="#" class="nav-item"><i class="fas fa-cog"></i> Настройки</a>
+            </div>
+            
+            <div class="recent-projects">
+                <h3>Недавние проекты</h3>
+                <div class="recent-item">
+                    <i class="fas fa-globe"></i>
+                    <div class="recent-item-info">
+                        <div class="recent-item-name">React E-commerce</div>
+                        <div class="recent-item-time">2 дня назад</div>
+                    </div>
+                </div>
+                <div class="recent-item">
+                    <i class="fas fa-mobile-alt"></i>
+                    <div class="recent-item-info">
+                        <div class="recent-item-name">Vue.js Dashboard</div>
+                        <div class="recent-item-time">1 неделя назад</div>
+                    </div>
+                </div>
+                <div class="recent-item">
+                    <i class="fas fa-brain"></i>
+                    <div class="recent-item-info">
+                        <div class="recent-item-name">React Native App</div>
+                        <div class="recent-item-time">3 дня назад</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-rocket"></i> Universal Project Manager v3.1</h1>
+                <div>
+                    <button class="btn btn-primary"><i class="fas fa-plus"></i> Создать проект</button>
+                    <button class="btn btn-secondary"><i class="fas fa-user"></i> Профиль</button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <h1>Добро пожаловать в Universal Project Manager v3.1!</h1>
+                    <p>Ваша универсальная платформа для управления проектами с интеграцией ИИ и квантового машинного обучения</p>
+                </div>
+                
+                <!-- Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-project-diagram"></i>
+                        <h3>8</h3>
+                        <p>Активные проекты</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-tasks"></i>
+                        <h3>24</h3>
+                        <p>Задачи выполнены</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <h3>32ч</h3>
+                        <p>Время работы</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>92%</h3>
+                        <p>Продуктивность</p>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <div class="action-card" onclick="createProject()">
+                        <i class="fas fa-plus-circle"></i>
+                        <h3>Создать проект</h3>
+                        <p>Создайте новый проект с помощью AI</p>
+                    </div>
+                    <div class="action-card" onclick="importProject()">
+                        <i class="fas fa-file-import"></i>
+                        <h3>Импортировать</h3>
+                        <p>Импортируйте существующий проект</p>
+                    </div>
+                    <div class="action-card" onclick="openDiscovery()">
+                        <i class="fas fa-search"></i>
+                        <h3>Найти проект</h3>
+                        <p>Поиск и выбор готовых проектов</p>
+                    </div>
+                    <div class="action-card" onclick="openAnalytics()">
+                        <i class="fas fa-chart-bar"></i>
+                        <h3>Аналитика</h3>
+                        <p>Анализ производительности проектов</p>
+                    </div>
+                    <div class="action-card" onclick="openChat()">
+                        <i class="fas fa-comments"></i>
+                        <h3>AI Чат</h3>
+                        <p>Общение с AI помощником</p>
+                    </div>
+                    <div class="action-card" onclick="openSettings()">
+                        <i class="fas fa-cog"></i>
+                        <h3>Настройки</h3>
+                        <p>Настройка системы и профиля</p>
+                    </div>
+                </div>
+                
+                <!-- AI Recommendations -->
+                <div class="ai-recommendations">
+                    <h3><i class="fas fa-robot"></i> AI-рекомендации для вас</h3>
+                    <div class="recommendations-grid">
+                        <div class="recommendation-card">
+                            <h4>🎯 React + TypeScript</h4>
+                            <p>Основано на ваших предыдущих проектах</p>
+                            <div class="confidence">Уверенность: 87%</div>
+                            <button class="btn btn-primary btn-sm" onclick="createProject('react-typescript')">Создать проект</button>
+                        </div>
+                        <div class="recommendation-card">
+                            <h4>🔥 Vue.js + FastAPI</h4>
+                            <p>Популярно в вашей сфере деятельности</p>
+                            <div class="confidence">Уверенность: 72%</div>
+                            <button class="btn btn-primary btn-sm" onclick="createProject('vue-fastapi')">Создать проект</button>
+                        </div>
+                        <div class="recommendation-card">
+                            <h4>🚀 Next.js + Prisma</h4>
+                            <p>Современный стек для веб-разработки</p>
+                            <div class="confidence">Уверенность: 68%</div>
+                            <button class="btn btn-primary btn-sm" onclick="createProject('nextjs-prisma')">Создать проект</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Projects Section -->
+                <div class="projects-section">
+                    <div class="projects-header">
+                        <h2>Мои проекты</h2>
+                        <button class="btn btn-secondary" onclick="viewAllProjects()">Показать все</button>
+                    </div>
+                    <div class="projects-grid">
+                        <div class="project-card" onclick="openProject(1)">
+                            <h3>React E-commerce Platform</h3>
+                            <p>React + Node.js + MongoDB</p>
+                            <div class="project-meta">
+                                <div class="project-rating">
+                                    <div class="stars">★★★★☆</div>
+                                    <span>4.8 (156)</span>
+                                </div>
+                                <span>2 дня назад</span>
+                            </div>
+                            <div class="project-actions">
+                                <button class="btn btn-primary btn-sm">Открыть</button>
+                                <button class="btn btn-secondary btn-sm">Настройки</button>
+                            </div>
+                        </div>
+                        <div class="project-card" onclick="openProject(2)">
+                            <h3>Vue.js Admin Dashboard</h3>
+                            <p>Vue + TypeScript + Ant Design</p>
+                            <div class="project-meta">
+                                <div class="project-rating">
+                                    <div class="stars">★★★★☆</div>
+                                    <span>4.6 (89)</span>
+                                </div>
+                                <span>1 неделя назад</span>
+                            </div>
+                            <div class="project-actions">
+                                <button class="btn btn-primary btn-sm">Открыть</button>
+                                <button class="btn btn-secondary btn-sm">Настройки</button>
+                            </div>
+                        </div>
+                        <div class="project-card" onclick="openProject(3)">
+                            <h3>React Native Mobile App</h3>
+                            <p>React Native + Firebase</p>
+                            <div class="project-meta">
+                                <div class="project-rating">
+                                    <div class="stars">★★★★★</div>
+                                    <span>4.7 (234)</span>
+                                </div>
+                                <span>3 дня назад</span>
+                            </div>
+                            <div class="project-actions">
+                                <button class="btn btn-primary btn-sm">Открыть</button>
+                                <button class="btn btn-secondary btn-sm">Настройки</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function createProject(template = null) {
+            if (template) {
+                alert(`Создание проекта на основе шаблона: ${template}`);
+            } else {
+                alert('Создание нового проекта...');
+            }
+        }
+        
+        function importProject() {
+            alert('Импорт проекта...');
+        }
+        
+        function openDiscovery() {
+            window.location.href = 'discovery-html-interface.html';
+        }
+        
+        function openAnalytics() {
+            alert('Открытие аналитики...');
+        }
+        
+        function openChat() {
+            window.location.href = 'chat-html-interface.html';
+        }
+        
+        function openSettings() {
+            alert('Открытие настроек...');
+        }
+        
+        function openProject(id) {
+            alert(`Открытие проекта ${id}...`);
+        }
+        
+        function viewAllProjects() {
+            window.location.href = 'discovery-html-interface.html';
+        }
+        
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate stat cards on load
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

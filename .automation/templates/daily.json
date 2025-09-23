@@ -1,0 +1,60 @@
+{
+  "name": "Daily Development Report",
+  "description": "Daily summary of development activities and system metrics",
+  "sections": [
+    "system",
+    "project", 
+    "performance",
+    "quality",
+    "development",
+    "git"
+  ],
+  "format": "html",
+  "schedule": {
+    "cron": "0 9 * * *",
+    "timezone": "UTC"
+  },
+  "template": {
+    "title": "Daily Development Report - {date}",
+    "sections": {
+      "system": {
+        "title": "🖥️ System Information",
+        "metrics": ["platform", "nodeVersion", "memory", "cpus", "uptime"]
+      },
+      "project": {
+        "title": "📁 Project Information", 
+        "metrics": ["name", "version", "dependencies", "devDependencies"]
+      },
+      "performance": {
+        "title": "📈 Performance Metrics",
+        "metrics": ["cpu", "memory", "disk", "network"]
+      },
+      "quality": {
+        "title": "🔧 Quality Metrics",
+        "metrics": ["linting", "testing", "typeChecking", "security"]
+      },
+      "development": {
+        "title": "💻 Development Activity",
+        "metrics": ["fileCount", "directoryCount", "totalSize", "languages"]
+      },
+      "git": {
+        "title": "📊 Git Information",
+        "metrics": ["branch", "commitCount", "lastCommit", "lastCommitDate"]
+      }
+    }
+  },
+  "alerts": {
+    "highCpuUsage": {
+      "threshold": 80,
+      "message": "High CPU usage detected: {value}%"
+    },
+    "highMemoryUsage": {
+      "threshold": 85,
+      "message": "High memory usage detected: {value}%"
+    },
+    "lowTestCoverage": {
+      "threshold": 50,
+      "message": "Low test coverage: {value}%"
+    }
+  }
+}

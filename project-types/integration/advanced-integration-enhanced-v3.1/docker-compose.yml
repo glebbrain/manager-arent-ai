@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  advanced-integration:
+    build: .
+    container_name: advanced-integration-v3.1
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      - LOG_LEVEL=info
+      
+      # IoT Integration Configuration
+      - IOT_ENABLED=true
+      - IOT_BROKER_URL=mqtt://mosquitto:1883
+      - IOT_DEVICE_LIMIT=10000
+      
+      # 5G Integration Configuration
+      - FIVEG_ENABLED=true
+      - FIVEG_NETWORK_SLICE_ID=slice-1
+      - FIVEG_QOS_LEVEL=high
+      
+      # AR/VR Integration Configuration
+      - ARVR_ENABLED=true
+      - ARVR_RENDERING_ENGINE=webxr
+      - ARVR_TRACKING_MODE=full
+      
+      # Blockchain Integration Configuration
+      - BLOCKCHAIN_ENABLED=true
+      - BLOCKCHAIN_NETWORK=ethereum
+      - BLOCKCHAIN_RPC_URL=http://ganache:8545
+      
+      # Quantum Integration Configuration
+      - QUANTUM_ENABLED=true
+      - QUANTUM_BACKEND=simulator
+      - QUANTUM_CIRCUIT_DEPTH=100
+      
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    networks:
+      - integration-network
+    depends_on:
+      - redis
+      - mongodb
+      - mosquitto
+      - ganache
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  redis:
+    image: redis:7-alpine
+    container_name: integration-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - integration-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  mongodb:
+    image: mongo:6
+    container_name: integration-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=integration
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - integration-network
+    restart: unless-stopped
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: integration-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-logs:/mosquitto/log
+    networks:
+      - integration-network
+    restart: unless-stopped
+
+  ganache:
+    image: trufflesuite/ganache-cli:latest
+    container_name: integration-ganache
+    ports:
+      - "8545:8545"
+    command: ganache-cli --host 0.0.0.0 --port 8545 --accounts 10 --defaultBalanceEther 1000
+    networks:
+      - integration-network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: integration-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - advanced-integration
+    networks:
+      - integration-network
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+  mongodb-data:
+  mosquitto-data:
+  mosquitto-logs:
+
+networks:
+  integration-network:
+    driver: bridge

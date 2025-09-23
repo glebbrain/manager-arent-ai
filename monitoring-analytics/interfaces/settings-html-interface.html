@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Universal Project Manager v3.1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .header { background: #ffffff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .back-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280; }
+        .header-title { font-size: 1.5rem; font-weight: bold; color: #1f2937; }
+        .header-actions { display: flex; gap: 1rem; align-items: center; }
+        .main-container { display: flex; min-height: calc(100vh - 80px); }
+        .sidebar { width: 250px; background: #ffffff; border-right: 1px solid #e5e7eb; padding: 2rem 0; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 2rem; color: #6b7280; text-decoration: none; transition: all 0.2s; }
+        .nav-item:hover, .nav-item.active { background: #f3f4f6; color: #2563eb; }
+        .main-content { flex: 1; padding: 2rem; }
+        .settings-section { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .section-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 1.5rem; color: #1f2937; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151; }
+        .form-input, .form-select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .form-textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+        .checkbox { width: 1rem; height: 1rem; }
+        .avatar-section { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .avatar { width: 80px; height: 80px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold; }
+        .avatar-actions { display: flex; gap: 0.5rem; }
+        .btn { padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #f3f4f6; color: #374151; }
+        .btn-secondary:hover { background: #e5e7eb; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .integration-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .integration-status { padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 500; }
+        .status-connected { background: #dcfce7; color: #166534; }
+        .status-disconnected { background: #fef2f2; color: #dc2626; }
+        .slider { width: 100%; height: 6px; border-radius: 3px; background: #e5e7eb; outline: none; }
+        .slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #2563eb; cursor: pointer; }
+        .slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #2563eb; cursor: pointer; border: none; }
+        .color-picker { width: 50px; height: 50px; border: none; border-radius: 0.5rem; cursor: pointer; }
+        .theme-options { display: flex; gap: 1rem; margin-bottom: 1rem; }
+        .theme-option { padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; cursor: pointer; text-align: center; transition: all 0.2s; }
+        .theme-option:hover, .theme-option.active { border-color: #2563eb; background: #f0f9ff; }
+        .theme-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .action-buttons { display: flex; gap: 1rem; margin-top: 2rem; }
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; padding: 1rem 0; }
+            .main-content { padding: 1rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .theme-options { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="back-btn">←</button>
+            <h1 class="header-title">Settings & Configuration</h1>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-primary">💾 Save</button>
+            <button class="btn btn-secondary">🔄 Reset</button>
+            <button class="btn btn-secondary">❓ Help</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <nav class="sidebar">
+            <a href="#" class="nav-item active">👤 Profile</a>
+            <a href="#" class="nav-item">🤖 AI</a>
+            <a href="#" class="nav-item">🔗 Integrations</a>
+            <a href="#" class="nav-item">🔒 Security</a>
+            <a href="#" class="nav-item">🔔 Notifications</a>
+            <a href="#" class="nav-item">🌐 Network</a>
+            <a href="#" class="nav-item">📊 Analytics</a>
+            <a href="#" class="nav-item">🎨 Appearance</a>
+            <a href="#" class="nav-item">⚙️ Advanced</a>
+        </nav>
+
+        <main class="main-content">
+            <!-- User Profile Settings -->
+            <section class="settings-section">
+                <h2 class="section-title">👤 User Profile Settings</h2>
+                <div class="avatar-section">
+                    <div class="avatar">JS</div>
+                    <div class="avatar-actions">
+                        <button class="btn btn-secondary">📷 Upload</button>
+                        <button class="btn btn-secondary">🔄 Change</button>
+                        <button class="btn btn-danger">❌ Remove</button>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-input" value="John">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-input" value="Smith">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" value="john.smith@company.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" value="+1 (555) 123-4567">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Role</label>
+                        <select class="form-select">
+                            <option>Senior Developer</option>
+                            <option>Team Lead</option>
+                            <option>Project Manager</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <select class="form-select">
+                            <option>Engineering</option>
+                            <option>Design</option>
+                            <option>QA</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Timezone</label>
+                        <select class="form-select">
+                            <option>UTC-8 (Pacific)</option>
+                            <option>UTC-5 (Eastern)</option>
+                            <option>UTC+0 (GMT)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Language</label>
+                        <select class="form-select">
+                            <option>English</option>
+                            <option>Spanish</option>
+                            <option>French</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Configuration -->
+            <section class="settings-section">
+                <h2 class="section-title">🤖 AI Configuration</h2>
+                <div class="form-group">
+                    <label class="form-label">AI Model Type</label>
+                    <select class="form-select">
+                        <option>GPT-4</option>
+                        <option>GPT-3.5</option>
+                        <option>Claude-3</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confidence Threshold: 85%</label>
+                    <input type="range" class="slider" min="0" max="100" value="85">
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Enable automatic code optimization</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Show AI recommendations</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Enable AI code analysis</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Enable risk prediction</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Enable AI monitoring</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Enable forecasting</label>
+                </div>
+            </section>
+
+            <!-- Integrations Management -->
+            <section class="settings-section">
+                <h2 class="section-title">🔗 Integrations Management</h2>
+                <div class="integration-item">
+                    <div>
+                        <strong>GitHub Integration</strong>
+                        <div>Repository: company/project-main</div>
+                        <div>Branch: main | Webhook: Enabled</div>
+                    </div>
+                    <div>
+                        <span class="integration-status status-connected">✅ Connected</span>
+                        <button class="btn btn-secondary">Configure</button>
+                    </div>
+                </div>
+                <div class="integration-item">
+                    <div>
+                        <strong>Azure DevOps Integration</strong>
+                        <div>Not connected</div>
+                    </div>
+                    <div>
+                        <span class="integration-status status-disconnected">❌ Not connected</span>
+                        <button class="btn btn-primary">Connect</button>
+                    </div>
+                </div>
+                <div class="integration-item">
+                    <div>
+                        <strong>Slack Integration</strong>
+                        <div>Channel: #project-updates | Notifications: Enabled</div>
+                    </div>
+                    <div>
+                        <span class="integration-status status-connected">✅ Connected</span>
+                        <button class="btn btn-secondary">Configure</button>
+                    </div>
+                </div>
+                <div class="integration-item">
+                    <div>
+                        <strong>Trello Integration</strong>
+                        <div>Not connected</div>
+                    </div>
+                    <div>
+                        <span class="integration-status status-disconnected">❌ Not connected</span>
+                        <button class="btn btn-primary">Connect</button>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <button class="btn btn-primary">➕ Add New Integration</button>
+                    <button class="btn btn-secondary">🧪 Test All Connections</button>
+                </div>
+            </section>
+
+            <!-- Security Settings -->
+            <section class="settings-section">
+                <h2 class="section-title">🔒 Security Settings</h2>
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" class="form-input" placeholder="••••••••••••••••">
+                    <button class="btn btn-secondary" style="margin-top: 0.5rem;">Change Password</button>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Two-Factor Authentication: Enabled</label>
+                    <button class="btn btn-secondary">Configure</button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">API Keys</label>
+                    <div style="margin-bottom: 0.5rem;">
+                        <strong>GitHub Token:</strong> ••••••••••••••••
+                        <button class="btn btn-secondary">Regenerate</button>
+                        <button class="btn btn-secondary">View</button>
+                    </div>
+                    <div>
+                        <strong>OpenAI Key:</strong> ••••••••••••••••
+                        <button class="btn btn-secondary">Regenerate</button>
+                        <button class="btn btn-secondary">View</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Active Sessions: 3 devices</label>
+                    <div style="margin-top: 0.5rem;">
+                        <button class="btn btn-secondary">View All Sessions</button>
+                        <button class="btn btn-danger">Sign Out All</button>
+                    </div>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Allow usage analytics</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Send error reports</label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data Retention</label>
+                    <select class="form-select">
+                        <option>30 days</option>
+                        <option>90 days</option>
+                        <option>1 year</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Notification Settings -->
+            <section class="settings-section">
+                <h2 class="section-title">🔔 Notification Settings</h2>
+                <h3>Email Notifications:</h3>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Project Updates</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>AI Recommendations</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Security Alerts</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Weekly Reports</label>
+                </div>
+                <h3 style="margin-top: 1.5rem;">Push Notifications:</h3>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Desktop</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Mobile</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox">
+                    <label>Browser</label>
+                </div>
+                <h3 style="margin-top: 1.5rem;">Notification Frequency:</h3>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Real-time: Critical issues only</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Daily Digest</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Weekly Summary</label>
+                </div>
+                <h3 style="margin-top: 1.5rem;">Quiet Hours:</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Start</label>
+                        <input type="time" class="form-input" value="22:00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End</label>
+                        <input type="time" class="form-input" value="08:00">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Appearance Settings -->
+            <section class="settings-section">
+                <h2 class="section-title">🎨 Appearance Settings</h2>
+                <div class="form-group">
+                    <label class="form-label">Theme</label>
+                    <div class="theme-options">
+                        <div class="theme-option active">
+                            <div class="theme-icon">🌞</div>
+                            <div>Light</div>
+                        </div>
+                        <div class="theme-option">
+                            <div class="theme-icon">🌙</div>
+                            <div>Dark</div>
+                        </div>
+                        <div class="theme-option">
+                            <div class="theme-icon">🔄</div>
+                            <div>Auto</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Primary Color</label>
+                        <input type="color" class="color-picker" value="#2563eb">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Accent Color</label>
+                        <input type="color" class="color-picker" value="#10b981">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Font Family</label>
+                        <select class="form-select">
+                            <option>Inter</option>
+                            <option>Arial</option>
+                            <option>Helvetica</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Font Size</label>
+                        <select class="form-select">
+                            <option>14px</option>
+                            <option>16px</option>
+                            <option>18px</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Enable animations</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox">
+                    <label>High contrast mode</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox">
+                    <label>Reduced motion</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" checked>
+                    <label>Screen reader support</label>
+                </div>
+            </section>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary">💾 Save All Settings</button>
+                <button class="btn btn-secondary">🔄 Reset to Defaults</button>
+                <button class="btn btn-secondary">📤 Export Settings</button>
+                <button class="btn btn-secondary">📥 Import Settings</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme selection
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    themeOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Slider updates
+            const sliders = document.querySelectorAll('.slider');
+            sliders.forEach(slider => {
+                slider.addEventListener('input', function() {
+                    const label = this.previousElementSibling;
+                    if (label) {
+                        label.textContent = label.textContent.split(':')[0] + ': ' + this.value + '%';
+                    }
+                });
+            });
+
+            // Color picker updates
+            const colorPickers = document.querySelectorAll('.color-picker');
+            colorPickers.forEach(picker => {
+                picker.addEventListener('change', function() {
+                    console.log('Color changed to:', this.value);
+                });
+            });
+
+            // Form validation
+            const formInputs = document.querySelectorAll('.form-input, .form-select');
+            formInputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.hasAttribute('required') && !this.value) {
+                        this.style.borderColor = '#ef4444';
+                    } else {
+                        this.style.borderColor = '#d1d5db';
+                    }
+                });
+            });
+
+            // Save functionality
+            const saveBtn = document.querySelector('.btn-primary');
+            saveBtn.addEventListener('click', function() {
+                console.log('Saving settings...');
+                // Add actual save functionality here
+            });
+        });
+    </script>
+</body>
+</html>

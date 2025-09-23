@@ -1,0 +1,52 @@
+{
+  "name": "service-mesh-orchestrator",
+  "version": "2.9.0",
+  "description": "Enhanced Service Mesh Orchestrator v2.9 with AI-Powered Microservices Management",
+  "main": "service-mesh-orchestrator.js",
+  "scripts": {
+    "start": "node service-mesh-orchestrator.js",
+    "dev": "nodemon service-mesh-orchestrator.js",
+    "test": "node test-orchestrator.js",
+    "test:comprehensive": "node test-orchestrator.js && jest",
+    "build": "npm install",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "service-mesh",
+    "orchestration",
+    "microservices",
+    "istio",
+    "kubernetes",
+    "ai",
+    "machine-learning",
+    "monitoring"
+  ],
+  "author": "Universal Project Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2",
+    "js-yaml": "^4.1.0",
+    "winston": "^3.10.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.6.2",
+    "eslint": "^8.47.0",
+    "prettier": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/universal-project/service-mesh"
+  },
+  "bugs": {
+    "url": "https://github.com/universal-project/service-mesh/issues"
+  },
+  "homepage": "https://github.com/universal-project/service-mesh#readme"
+}

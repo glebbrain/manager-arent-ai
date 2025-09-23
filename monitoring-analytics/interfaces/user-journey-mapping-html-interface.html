@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Journey Mapping - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .journey-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .journey-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .journey-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .journey-maps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .journey-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .journey-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .journey-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .journey-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .journey-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-completed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-draft {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .journey-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .journey-steps {
+            margin-bottom: 15px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .step-icon {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .step-text {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .step-status {
+            margin-left: auto;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .step-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .step-current {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .step-pending {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .journey-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .journey-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .mapping-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .mapping-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .mapping-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .mapping-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recent-mappings {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .mappings-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .mapping-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .mapping-item:hover {
+            background: #f8f9fa;
+        }
+
+        .mapping-item:last-child {
+            border-bottom: none;
+        }
+
+        .mapping-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .mapping-icon.created {
+            background: #10b981;
+        }
+
+        .mapping-icon.updated {
+            background: #3b82f6;
+        }
+
+        .mapping-icon.analyzed {
+            background: #f59e0b;
+        }
+
+        .mapping-content {
+            flex: 1;
+        }
+
+        .mapping-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .mapping-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .mapping-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .journey-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .journey-maps {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-route"></i> User Journey Mapping</h1>
+            <p>Visual mapping of user interactions and workflows in Universal Project Manager v3.2</p>
+        </div>
+
+        <div class="journey-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-route"></i></div>
+                <div class="overview-value">24</div>
+                <div class="overview-label">Journey Maps</div>
+                <div class="overview-trend trend-up">+3 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-user"></i></div>
+                <div class="overview-value">8</div>
+                <div class="overview-label">User Personas</div>
+                <div class="overview-trend trend-up">+1 this month</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-tasks"></i></div>
+                <div class="overview-value">156</div>
+                <div class="overview-label">User Tasks</div>
+                <div class="overview-trend trend-up">+12 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="overview-value">87%</div>
+                <div class="overview-label">Task Completion</div>
+                <div class="overview-trend trend-up">+5% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-clock"></i></div>
+                <div class="overview-value">2.3m</div>
+                <div class="overview-label">Avg Task Time</div>
+                <div class="overview-trend trend-down">-0.4m faster</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">94%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+3% improvement</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="journey-section">
+                <h2><i class="fas fa-chart-area"></i> Journey Maps</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">User Journey Analytics</div>
+                    <canvas id="journeyChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Task Completion Rates</div>
+                    <canvas id="completionChart"></canvas>
+                </div>
+
+                <div class="journey-maps">
+                    <div class="journey-card">
+                        <div class="journey-header">
+                            <div class="journey-title">New User Onboarding</div>
+                            <div class="journey-status status-active">Active</div>
+                        </div>
+                        <div class="journey-description">Complete journey from registration to first successful project creation</div>
+                        <div class="journey-steps">
+                            <div class="step-item">
+                                <i class="fas fa-user-plus step-icon"></i>
+                                <span class="step-text">Account Registration</span>
+                                <span class="step-status step-completed">Completed</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-cog step-icon"></i>
+                                <span class="step-text">Profile Setup</span>
+                                <span class="step-status step-completed">Completed</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-play step-icon"></i>
+                                <span class="step-text">Tutorial Walkthrough</span>
+                                <span class="step-status step-current">Current</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-project-diagram step-icon"></i>
+                                <span class="step-text">First Project</span>
+                                <span class="step-status step-pending">Pending</span>
+                            </div>
+                        </div>
+                        <div class="journey-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">75%</div>
+                                <div class="metric-label">Complete</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">3.2m</div>
+                                <div class="metric-label">Avg Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">92%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                        </div>
+                        <div class="journey-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="journey-card">
+                        <div class="journey-header">
+                            <div class="journey-title">Project Creation</div>
+                            <div class="journey-status status-completed">Completed</div>
+                        </div>
+                        <div class="journey-description">End-to-end project creation workflow with AI assistance</div>
+                        <div class="journey-steps">
+                            <div class="step-item">
+                                <i class="fas fa-plus step-icon"></i>
+                                <span class="step-text">New Project</span>
+                                <span class="step-status step-completed">Completed</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-robot step-icon"></i>
+                                <span class="step-text">AI Configuration</span>
+                                <span class="step-status step-completed">Completed</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-tasks step-icon"></i>
+                                <span class="step-text">Task Setup</span>
+                                <span class="step-status step-completed">Completed</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-check step-icon"></i>
+                                <span class="step-text">Project Launch</span>
+                                <span class="step-status step-completed">Completed</span>
+                            </div>
+                        </div>
+                        <div class="journey-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Complete</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">1.8m</div>
+                                <div class="metric-label">Avg Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">96%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                        </div>
+                        <div class="journey-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="journey-card">
+                        <div class="journey-header">
+                            <div class="journey-title">Task Management</div>
+                            <div class="journey-status status-active">Active</div>
+                        </div>
+                        <div class="journey-description">Daily task management and progress tracking workflow</div>
+                        <div class="journey-steps">
+                            <div class="step-item">
+                                <i class="fas fa-list step-icon"></i>
+                                <span class="step-text">View Tasks</span>
+                                <span class="step-status step-completed">Completed</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-edit step-icon"></i>
+                                <span class="step-text">Update Progress</span>
+                                <span class="step-status step-current">Current</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-comments step-icon"></i>
+                                <span class="step-text">Team Collaboration</span>
+                                <span class="step-status step-pending">Pending</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-chart-line step-icon"></i>
+                                <span class="step-text">Review Analytics</span>
+                                <span class="step-status step-pending">Pending</span>
+                            </div>
+                        </div>
+                        <div class="journey-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">60%</div>
+                                <div class="metric-label">Complete</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2.1m</div>
+                                <div class="metric-label">Avg Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">89%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                        </div>
+                        <div class="journey-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="journey-card">
+                        <div class="journey-header">
+                            <div class="journey-title">AI Analysis</div>
+                            <div class="journey-status status-completed">Completed</div>
+                        </div>
+                        <div class="journey-description">AI-powered project analysis and insights workflow</div>
+                        <div class="journey-steps">
+                            <div class="step-item">
+                                <i class="fas fa-upload step-icon"></i>
+                                <span class="step-text">Data Upload</span>
+                                <span class="step-status step-completed">Completed</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-brain step-icon"></i>
+                                <span class="step-text">AI Processing</span>
+                                <span class="step-status step-completed">Completed</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-chart-bar step-icon"></i>
+                                <span class="step-text">Generate Insights</span>
+                                <span class="step-status step-completed">Completed</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-download step-icon"></i>
+                                <span class="step-text">Export Results</span>
+                                <span class="step-status step-completed">Completed</span>
+                            </div>
+                        </div>
+                        <div class="journey-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Complete</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.5m</div>
+                                <div class="metric-label">Avg Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">94%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                        </div>
+                        <div class="journey-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="journey-card">
+                        <div class="journey-header">
+                            <div class="journey-title">Team Collaboration</div>
+                            <div class="journey-status status-active">Active</div>
+                        </div>
+                        <div class="journey-description">Team collaboration and communication workflow</div>
+                        <div class="journey-steps">
+                            <div class="step-item">
+                                <i class="fas fa-users step-icon"></i>
+                                <span class="step-text">Team Setup</span>
+                                <span class="step-status step-completed">Completed</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-comments step-icon"></i>
+                                <span class="step-text">Communication</span>
+                                <span class="step-status step-current">Current</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-share step-icon"></i>
+                                <span class="step-text">File Sharing</span>
+                                <span class="step-status step-pending">Pending</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-sync step-icon"></i>
+                                <span class="step-text">Sync Updates</span>
+                                <span class="step-status step-pending">Pending</span>
+                            </div>
+                        </div>
+                        <div class="journey-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">50%</div>
+                                <div class="metric-label">Complete</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">3.8m</div>
+                                <div class="metric-label">Avg Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">91%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                        </div>
+                        <div class="journey-actions">
+                            <button class="action-btn">View</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+
+                    <div class="journey-card">
+                        <div class="journey-header">
+                            <div class="journey-title">Reporting & Analytics</div>
+                            <div class="journey-status status-draft">Draft</div>
+                        </div>
+                        <div class="journey-description">Report generation and analytics workflow</div>
+                        <div class="journey-steps">
+                            <div class="step-item">
+                                <i class="fas fa-chart-pie step-icon"></i>
+                                <span class="step-text">Select Metrics</span>
+                                <span class="step-status step-pending">Pending</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-cog step-icon"></i>
+                                <span class="step-text">Configure Report</span>
+                                <span class="step-status step-pending">Pending</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-play step-icon"></i>
+                                <span class="step-text">Generate Report</span>
+                                <span class="step-status step-pending">Pending</span>
+                            </div>
+                            <div class="step-item">
+                                <i class="fas fa-share step-icon"></i>
+                                <span class="step-text">Share Results</span>
+                                <span class="step-status step-pending">Pending</span>
+                            </div>
+                        </div>
+                        <div class="journey-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">0%</div>
+                                <div class="metric-label">Complete</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">-</div>
+                                <div class="metric-label">Avg Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">-</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                        </div>
+                        <div class="journey-actions">
+                            <button class="action-btn">Start</button>
+                            <button class="action-btn secondary">Edit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mapping-controls">
+                <h2><i class="fas fa-cogs"></i> Mapping Controls</h2>
+                
+                <div class="mapping-actions">
+                    <button class="control-btn" onclick="createJourney()">
+                        <i class="fas fa-plus"></i> Create Journey
+                    </button>
+                    <button class="control-btn secondary" onclick="analyzeJourney()">
+                        <i class="fas fa-chart-line"></i> Analyze
+                    </button>
+                    <button class="control-btn secondary" onclick="exportJourney()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+
+                <div class="mapping-status">
+                    <div class="status-title">Mapping Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Total Journeys</div>
+                        <div class="status-value">24 maps</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Active Journeys</div>
+                        <div class="status-value">8 maps</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Completed Journeys</div>
+                        <div class="status-value">14 maps</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Draft Journeys</div>
+                        <div class="status-value">2 maps</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Last Update</div>
+                        <div class="status-value">1 hour ago</div>
+                    </div>
+                </div>
+
+                <div class="recent-mappings">
+                    <div class="mappings-title">Recent Mappings</div>
+                    <div class="mapping-item">
+                        <div class="mapping-icon created">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="mapping-content">
+                            <div class="mapping-title">New User Onboarding</div>
+                            <div class="mapping-description">Created new journey map for user onboarding process</div>
+                        </div>
+                        <div class="mapping-time">1 hour ago</div>
+                    </div>
+                    <div class="mapping-item">
+                        <div class="mapping-icon updated">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="mapping-content">
+                            <div class="mapping-title">Task Management</div>
+                            <div class="mapping-description">Updated task management journey with new steps</div>
+                        </div>
+                        <div class="mapping-time">3 hours ago</div>
+                    </div>
+                    <div class="mapping-item">
+                        <div class="mapping-icon analyzed">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="mapping-content">
+                            <div class="mapping-title">AI Analysis Journey</div>
+                            <div class="mapping-description">Analyzed AI analysis journey for optimization</div>
+                        </div>
+                        <div class="mapping-time">5 hours ago</div>
+                    </div>
+                    <div class="mapping-item">
+                        <div class="mapping-icon created">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="mapping-content">
+                            <div class="mapping-title">Team Collaboration</div>
+                            <div class="mapping-description">Created team collaboration journey map</div>
+                        </div>
+                        <div class="mapping-time">1 day ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI Journey Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        Journey mapping accuracy improved by 22% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Some journey steps need optimization for better UX
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI templates available for journey mapping
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let journeyChart, completionChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Journey Chart
+            const journeyCtx = document.getElementById('journeyChart').getContext('2d');
+            journeyChart = new Chart(journeyCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(12),
+                    datasets: [{
+                        label: 'Journey Completions',
+                        data: [15, 18, 22, 25, 28, 30, 32, 35, 38, 40, 42, 45],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'User Tasks',
+                        data: [120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 285],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Completion Chart
+            const completionCtx = document.getElementById('completionChart').getContext('2d');
+            completionChart = new Chart(completionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'In Progress', 'Pending', 'Failed'],
+                    datasets: [{
+                        data: [65, 20, 10, 5],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels(months) {
+            const labels = [];
+            const now = new Date();
+            for (let i = months - 1; i >= 0; i--) {
+                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function createJourney() {
+            alert('Creating new journey map...');
+        }
+
+        function analyzeJourney() {
+            alert('Analyzing journey maps...');
+        }
+
+        function exportJourney() {
+            alert('Exporting journey maps...');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+{
+  "version": "4.8",
+  "description": "Конфигурация умного копирования для start-v4.8",
+  "source": {
+    "defaultPath": "${workspaceFolder}",
+    "description": "Путь к исходному проекту ManagerAgentAI"
+  },
+  "target": {
+    "automationPath": "${workspaceFolder}\\.automation",
+    "managerPath": "${workspaceFolder}\\.manager",
+    "configPath": "${workspaceFolder}\\.automation\\config",
+    "docsPath": "${workspaceFolder}\\docs",
+    "scriptsPath": "${workspaceFolder}\\.automation\\scripts",
+    "reportsPath": "${workspaceFolder}\\.automation\\reports"
+  },
+  "excludeFiles": [
+    "TODO.md",
+    "IDEA.md",
+    "COMPLETED.md",
+    "ERRORS.md",
+    "README.md",
+    "package.json",
+    "package-lock.json",
+    "yarn.lock",
+    "node_modules",
+    ".git",
+    ".vs",
+    "bin",
+    "obj",
+    "dist",
+    "build",
+    "*.log",
+    "*.tmp",
+    ".DS_Store",
+    "Thumbs.db",
+    "deploy-archives",
+    "backup-*",
+    "*.backup.*"
+  ],
+  "mergeFiles": {
+    ".manager/start.md": {
+      "type": "append",
+      "description": "Добавляет содержимое в конец файла",
+      "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ===",
+      "enabled": true
+    },
+    ".manager/control-files/INSTRUCTIONS.md": {
+      "type": "append",
+      "description": "Добавляет инструкции в конец файла",
+      "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ===",
+      "enabled": true
+    },
+    ".manager/control-files/TODO.md": {
+      "type": "append",
+      "description": "Добавляет задачи в конец файла",
+      "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ===",
+      "enabled": true
+    },
+    ".manager/control-files/IDEA.md": {
+      "type": "append",
+      "description": "Добавляет идеи в конец файла",
+      "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ===",
+      "enabled": true
+    },
+    ".manager/control-files/COMPLETED.md": {
+      "type": "append",
+      "description": "Добавляет завершенные задачи в конец файла",
+      "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ===",
+      "enabled": true
+    },
+    ".manager/control-files/ERRORS.md": {
+      "type": "append",
+      "description": "Добавляет ошибки в конец файла",
+      "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ===",
+      "enabled": true
+    }
+  },
+  "replaceFiles": {
+    "cursor.json": {
+      "description": "Заменяет конфигурацию Cursor IDE",
+      "backup": true,
+      "enabled": true
+    },
+    ".automation/scripts/New-Aliases-v4.8.ps1": {
+      "description": "Заменяет скрипт алиасов",
+      "backup": false,
+      "enabled": true
+    },
+    ".automation/Project-Analysis-Optimizer-v4.8.ps1": {
+      "description": "Заменяет анализатор проектов",
+      "backup": false,
+      "enabled": true
+    },
+    ".automation/Quick-Access-Optimized-v4.8.ps1": {
+      "description": "Заменяет оптимизатор доступа",
+      "backup": false,
+      "enabled": true
+    }
+  },
+  "backupSettings": {
+    "enabled": true,
+    "suffix": "backup",
+    "timestampFormat": "yyyy-MM-dd-HH-mm-ss",
+    "maxBackups": 5,
+    "description": "Настройки резервного копирования"
+  },
+  "mergeSettings": {
+    "checkDuplicates": true,
+    "addSeparator": true,
+    "separator": "# === ДОБАВЛЕНО ИЗ v4.8 ===",
+    "encoding": "UTF8",
+    "description": "Настройки слияния файлов"
+  },
+  "logging": {
+    "enabled": true,
+    "level": "INFO",
+    "file": "smart-copy.log",
+    "maxSize": "10MB",
+    "maxFiles": 5,
+    "description": "Настройки логирования"
+  },
+  "validation": {
+    "checkSourcePath": true,
+    "checkTargetPaths": true,
+    "checkDiskSpace": true,
+    "minDiskSpaceGB": 1,
+    "description": "Настройки валидации"
+  },
+  "features": {
+    "ai": true,
+    "quantum": true,
+    "blockchain": true,
+    "edge": true,
+    "vr": true,
+    "ar": true,
+    "5g": true,
+    "iot": true,
+    "description": "Включенные функции v4.8"
+  },
+  "scripts": {
+    "aliases": {
+      "mpo": "Maximum-Performance-Optimizer-v4.8.ps1",
+      "mmo": "Advanced-Monitoring-System-v4.8.ps1",
+      "qai": "Project-Analysis-Optimizer-v4.8.ps1",
+      "qaq": "Quick-Access-Optimized-v4.8.ps1",
+      "qap": "AI-Enhanced-Features-Manager-v4.8.ps1"
+    },
+    "paths": {
+      "automation": ".automation",
+      "manager": ".manager",
+      "config": "config",
+      "docs": "docs",
+      "scripts": "scripts"
+    }
+  },
+  "notifications": {
+    "enabled": false,
+    "email": "",
+    "webhook": "",
+    "slack": "",
+    "description": "Настройки уведомлений"
+  },
+  "security": {
+    "verifyChecksums": true,
+    "encryptBackups": false,
+    "signFiles": false,
+    "description": "Настройки безопасности"
+  },
+  "performance": {
+    "parallelCopy": 3,
+    "chunkSize": "1MB",
+    "retryAttempts": 3,
+    "retryDelay": 5,
+    "description": "Настройки производительности"
+  }
+}

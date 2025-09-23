@@ -1,0 +1,60 @@
+# ManagerAgentAI Interactive Dashboards Service Dockerfile v2.4
+# Multi-stage build for production-ready Interactive Dashboards service
+
+# Stage 1: Build stage
+FROM node:18-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY interactive-dashboards/package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy source code
+COPY interactive-dashboards/ ./
+
+# Create necessary directories
+RUN mkdir -p logs reports config
+
+# Stage 2: Production stage
+FROM node:18-alpine AS production
+
+# Install system dependencies
+RUN apk add --no-cache \
+    curl \
+    dumb-init \
+    && rm -rf /var/cache/apk/*
+
+# Create app user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S interactive-dashboards -u 1001
+
+# Set working directory
+WORKDIR /app
+
+# Copy built application from builder stage
+COPY --from=builder --chown=interactive-dashboards:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=interactive-dashboards:nodejs /app ./
+
+# Create necessary directories with proper permissions
+RUN mkdir -p logs reports config && \
+    chown -R interactive-dashboards:nodejs logs reports config
+
+# Switch to non-root user
+USER interactive-dashboards
+
+# Expose port
+EXPOSE 3017
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:3017/health || exit 1
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application
+CMD ["node", "server.js"]

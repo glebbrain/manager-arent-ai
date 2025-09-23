@@ -1,0 +1,255 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservices-orchestrator-enhanced
+  namespace: manager-agent-ai-v2.9
+  labels:
+    app: microservices-orchestrator-enhanced
+    version: "2.9.0"
+    component: orchestrator
+    tier: backend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: microservices-orchestrator-enhanced
+  template:
+    metadata:
+      labels:
+        app: microservices-orchestrator-enhanced
+        version: "2.9.0"
+        component: orchestrator
+        tier: backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: manager-agent-ai-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+      containers:
+      - name: microservices-orchestrator-enhanced
+        image: manager-agent-ai/microservices-orchestrator-enhanced:2.9.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        - name: websocket
+          containerPort: 8081
+          protocol: TCP
+        - name: metrics
+          containerPort: 9092
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: NODE_ENV
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: LOG_LEVEL
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: ORCHESTRATOR_PORT
+        - name: HEALTH_CHECK_INTERVAL
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: ORCHESTRATOR_HEALTH_CHECK_INTERVAL
+        - name: METRICS_INTERVAL
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: ORCHESTRATOR_METRICS_INTERVAL
+        - name: SERVICE_MESH_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: SERVICE_MESH_ENABLED
+        - name: CIRCUIT_BREAKER_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: CIRCUIT_BREAKER_ENABLED
+        - name: LOAD_BALANCING_STRATEGY
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: LOAD_BALANCING_STRATEGY
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: manager-agent-ai-config
+              key: REDIS_PORT
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: manager-agent-ai-secrets
+              key: REDIS_PASSWORD
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: manager-agent-ai-secrets
+              key: JWT_SECRET
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+            ephemeral-storage: "2Gi"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+            ephemeral-storage: "4Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 10
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+          readOnly: true
+        - name: logs-volume
+          mountPath: /app/logs
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: config-volume
+        configMap:
+          name: manager-agent-ai-config
+      - name: logs-volume
+        emptyDir: {}
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - microservices-orchestrator-enhanced
+              topologyKey: kubernetes.io/hostname
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservices-orchestrator-service
+  namespace: manager-agent-ai-v2.9
+  labels:
+    app: microservices-orchestrator-enhanced
+    version: "2.9.0"
+    component: orchestrator
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+    protocol: TCP
+  - name: websocket
+    port: 8081
+    targetPort: websocket
+    protocol: TCP
+  - name: metrics
+    port: 9092
+    targetPort: metrics
+    protocol: TCP
+  selector:
+    app: microservices-orchestrator-enhanced
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: microservices-orchestrator-hpa
+  namespace: manager-agent-ai-v2.9
+  labels:
+    app: microservices-orchestrator-enhanced
+    version: "2.9.0"
+    component: orchestrator
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: microservices-orchestrator-enhanced
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+      - type: Pods
+        value: 1
+        periodSeconds: 60
+      selectPolicy: Max

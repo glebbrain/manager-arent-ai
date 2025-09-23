@@ -1,0 +1,84 @@
+{
+  "name": "Weekly Project Summary",
+  "description": "Weekly comprehensive analysis of project progress and metrics",
+  "sections": [
+    "system",
+    "project",
+    "performance", 
+    "quality",
+    "development",
+    "git",
+    "build"
+  ],
+  "format": "html",
+  "schedule": {
+    "cron": "0 10 * * 1",
+    "timezone": "UTC"
+  },
+  "template": {
+    "title": "Weekly Project Summary - Week of {date}",
+    "sections": {
+      "system": {
+        "title": "🖥️ System Overview",
+        "metrics": ["platform", "nodeVersion", "memory", "cpus", "uptime"],
+        "trends": true
+      },
+      "project": {
+        "title": "📁 Project Status",
+        "metrics": ["name", "version", "dependencies", "devDependencies", "path"]
+      },
+      "performance": {
+        "title": "📈 Performance Analysis",
+        "metrics": ["cpu", "memory", "disk", "network"],
+        "trends": true,
+        "averages": true
+      },
+      "quality": {
+        "title": "🔧 Quality Assessment",
+        "metrics": ["linting", "testing", "typeChecking", "security"],
+        "recommendations": true
+      },
+      "development": {
+        "title": "💻 Development Progress",
+        "metrics": ["fileCount", "directoryCount", "totalSize", "languages", "lastModified"],
+        "trends": true
+      },
+      "git": {
+        "title": "📊 Git Activity",
+        "metrics": ["branch", "commitCount", "lastCommit", "lastCommitDate"],
+        "weeklyCommits": true
+      },
+      "build": {
+        "title": "🏗️ Build Information",
+        "metrics": ["lastBuild", "artifact", "buildCount", "successRate"]
+      }
+    }
+  },
+  "analysis": {
+    "trends": true,
+    "comparisons": true,
+    "recommendations": true
+  },
+  "alerts": {
+    "highCpuUsage": {
+      "threshold": 80,
+      "message": "High CPU usage detected: {value}%"
+    },
+    "highMemoryUsage": {
+      "threshold": 85,
+      "message": "High memory usage detected: {value}%"
+    },
+    "lowTestCoverage": {
+      "threshold": 50,
+      "message": "Low test coverage: {value}%"
+    },
+    "noRecentCommits": {
+      "threshold": 7,
+      "message": "No commits in the last {value} days"
+    },
+    "buildFailures": {
+      "threshold": 3,
+      "message": "Multiple build failures detected: {value}"
+    }
+  }
+}

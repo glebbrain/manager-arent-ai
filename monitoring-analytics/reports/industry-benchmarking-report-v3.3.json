@@ -1,0 +1,119 @@
+{
+  "Comparison": {
+    "CategoryScores": {
+      "Maintainability": 100.0,
+      "Performance": 90.0,
+      "CodeQuality": 75.0,
+      "Security": 100.0
+    },
+    "OverallScore": 91.25,
+    "IndustryRanking": "Top 10%",
+    "Recommendations": [
+      "Improve CyclomaticComplexity in CodeQuality - currently Poor (222.63 vs industry standard 20)"
+    ]
+  },
+  "ProjectMetrics": {
+    "Maintainability": {
+      "Modularity": 75,
+      "Testability": 2.78,
+      "Documentation": 13.17
+    },
+    "Performance": {
+      "ResponseTime": 150,
+      "CPUUsage": 45,
+      "Throughput": 800,
+      "MemoryUsage": 200
+    },
+    "CodeQuality": {
+      "Duplication": 1,
+      "CyclomaticComplexity": 222.63,
+      "TechnicalDebt": 2,
+      "CodeCoverage": 85
+    },
+    "Security": {
+      "Vulnerabilities": 0,
+      "Compliance": 95,
+      "SecurityScore": 88
+    }
+  },
+  "IndustryStandards": {
+    "Maintainability": {
+      "Modularity": {
+        "Good": 70,
+        "Acceptable": 50,
+        "Excellent": 90
+      },
+      "Testability": {
+        "Good": 70,
+        "Acceptable": 50,
+        "Excellent": 90
+      },
+      "Documentation": {
+        "Good": 70,
+        "Acceptable": 50,
+        "Excellent": 90
+      }
+    },
+    "Performance": {
+      "ResponseTime": {
+        "Good": 500,
+        "Acceptable": 1000,
+        "Excellent": 100
+      },
+      "CPUUsage": {
+        "Good": 70,
+        "Acceptable": 90,
+        "Excellent": 50
+      },
+      "Throughput": {
+        "Good": 500,
+        "Acceptable": 100,
+        "Excellent": 1000
+      },
+      "MemoryUsage": {
+        "Good": 500,
+        "Acceptable": 1000,
+        "Excellent": 100
+      }
+    },
+    "CodeQuality": {
+      "Duplication": {
+        "Good": 3,
+        "Acceptable": 5,
+        "Excellent": 0
+      },
+      "CyclomaticComplexity": {
+        "Good": 20,
+        "Acceptable": 30,
+        "Excellent": 10
+      },
+      "TechnicalDebt": {
+        "Good": 5,
+        "Acceptable": 10,
+        "Excellent": 0
+      },
+      "CodeCoverage": {
+        "Good": 80,
+        "Acceptable": 70,
+        "Excellent": 90
+      }
+    },
+    "Security": {
+      "Vulnerabilities": {
+        "Good": 1,
+        "Acceptable": 3,
+        "Excellent": 0
+      },
+      "Compliance": {
+        "Good": 90,
+        "Acceptable": 80,
+        "Excellent": 100
+      },
+      "SecurityScore": {
+        "Good": 80,
+        "Acceptable": 70,
+        "Excellent": 95
+      }
+    }
+  }
+}

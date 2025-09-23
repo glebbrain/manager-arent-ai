@@ -1,0 +1,59 @@
+﻿{
+    "Frameworks":  [
+                       "actix",
+                       "angular",
+                       "asp.net",
+                       "express",
+                       "fastapi",
+                       "flutter",
+                       "gin",
+                       "ionic",
+                       "keras",
+                       "laravel",
+                       "next.js",
+                       "numpy",
+                       "nuxt.js",
+                       "pandas",
+                       "pester",
+                       "psake",
+                       "psunit",
+                       "pytorch",
+                       "react",
+                       "react-native",
+                       "scikit-learn",
+                       "spring",
+                       "svelte",
+                       "tensorflow",
+                       "vue",
+                       "xamarin"
+                   ],
+    "ProjectType":  "powershell",
+    "BuildTools":  [
+                       "cargo",
+                       "conda",
+                       "docker",
+                       "dotnet",
+                       "go",
+                       "maven",
+                       "npm",
+                       "pip"
+                   ],
+    "Languages":  [
+                      "powershell",
+                      "javascript",
+                      "css",
+                      "html"
+                  ],
+    "ScanDate":  "2025-09-05 16:50:41",
+    "TestFrameworks":  [
+                           "jest",
+                           "junit",
+                           "mocha",
+                           "nunit",
+                           "pester",
+                           "pytest",
+                           "rspec",
+                           "unittest",
+                           "xunit"
+                       ]
+}

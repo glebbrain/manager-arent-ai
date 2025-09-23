@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Admin - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .enterprise-admin { display: flex; height: 100vh; }
+        .sidebar { width: 280px; background: #1f2937; color: white; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .admin-header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; }
+        .admin-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .admin-subtitle { font-size: 1.1rem; opacity: 0.9; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .metric-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .metric-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .metric-title { font-size: 0.9rem; font-weight: 500; color: #6b7280; }
+        .metric-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .metric-value { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+        .metric-change { font-size: 0.8rem; display: flex; align-items: center; gap: 0.25rem; }
+        .metric-change.positive { color: #10b981; }
+        .metric-change.negative { color: #ef4444; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .chart-container { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .chart-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem; }
+        .chart-canvas { width: 100%; height: 300px; }
+        .data-tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .table-container { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .table-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .table-actions { display: flex; gap: 0.5rem; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .table th { background: #f8fafc; font-weight: 600; color: #374151; font-size: 0.9rem; }
+        .table tbody tr:hover { background: #f8fafc; }
+        .status-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 500; }
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-inactive { background: #f3f4f6; color: #6b7280; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-error { background: #fef2f2; color: #dc2626; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        .nav { padding: 1rem; }
+        .nav-item { display: block; padding: 0.75rem; color: #9ca3af; text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .nav-item:hover, .nav-item.active { background: #374151; color: white; }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-section-title { font-size: 0.8rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; padding: 0 0.75rem; }
+        .user-info { padding: 1rem; border-top: 1px solid #374151; margin-top: auto; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; }
+        .user-name { font-weight: 600; color: white; margin-bottom: 0.25rem; }
+        .user-role { font-size: 0.8rem; color: #9ca3af; }
+        .filters { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .filters-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .filter-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .filter-group label { font-size: 0.9rem; font-weight: 500; color: #374151; }
+        .filter-select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; font-size: 0.9rem; }
+        .search-input { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; width: 200px; }
+        .alerts { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .alert-item { display: flex; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 8px; margin-bottom: 1rem; }
+        .alert-item:last-child { margin-bottom: 0; }
+        .alert-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem; }
+        .alert-content { flex: 1; }
+        .alert-title { font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; }
+        .alert-description { color: #6b7280; font-size: 0.9rem; }
+        .alert-time { color: #6b7280; font-size: 0.8rem; }
+        .system-status { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .status-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6; }
+        .status-item:last-child { border-bottom: none; }
+        .status-name { font-weight: 500; color: #1f2937; }
+        .status-indicator { width: 12px; height: 12px; border-radius: 50%; }
+        .status-online { background: #10b981; }
+        .status-offline { background: #ef4444; }
+        .status-warning { background: #f59e0b; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-title { font-size: 1.3rem; font-weight: 600; color: #1f2937; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; color: #6b7280; cursor: pointer; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        @media (max-width: 768px) {
+            .enterprise-admin { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .charts-grid, .data-tables { grid-template-columns: 1fr; }
+            .filters-row { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <div class="enterprise-admin">
+        <div class="sidebar">
+            <div class="nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Основное</div>
+                    <a href="#" class="nav-item active"><i class="fas fa-tachometer-alt"></i> Дашборд</a>
+                    <a href="#" class="nav-item"><i class="fas fa-users"></i> Пользователи</a>
+                    <a href="#" class="nav-item"><i class="fas fa-project-diagram"></i> Проекты</a>
+                    <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Аналитика</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Управление</div>
+                    <a href="#" class="nav-item"><i class="fas fa-cog"></i> Настройки</a>
+                    <a href="#" class="nav-item"><i class="fas fa-shield-alt"></i> Безопасность</a>
+                    <a href="#" class="nav-item"><i class="fas fa-database"></i> База данных</a>
+                    <a href="#" class="nav-item"><i class="fas fa-server"></i> Серверы</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Мониторинг</div>
+                    <a href="#" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Алерты</a>
+                    <a href="#" class="nav-item"><i class="fas fa-chart-bar"></i> Логи</a>
+                    <a href="#" class="nav-item"><i class="fas fa-bell"></i> Уведомления</a>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">АП</div>
+                <div class="user-name">Администратор</div>
+                <div class="user-role">Enterprise Admin</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-crown"></i> Enterprise Admin Panel</h1>
+                <div>
+                    <button class="btn btn-primary" onclick="openAddUserModal()">
+                        <i class="fas fa-user-plus"></i> Добавить пользователя
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        <i class="fas fa-download"></i> Экспорт
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="admin-header">
+                    <div class="admin-title">Панель управления Enterprise</div>
+                    <div class="admin-subtitle">Мониторинг и управление корпоративной системой Universal Project Manager v3.1</div>
+                </div>
+                
+                <div class="filters">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label>Период</label>
+                            <select class="filter-select">
+                                <option value="24h">Последние 24 часа</option>
+                                <option value="7d" selected>Последние 7 дней</option>
+                                <option value="30d">Последние 30 дней</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Статус</label>
+                            <select class="filter-select">
+                                <option value="all">Все</option>
+                                <option value="active">Активные</option>
+                                <option value="inactive">Неактивные</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Поиск</label>
+                            <input type="text" class="search-input" placeholder="Поиск...">
+                        </div>
+                        <button class="btn btn-primary" onclick="applyFilters()">Применить</button>
+                    </div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Активные пользователи</span>
+                            <div class="metric-icon" style="background: #10b981; color: white;">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">1,247</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +12% за неделю
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Проекты</span>
+                            <div class="metric-icon" style="background: #2563eb; color: white;">
+                                <i class="fas fa-project-diagram"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">89</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +8% за неделю
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Задачи выполнено</span>
+                            <div class="metric-icon" style="background: #f59e0b; color: white;">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">2,456</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +15% за неделю
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Системная нагрузка</span>
+                            <div class="metric-icon" style="background: #ef4444; color: white;">
+                                <i class="fas fa-server"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">67%</div>
+                        <div class="metric-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            -5% за неделю
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">Активность пользователей</div>
+                        <canvas id="userActivityChart" class="chart-canvas"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">Распределение проектов</div>
+                        <canvas id="projectDistributionChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="data-tables">
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div class="table-title">Пользователи</div>
+                            <div class="table-actions">
+                                <button class="btn btn-sm btn-primary" onclick="refreshUsers()">Обновить</button>
+                                <button class="btn btn-sm btn-success" onclick="openAddUserModal()">Добавить</button>
+                            </div>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Пользователь</th>
+                                    <th>Роль</th>
+                                    <th>Проекты</th>
+                                    <th>Статус</th>
+                                    <th>Последний вход</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center;">
+                                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; margin-right: 8px; font-size: 12px;">ИП</div>
+                                            <div>
+                                                <div style="font-weight: 500;">Иван Петров</div>
+                                                <div style="font-size: 12px; color: #6b7280;">ivan@company.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Admin</td>
+                                    <td>12</td>
+                                    <td><span class="status-badge status-active">Активен</span></td>
+                                    <td>2 часа назад</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="editUser(1)">Редактировать</button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteUser(1)">Удалить</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center;">
+                                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #10b981; color: white; display: flex; align-items: center; justify-content: center; margin-right: 8px; font-size: 12px;">АС</div>
+                                            <div>
+                                                <div style="font-weight: 500;">Анна Сидорова</div>
+                                                <div style="font-size: 12px; color: #6b7280;">anna@company.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Manager</td>
+                                    <td>8</td>
+                                    <td><span class="status-badge status-active">Активен</span></td>
+                                    <td>1 час назад</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="editUser(2)">Редактировать</button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteUser(2)">Удалить</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center;">
+                                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #f59e0b; color: white; display: flex; align-items: center; justify-content: center; margin-right: 8px; font-size: 12px;">ПК</div>
+                                            <div>
+                                                <div style="font-weight: 500;">Петр Козлов</div>
+                                                <div style="font-size: 12px; color: #6b7280;">petr@company.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Developer</td>
+                                    <td>15</td>
+                                    <td><span class="status-badge status-inactive">Неактивен</span></td>
+                                    <td>3 дня назад</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="editUser(3)">Редактировать</button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteUser(3)">Удалить</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div class="table-title">Системные события</div>
+                            <div class="table-actions">
+                                <button class="btn btn-sm btn-primary" onclick="refreshEvents()">Обновить</button>
+                                <button class="btn btn-sm btn-warning" onclick="clearEvents()">Очистить</button>
+                            </div>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Время</th>
+                                    <th>Событие</th>
+                                    <th>Пользователь</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>14:32</td>
+                                    <td>Пользователь вошел в систему</td>
+                                    <td>Иван Петров</td>
+                                    <td><span class="status-badge status-active">Успешно</span></td>
+                                </tr>
+                                <tr>
+                                    <td>14:28</td>
+                                    <td>Создан новый проект</td>
+                                    <td>Анна Сидорова</td>
+                                    <td><span class="status-badge status-active">Успешно</span></td>
+                                </tr>
+                                <tr>
+                                    <td>14:15</td>
+                                    <td>Ошибка подключения к БД</td>
+                                    <td>Система</td>
+                                    <td><span class="status-badge status-error">Ошибка</span></td>
+                                </tr>
+                                <tr>
+                                    <td>14:10</td>
+                                    <td>Задача завершена</td>
+                                    <td>Петр Козлов</td>
+                                    <td><span class="status-badge status-active">Успешно</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="alerts">
+                    <h3 style="margin-bottom: 1rem; color: #1f2937;">Критические алерты</h3>
+                    <div class="alert-item">
+                        <div class="alert-icon" style="background: #ef4444; color: white;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">Высокая нагрузка на сервер</div>
+                            <div class="alert-description">CPU использование превышает 90% в течение 5 минут</div>
+                            <div class="alert-time">2 минуты назад</div>
+                        </div>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-icon" style="background: #f59e0b; color: white;">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">Недостаточно места на диске</div>
+                            <div class="alert-description">Свободное место на диске C: менее 10%</div>
+                            <div class="alert-time">15 минут назад</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="system-status">
+                    <h3 style="margin-bottom: 1rem; color: #1f2937;">Статус системы</h3>
+                    <div class="status-item">
+                        <span class="status-name">Веб-сервер</span>
+                        <div class="status-indicator status-online"></div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-name">База данных</span>
+                        <div class="status-indicator status-online"></div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-name">Redis Cache</span>
+                        <div class="status-indicator status-warning"></div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-name">AI Services</span>
+                        <div class="status-indicator status-online"></div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-name">File Storage</span>
+                        <div class="status-indicator status-online"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Добавить пользователя</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label for="userName">Полное имя</label>
+                    <input type="text" id="userName" required>
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email</label>
+                    <input type="email" id="userEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="userRole">Роль</label>
+                    <select id="userRole" required>
+                        <option value="">Выберите роль</option>
+                        <option value="admin">Администратор</option>
+                        <option value="manager">Менеджер</option>
+                        <option value="developer">Разработчик</option>
+                        <option value="viewer">Наблюдатель</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="userDepartment">Отдел</label>
+                    <input type="text" id="userDepartment">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить пользователя</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            setupEventListeners();
+        });
+        
+        function initializeCharts() {
+            // User Activity Chart
+            const userActivityCtx = document.getElementById('userActivityChart').getContext('2d');
+            new Chart(userActivityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+                    datasets: [{
+                        label: 'Активные пользователи',
+                        data: [1200, 1350, 1100, 1450, 1600, 800, 600],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Project Distribution Chart
+            const projectDistCtx = document.getElementById('projectDistributionChart').getContext('2d');
+            new Chart(projectDistCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Активные', 'Завершенные', 'Приостановленные', 'Архивные'],
+                    datasets: [{
+                        data: [45, 25, 15, 15],
+                        backgroundColor: ['#10b981', '#2563eb', '#f59e0b', '#6b7280']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('addUserForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addUser();
+            });
+        }
+        
+        function openAddUserModal() {
+            document.getElementById('addUserModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+        
+        function addUser() {
+            const form = document.getElementById('addUserForm');
+            const formData = new FormData(form);
+            
+            // Simulate adding user
+            alert('Пользователь добавлен!');
+            form.reset();
+            closeModal();
+        }
+        
+        function editUser(id) {
+            alert(`Редактирование пользователя ${id}...`);
+        }
+        
+        function deleteUser(id) {
+            if (confirm('Вы уверены, что хотите удалить пользователя?')) {
+                alert(`Пользователь ${id} удален!`);
+            }
+        }
+        
+        function refreshUsers() {
+            alert('Список пользователей обновлен!');
+        }
+        
+        function refreshEvents() {
+            alert('События обновлены!');
+        }
+        
+        function clearEvents() {
+            if (confirm('Вы уверены, что хотите очистить все события?')) {
+                alert('События очищены!');
+            }
+        }
+        
+        function applyFilters() {
+            alert('Фильтры применены!');
+        }
+        
+        function exportData() {
+            alert('Экспорт данных...');
+        }
+        
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

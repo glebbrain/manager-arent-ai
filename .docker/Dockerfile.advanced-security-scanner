@@ -1,0 +1,74 @@
+# Advanced Security Scanner Dockerfile
+# Multi-stage build for optimized production image
+
+# Stage 1: Base image with Node.js and security tools
+FROM node:18-alpine AS base
+
+# Install system dependencies and security tools
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    git \
+    curl \
+    wget \
+    unzip \
+    && rm -rf /var/cache/apk/*
+
+# Install Python security tools
+RUN pip3 install --no-cache-dir \
+    bandit \
+    safety \
+    semgrep \
+    trivy
+
+# Install Node.js security tools
+RUN npm install -g \
+    eslint \
+    eslint-plugin-security \
+    @typescript-eslint/parser \
+    @typescript-eslint/eslint-plugin
+
+# Stage 2: Build stage
+FROM base AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY advanced-security-scanner/package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy application code
+COPY advanced-security-scanner/ ./
+
+# Stage 3: Production stage
+FROM base AS production
+
+# Create non-root user
+RUN addgroup -g 1001 -S scanner && \
+    adduser -S scanner -u 1001
+
+# Set working directory
+WORKDIR /app
+
+# Copy built application
+COPY --from=builder --chown=scanner:scanner /app ./
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/reports /app/cache && \
+    chown -R scanner:scanner /app
+
+# Switch to non-root user
+USER scanner
+
+# Expose port
+EXPOSE 3009
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3009/health || exit 1
+
+# Start the application
+CMD ["node", "server.js"]

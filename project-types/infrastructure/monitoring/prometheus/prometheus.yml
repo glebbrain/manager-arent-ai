@@ -1,0 +1,99 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "rules/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # API Gateway
+  - job_name: 'api-gateway'
+    static_configs:
+      - targets: ['api-gateway:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Dashboard
+  - job_name: 'dashboard'
+    static_configs:
+      - targets: ['dashboard:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Event Bus
+  - job_name: 'event-bus'
+    static_configs:
+      - targets: ['event-bus:4000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Project Manager
+  - job_name: 'project-manager'
+    static_configs:
+      - targets: ['project-manager:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # AI Planner
+  - job_name: 'ai-planner'
+    static_configs:
+      - targets: ['ai-planner:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Workflow Orchestrator
+  - job_name: 'workflow-orchestrator'
+    static_configs:
+      - targets: ['workflow-orchestrator:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Smart Notifications
+  - job_name: 'smart-notifications'
+    static_configs:
+      - targets: ['smart-notifications:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Template Generator
+  - job_name: 'template-generator'
+    static_configs:
+      - targets: ['template-generator:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Consistency Manager
+  - job_name: 'consistency-manager'
+    static_configs:
+      - targets: ['consistency-manager:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # PostgreSQL
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    scrape_interval: 30s
+
+  # Redis
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+
+  # Nginx
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:80']
+    scrape_interval: 30s

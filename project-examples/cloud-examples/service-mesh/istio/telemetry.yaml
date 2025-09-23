@@ -1,0 +1,171 @@
+# Telemetry Configuration for ManagerAgentAI
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: manager-agent-ai-telemetry
+  namespace: manager-agent-ai
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: ALL_METRICS
+      tagOverrides:
+        request_protocol:
+          value: "http"
+        response_code:
+          value: "200"
+        source_service:
+          value: "unknown"
+        destination_service:
+          value: "unknown"
+  tracing:
+  - providers:
+    - name: jaeger
+  - overrides:
+    - match:
+        metric: ALL_METRICS
+      providers:
+        - name: jaeger
+---
+# Access Logging Configuration
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: manager-agent-ai-access-logs
+  namespace: manager-agent-ai
+spec:
+  accessLogging:
+  - providers:
+    - name: otel
+  - overrides:
+    - match:
+        metric: ALL_METRICS
+      providers:
+        - name: otel
+---
+# Metrics Configuration for API Gateway
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: api-gateway-telemetry
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: api-gateway
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: REQUEST_COUNT
+      tagOverrides:
+        source_service:
+          value: "api-gateway"
+        destination_service:
+          value: "unknown"
+    - match:
+        metric: REQUEST_DURATION
+      tagOverrides:
+        source_service:
+          value: "api-gateway"
+        destination_service:
+          value: "unknown"
+    - match:
+        metric: REQUEST_SIZE
+      tagOverrides:
+        source_service:
+          value: "api-gateway"
+        destination_service:
+          value: "unknown"
+    - match:
+        metric: RESPONSE_SIZE
+      tagOverrides:
+        source_service:
+          value: "api-gateway"
+        destination_service:
+          value: "unknown"
+  tracing:
+  - providers:
+    - name: jaeger
+  - overrides:
+    - match:
+        metric: ALL_METRICS
+      providers:
+        - name: jaeger
+---
+# Metrics Configuration for Project Manager
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: project-manager-telemetry
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: project-manager
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: REQUEST_COUNT
+      tagOverrides:
+        source_service:
+          value: "project-manager"
+        destination_service:
+          value: "unknown"
+    - match:
+        metric: REQUEST_DURATION
+      tagOverrides:
+        source_service:
+          value: "project-manager"
+        destination_service:
+          value: "unknown"
+  tracing:
+  - providers:
+    - name: jaeger
+  - overrides:
+    - match:
+        metric: ALL_METRICS
+      providers:
+        - name: jaeger
+---
+# Metrics Configuration for AI Planner
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: ai-planner-telemetry
+  namespace: manager-agent-ai
+spec:
+  selector:
+    matchLabels:
+      app: ai-planner
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: REQUEST_COUNT
+      tagOverrides:
+        source_service:
+          value: "ai-planner"
+        destination_service:
+          value: "unknown"
+    - match:
+        metric: REQUEST_DURATION
+      tagOverrides:
+        source_service:
+          value: "ai-planner"
+        destination_service:
+          value: "unknown"
+  tracing:
+  - providers:
+    - name: jaeger
+  - overrides:
+    - match:
+        metric: ALL_METRICS
+      providers:
+        - name: jaeger

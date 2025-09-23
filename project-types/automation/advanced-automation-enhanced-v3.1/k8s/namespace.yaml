@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: advanced-automation-v3-1
+  labels:
+    name: advanced-automation-v3-1
+    version: "3.1"
+    component: automation
+    tier: advanced

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .api-docs { display: flex; height: 100vh; }
+        .sidebar { width: 300px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .api-header { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .api-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+        .api-subtitle { color: #6b7280; font-size: 1.1rem; margin-bottom: 1rem; }
+        .api-version { display: inline-block; background: #10b981; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500; }
+        .endpoint-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .endpoint-header { display: flex; align-items: center; margin-bottom: 1rem; }
+        .endpoint-method { padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600; margin-right: 1rem; }
+        .method-get { background: #10b981; color: white; }
+        .method-post { background: #2563eb; color: white; }
+        .method-put { background: #f59e0b; color: white; }
+        .method-delete { background: #ef4444; color: white; }
+        .endpoint-path { font-family: 'Monaco', 'Consolas', monospace; font-size: 1.1rem; font-weight: 600; color: #1f2937; }
+        .endpoint-description { color: #6b7280; margin-bottom: 1.5rem; }
+        .endpoint-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb; }
+        .endpoint-tab { padding: 0.75rem 1rem; border: none; background: none; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.3s ease; }
+        .endpoint-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+        .endpoint-content { display: none; }
+        .endpoint-content.active { display: block; }
+        .code-block { background: #1f2937; color: #f9fafb; border-radius: 8px; padding: 1rem; margin: 1rem 0; overflow-x: auto; }
+        .code-block pre { margin: 0; font-family: 'Monaco', 'Consolas', monospace; font-size: 0.9rem; }
+        .code-block .language-label { display: block; background: #374151; color: #9ca3af; padding: 0.5rem 1rem; margin: -1rem -1rem 1rem -1rem; border-radius: 8px 8px 0 0; font-size: 0.8rem; }
+        .parameters-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .parameters-table th, .parameters-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .parameters-table th { background: #f8fafc; font-weight: 600; color: #374151; }
+        .parameter-name { font-family: 'Monaco', 'Consolas', monospace; font-weight: 600; color: #1f2937; }
+        .parameter-type { color: #6b7280; font-size: 0.9rem; }
+        .parameter-required { color: #ef4444; font-size: 0.8rem; font-weight: 500; }
+        .parameter-optional { color: #6b7280; font-size: 0.8rem; }
+        .response-example { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .response-status { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600; margin-right: 0.5rem; }
+        .status-200 { background: #dcfce7; color: #166534; }
+        .status-400 { background: #fef2f2; color: #dc2626; }
+        .status-401 { background: #fef3c7; color: #92400e; }
+        .status-500 { background: #fef2f2; color: #dc2626; }
+        .nav { padding: 1rem; }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-section-title { font-size: 0.8rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; padding: 0 0.75rem; }
+        .nav-item { display: block; padding: 0.75rem; color: #6b7280; text-decoration: none; border-radius: 6px; margin-bottom: 0.25rem; transition: all 0.3s ease; }
+        .nav-item:hover, .nav-item.active { background: #eff6ff; color: #2563eb; }
+        .nav-subitem { padding-left: 1.5rem; font-size: 0.9rem; }
+        .search-box { padding: 1rem; border-bottom: 1px solid #e5e7eb; }
+        .search-input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; }
+        .try-it-section { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .try-it-title { font-weight: 600; color: #1e40af; margin-bottom: 0.5rem; }
+        .try-it-form { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+        .try-it-input { flex: 1; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.9rem; }
+        .try-it-btn { padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+        .response-output { background: #1f2937; color: #f9fafb; border-radius: 4px; padding: 0.75rem; margin-top: 0.75rem; font-family: 'Monaco', 'Consolas', monospace; font-size: 0.8rem; }
+        .auth-section { background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .auth-title { font-weight: 600; color: #92400e; margin-bottom: 0.5rem; }
+        .auth-description { color: #92400e; font-size: 0.9rem; }
+        .api-key-input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-family: 'Monaco', 'Consolas', monospace; font-size: 0.9rem; margin-top: 0.5rem; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.25rem 0.5rem; background: #374151; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+        .code-container { position: relative; }
+        .endpoint-examples { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1rem 0; }
+        .example-card { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; }
+        .example-title { font-weight: 600; color: #1f2937; margin-bottom: 0.5rem; }
+        .example-description { color: #6b7280; font-size: 0.9rem; margin-bottom: 0.75rem; }
+        .example-code { background: #1f2937; color: #f9fafb; border-radius: 4px; padding: 0.75rem; font-family: 'Monaco', 'Consolas', monospace; font-size: 0.8rem; }
+        @media (max-width: 768px) {
+            .api-docs { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .endpoint-tabs { flex-wrap: wrap; }
+            .endpoint-examples { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="api-docs">
+        <div class="sidebar">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Поиск по API..." id="searchInput">
+            </div>
+            <div class="nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Начало работы</div>
+                    <a href="#introduction" class="nav-item active">Введение</a>
+                    <a href="#authentication" class="nav-item">Аутентификация</a>
+                    <a href="#rate-limiting" class="nav-item">Ограничения</a>
+                    <a href="#errors" class="nav-item">Обработка ошибок</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Проекты</div>
+                    <a href="#projects-list" class="nav-item">Список проектов</a>
+                    <a href="#projects-create" class="nav-item">Создание проекта</a>
+                    <a href="#projects-get" class="nav-item">Получение проекта</a>
+                    <a href="#projects-update" class="nav-item">Обновление проекта</a>
+                    <a href="#projects-delete" class="nav-item">Удаление проекта</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Задачи</div>
+                    <a href="#tasks-list" class="nav-item">Список задач</a>
+                    <a href="#tasks-create" class="nav-item">Создание задачи</a>
+                    <a href="#tasks-update" class="nav-item">Обновление задачи</a>
+                    <a href="#tasks-delete" class="nav-item">Удаление задачи</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Пользователи</div>
+                    <a href="#users-list" class="nav-item">Список пользователей</a>
+                    <a href="#users-create" class="nav-item">Создание пользователя</a>
+                    <a href="#users-profile" class="nav-item">Профиль пользователя</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">AI</div>
+                    <a href="#ai-analysis" class="nav-item">AI анализ</a>
+                    <a href="#ai-chat" class="nav-item">AI чат</a>
+                    <a href="#ai-recommendations" class="nav-item">Рекомендации</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-code"></i> API Documentation</h1>
+                <div>
+                    <button class="btn btn-primary" onclick="generateSDK()">
+                        <i class="fas fa-download"></i> Скачать SDK
+                    </button>
+                    <button class="btn btn-secondary" onclick="openPostman()">
+                        <i class="fas fa-external-link-alt"></i> Postman Collection
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="api-header">
+                    <div class="api-title">Universal Project Manager API</div>
+                    <div class="api-subtitle">RESTful API для управления проектами с интеграцией AI</div>
+                    <span class="api-version">v3.1.0</span>
+                </div>
+                
+                <div class="auth-section">
+                    <div class="auth-title">🔑 Аутентификация</div>
+                    <div class="auth-description">Для использования API необходимо получить API ключ. Добавьте его в заголовок Authorization.</div>
+                    <input type="text" class="api-key-input" placeholder="Введите ваш API ключ..." id="apiKey">
+                </div>
+                
+                <div class="endpoint-section" id="introduction">
+                    <div class="endpoint-header">
+                        <span class="endpoint-method method-get">GET</span>
+                        <span class="endpoint-path">/api/v3/introduction</span>
+                    </div>
+                    <div class="endpoint-description">
+                        Получение информации о API и доступных эндпоинтах.
+                    </div>
+                    <div class="endpoint-tabs">
+                        <button class="endpoint-tab active" onclick="switchTab(this, 'intro-request')">Запрос</button>
+                        <button class="endpoint-tab" onclick="switchTab(this, 'intro-response')">Ответ</button>
+                        <button class="endpoint-tab" onclick="switchTab(this, 'intro-examples')">Примеры</button>
+                    </div>
+                    <div class="endpoint-content active" id="intro-request">
+                        <div class="code-container">
+                            <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+                            <div class="code-block">
+                                <span class="language-label">cURL</span>
+                                <pre><code>curl -X GET "https://api.universalpm.com/v3/introduction" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="endpoint-content" id="intro-response">
+                        <div class="response-example">
+                            <span class="response-status status-200">200 OK</span>
+                            <div class="code-container">
+                                <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+                                <div class="code-block">
+                                    <span class="language-label">JSON</span>
+                                    <pre><code>{
+  "success": true,
+  "data": {
+    "api_version": "3.1.0",
+    "name": "Universal Project Manager API",
+    "description": "RESTful API для управления проектами с интеграцией AI",
+    "endpoints": [
+      {
+        "path": "/projects",
+        "methods": ["GET", "POST"],
+        "description": "Управление проектами"
+      },
+      {
+        "path": "/tasks",
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "description": "Управление задачами"
+      }
+    ]
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="endpoint-content" id="intro-examples">
+                        <div class="endpoint-examples">
+                            <div class="example-card">
+                                <div class="example-title">JavaScript</div>
+                                <div class="example-description">Использование с fetch API</div>
+                                <div class="example-code">
+const response = await fetch('https://api.universalpm.com/v3/introduction', {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  }
+});
+const data = await response.json();
+                                </div>
+                            </div>
+                            <div class="example-card">
+                                <div class="example-title">Python</div>
+                                <div class="example-description">Использование с requests</div>
+                                <div class="example-code">
+import requests
+
+response = requests.get(
+    'https://api.universalpm.com/v3/introduction',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    }
+)
+data = response.json()
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="endpoint-section" id="projects-list">
+                    <div class="endpoint-header">
+                        <span class="endpoint-method method-get">GET</span>
+                        <span class="endpoint-path">/api/v3/projects</span>
+                    </div>
+                    <div class="endpoint-description">
+                        Получение списка всех проектов пользователя с возможностью фильтрации и пагинации.
+                    </div>
+                    <div class="endpoint-tabs">
+                        <button class="endpoint-tab active" onclick="switchTab(this, 'projects-list-params')">Параметры</button>
+                        <button class="endpoint-tab" onclick="switchTab(this, 'projects-list-request')">Запрос</button>
+                        <button class="endpoint-tab" onclick="switchTab(this, 'projects-list-response')">Ответ</button>
+                    </div>
+                    <div class="endpoint-content active" id="projects-list-params">
+                        <table class="parameters-table">
+                            <thead>
+                                <tr>
+                                    <th>Параметр</th>
+                                    <th>Тип</th>
+                                    <th>Обязательный</th>
+                                    <th>Описание</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="parameter-name">page</span></td>
+                                    <td><span class="parameter-type">integer</span></td>
+                                    <td><span class="parameter-optional">Нет</span></td>
+                                    <td>Номер страницы (по умолчанию: 1)</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="parameter-name">limit</span></td>
+                                    <td><span class="parameter-type">integer</span></td>
+                                    <td><span class="parameter-optional">Нет</span></td>
+                                    <td>Количество проектов на странице (по умолчанию: 20)</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="parameter-name">status</span></td>
+                                    <td><span class="parameter-type">string</span></td>
+                                    <td><span class="parameter-optional">Нет</span></td>
+                                    <td>Фильтр по статусу (active, completed, archived)</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="parameter-name">search</span></td>
+                                    <td><span class="parameter-type">string</span></td>
+                                    <td><span class="parameter-optional">Нет</span></td>
+                                    <td>Поиск по названию проекта</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="endpoint-content" id="projects-list-request">
+                        <div class="code-container">
+                            <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+                            <div class="code-block">
+                                <span class="language-label">cURL</span>
+                                <pre><code>curl -X GET "https://api.universalpm.com/v3/projects?page=1&limit=10&status=active" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="endpoint-content" id="projects-list-response">
+                        <div class="response-example">
+                            <span class="response-status status-200">200 OK</span>
+                            <div class="code-container">
+                                <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+                                <div class="code-block">
+                                    <span class="language-label">JSON</span>
+                                    <pre><code>{
+  "success": true,
+  "data": {
+    "projects": [
+      {
+        "id": "proj_123",
+        "name": "React E-commerce Platform",
+        "description": "Полнофункциональная платформа электронной коммерции",
+        "status": "active",
+        "progress": 75,
+        "created_at": "2025-01-15T10:30:00Z",
+        "updated_at": "2025-01-31T14:20:00Z",
+        "technologies": ["React", "Node.js", "MongoDB"],
+        "team_size": 5
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 25,
+      "pages": 3
+    }
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="endpoint-section" id="projects-create">
+                    <div class="endpoint-header">
+                        <span class="endpoint-method method-post">POST</span>
+                        <span class="endpoint-path">/api/v3/projects</span>
+                    </div>
+                    <div class="endpoint-description">
+                        Создание нового проекта с указанием основных параметров.
+                    </div>
+                    <div class="endpoint-tabs">
+                        <button class="endpoint-tab active" onclick="switchTab(this, 'projects-create-body')">Тело запроса</button>
+                        <button class="endpoint-tab" onclick="switchTab(this, 'projects-create-request')">Запрос</button>
+                        <button class="endpoint-tab" onclick="switchTab(this, 'projects-create-response')">Ответ</button>
+                    </div>
+                    <div class="endpoint-content active" id="projects-create-body">
+                        <table class="parameters-table">
+                            <thead>
+                                <tr>
+                                    <th>Поле</th>
+                                    <th>Тип</th>
+                                    <th>Обязательное</th>
+                                    <th>Описание</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="parameter-name">name</span></td>
+                                    <td><span class="parameter-type">string</span></td>
+                                    <td><span class="parameter-required">Да</span></td>
+                                    <td>Название проекта</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="parameter-name">description</span></td>
+                                    <td><span class="parameter-type">string</span></td>
+                                    <td><span class="parameter-optional">Нет</span></td>
+                                    <td>Описание проекта</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="parameter-name">technologies</span></td>
+                                    <td><span class="parameter-type">array</span></td>
+                                    <td><span class="parameter-optional">Нет</span></td>
+                                    <td>Список используемых технологий</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="parameter-name">team_members</span></td>
+                                    <td><span class="parameter-type">array</span></td>
+                                    <td><span class="parameter-optional">Нет</span></td>
+                                    <td>Список участников команды</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="endpoint-content" id="projects-create-request">
+                        <div class="code-container">
+                            <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+                            <div class="code-block">
+                                <span class="language-label">cURL</span>
+                                <pre><code>curl -X POST "https://api.universalpm.com/v3/projects" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Vue.js Dashboard",
+    "description": "Административная панель для управления системой",
+    "technologies": ["Vue.js", "TypeScript", "Vite"],
+    "team_members": ["user_123", "user_456"]
+  }'</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="endpoint-content" id="projects-create-response">
+                        <div class="response-example">
+                            <span class="response-status status-200">201 Created</span>
+                            <div class="code-container">
+                                <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+                                <div class="code-block">
+                                    <span class="language-label">JSON</span>
+                                    <pre><code>{
+  "success": true,
+  "data": {
+    "id": "proj_456",
+    "name": "Vue.js Dashboard",
+    "description": "Административная панель для управления системой",
+    "status": "active",
+    "progress": 0,
+    "created_at": "2025-01-31T15:30:00Z",
+    "updated_at": "2025-01-31T15:30:00Z",
+    "technologies": ["Vue.js", "TypeScript", "Vite"],
+    "team_size": 2
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="endpoint-section" id="ai-analysis">
+                    <div class="endpoint-header">
+                        <span class="endpoint-method method-post">POST</span>
+                        <span class="endpoint-path">/api/v3/ai/analysis</span>
+                    </div>
+                    <div class="endpoint-description">
+                        Запуск AI-анализа проекта для получения рекомендаций по оптимизации.
+                    </div>
+                    <div class="endpoint-tabs">
+                        <button class="endpoint-tab active" onclick="switchTab(this, 'ai-analysis-body')">Тело запроса</button>
+                        <button class="endpoint-tab" onclick="switchTab(this, 'ai-analysis-request')">Запрос</button>
+                        <button class="endpoint-tab" onclick="switchTab(this, 'ai-analysis-response')">Ответ</button>
+                    </div>
+                    <div class="endpoint-content active" id="ai-analysis-body">
+                        <table class="parameters-table">
+                            <thead>
+                                <tr>
+                                    <th>Поле</th>
+                                    <th>Тип</th>
+                                    <th>Обязательное</th>
+                                    <th>Описание</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="parameter-name">project_id</span></td>
+                                    <td><span class="parameter-type">string</span></td>
+                                    <td><span class="parameter-required">Да</span></td>
+                                    <td>ID проекта для анализа</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="parameter-name">analysis_type</span></td>
+                                    <td><span class="parameter-type">string</span></td>
+                                    <td><span class="parameter-optional">Нет</span></td>
+                                    <td>Тип анализа (performance, security, quality)</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="parameter-name">ai_model</span></td>
+                                    <td><span class="parameter-type">string</span></td>
+                                    <td><span class="parameter-optional">Нет</span></td>
+                                    <td>AI модель для анализа (gpt4, claude, gemini)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="endpoint-content" id="ai-analysis-request">
+                        <div class="code-container">
+                            <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+                            <div class="code-block">
+                                <span class="language-label">cURL</span>
+                                <pre><code>curl -X POST "https://api.universalpm.com/v3/ai/analysis" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "project_id": "proj_123",
+    "analysis_type": "performance",
+    "ai_model": "gpt4"
+  }'</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="endpoint-content" id="ai-analysis-response">
+                        <div class="response-example">
+                            <span class="response-status status-200">200 OK</span>
+                            <div class="code-container">
+                                <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+                                <div class="code-block">
+                                    <span class="language-label">JSON</span>
+                                    <pre><code>{
+  "success": true,
+  "data": {
+    "analysis_id": "analysis_789",
+    "project_id": "proj_123",
+    "status": "completed",
+    "results": {
+      "performance_score": 92,
+      "security_score": 87,
+      "quality_score": 89,
+      "recommendations": [
+        {
+          "type": "performance",
+          "title": "Оптимизация компонентов",
+          "description": "Использовать React.memo для предотвращения ненужных ре-рендеров",
+          "impact": "high",
+          "confidence": 0.87
+        }
+      ]
+    },
+    "created_at": "2025-01-31T15:45:00Z"
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            initializeSearch();
+        });
+        
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                searchAPI(e.target.value);
+            });
+            
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    scrollToSection(this.getAttribute('href').substring(1));
+                });
+            });
+        }
+        
+        function switchTab(tab, contentId) {
+            // Remove active class from all tabs in this section
+            const section = tab.closest('.endpoint-section');
+            section.querySelectorAll('.endpoint-tab').forEach(t => t.classList.remove('active'));
+            section.querySelectorAll('.endpoint-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            tab.classList.add('active');
+            document.getElementById(contentId).classList.add('active');
+        }
+        
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling.querySelector('code');
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = 'Скопировано!';
+                setTimeout(() => {
+                    button.textContent = 'Копировать';
+                }, 2000);
+            });
+        }
+        
+        function searchAPI(query) {
+            const navItems = document.querySelectorAll('.nav-item');
+            const searchTerm = query.toLowerCase();
+            
+            navItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = searchTerm ? 'none' : 'block';
+                }
+            });
+        }
+        
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        function generateSDK() {
+            alert('Генерация SDK...');
+        }
+        
+        function openPostman() {
+            window.open('https://www.postman.com/universalpm/workspace/universal-project-manager', '_blank');
+        }
+        
+        function initializeSearch() {
+            // Initialize search with empty query to show all items
+            searchAPI('');
+        }
+    </script>
+</body>
+</html>

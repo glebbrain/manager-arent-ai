@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analysis - Universal Project Manager v3.1</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .header { background: #ffffff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .back-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280; }
+        .header-title { font-size: 1.5rem; font-weight: bold; color: #1f2937; }
+        .header-actions { display: flex; gap: 1rem; align-items: center; }
+        .main-container { display: flex; min-height: calc(100vh - 80px); }
+        .sidebar { width: 250px; background: #ffffff; border-right: 1px solid #e5e7eb; padding: 2rem 0; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 2rem; color: #6b7280; text-decoration: none; transition: all 0.2s; }
+        .nav-item:hover, .nav-item.active { background: #f3f4f6; color: #2563eb; }
+        .main-content { flex: 1; padding: 2rem; }
+        .analysis-overview { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+        .metric-card { text-align: center; padding: 1.5rem; background: #f8fafc; border-radius: 0.5rem; }
+        .metric-value { font-size: 2rem; font-weight: bold; color: #1f2937; margin-bottom: 0.5rem; }
+        .metric-label { color: #6b7280; font-size: 0.875rem; }
+        .chart-container { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .chart-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; color: #1f2937; }
+        .chart-canvas { width: 100%; height: 300px; }
+        .recommendations { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .recommendation-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .recommendation-icon { font-size: 1.5rem; }
+        .recommendation-critical { color: #ef4444; }
+        .recommendation-medium { color: #f59e0b; }
+        .recommendation-low { color: #10b981; }
+        .performance-analysis { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .performance-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .performance-value { font-weight: bold; }
+        .performance-good { color: #10b981; }
+        .performance-warning { color: #f59e0b; }
+        .performance-critical { color: #ef4444; }
+        .security-analysis { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .security-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .security-score { font-size: 1.5rem; font-weight: bold; color: #10b981; }
+        .predictive-analytics { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .prediction-item { padding: 1rem; background: #f8fafc; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .prediction-value { font-size: 1.25rem; font-weight: bold; color: #2563eb; }
+        .code-quality { background: #ffffff; padding: 2rem; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .quality-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .quality-bar { width: 200px; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+        .quality-fill { height: 100%; background: #2563eb; transition: width 0.3s; }
+        .action-btn { background: #f3f4f6; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; margin-right: 0.5rem; }
+        .action-btn:hover { background: #2563eb; color: white; }
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; padding: 1rem 0; }
+            .main-content { padding: 1rem; }
+            .metrics-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="back-btn">←</button>
+            <h1 class="header-title">AI Analysis Dashboard</h1>
+        </div>
+        <div class="header-actions">
+            <button class="action-btn">⚙️ Settings</button>
+            <button class="action-btn">📤 Export</button>
+            <button class="action-btn">❓ Help</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <nav class="sidebar">
+            <a href="#" class="nav-item active">📊 Analytics</a>
+            <a href="#" class="nav-item">🔍 Code Review</a>
+            <a href="#" class="nav-item">📈 Trends</a>
+            <a href="#" class="nav-item">⚠️ Risks</a>
+            <a href="#" class="nav-item">💡 Insights</a>
+            <a href="#" class="nav-item">🎯 Predictions</a>
+            <a href="#" class="nav-item">📋 Reports</a>
+            <a href="#" class="nav-item">⚙️ Settings</a>
+        </nav>
+
+        <main class="main-content">
+            <!-- AI Analysis Overview -->
+            <section class="analysis-overview">
+                <h2>🤖 AI Analysis Overview</h2>
+                <p>Project: E-commerce Platform | Analysis: Complete | Confidence: 94%</p>
+                <p>Last Updated: 2 hours ago | Next Analysis: 6 hours</p>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">92/100</div>
+                        <div class="metric-label">Code Quality</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">88/100</div>
+                        <div class="metric-label">Performance</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">95/100</div>
+                        <div class="metric-label">Security</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">87%</div>
+                        <div class="metric-label">Team Productivity</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Analysis Chart -->
+            <section class="chart-container">
+                <h3 class="chart-title">📈 Code Analysis Trends</h3>
+                <canvas id="codeQualityChart" class="chart-canvas"></canvas>
+            </section>
+
+            <!-- AI Recommendations -->
+            <section class="recommendations">
+                <h2>💡 AI Recommendations (High Priority)</h2>
+                <div class="recommendation-item">
+                    <div class="recommendation-icon recommendation-critical">🔴</div>
+                    <div>
+                        <strong>Critical:</strong> Refactor UserService class - 3 code smells detected
+                    </div>
+                </div>
+                <div class="recommendation-item">
+                    <div class="recommendation-icon recommendation-medium">🟡</div>
+                    <div>
+                        <strong>Medium:</strong> Add unit tests for PaymentProcessor - 0% coverage
+                    </div>
+                </div>
+                <div class="recommendation-item">
+                    <div class="recommendation-icon recommendation-low">🟢</div>
+                    <div>
+                        <strong>Low:</strong> Optimize database queries - potential 20% improvement
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <button class="action-btn">Apply All</button>
+                    <button class="action-btn">Review Details</button>
+                    <button class="action-btn">Schedule Fix</button>
+                    <button class="action-btn">Dismiss</button>
+                </div>
+            </section>
+
+            <!-- Performance Analysis -->
+            <section class="performance-analysis">
+                <h2>⚡ Performance Analysis</h2>
+                <div class="performance-item">
+                    <span>Response Time:</span>
+                    <span class="performance-value performance-warning">245ms (Target: <200ms) ⚠️</span>
+                </div>
+                <div class="performance-item">
+                    <span>Memory Usage:</span>
+                    <span class="performance-value performance-good">512MB (Target: <1GB) ✅</span>
+                </div>
+                <div class="performance-item">
+                    <span>CPU Usage:</span>
+                    <span class="performance-value performance-good">78% (Target: <80%) ✅</span>
+                </div>
+                <div class="performance-item">
+                    <span>Database Queries:</span>
+                    <span class="performance-value performance-warning">156 (Target: <100) ⚠️</span>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <h4>Top Slow Queries:</h4>
+                    <div style="margin-top: 0.5rem;">
+                        <div>1. SELECT * FROM users WHERE... (45ms)</div>
+                        <div>2. JOIN orders, products... (38ms)</div>
+                        <div>3. COUNT(*) FROM transactions... (32ms)</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Security Analysis -->
+            <section class="security-analysis">
+                <h2>🔒 Security Analysis</h2>
+                <div class="security-item">
+                    <span>Vulnerabilities:</span>
+                    <span>2 (High: 1, Medium: 1)</span>
+                </div>
+                <div class="security-item">
+                    <span>Dependencies:</span>
+                    <span>156 packages (3 outdated)</span>
+                </div>
+                <div class="security-item">
+                    <span>Secrets:</span>
+                    <span class="performance-good">0 exposed secrets ✅</span>
+                </div>
+                <div class="security-item">
+                    <span>Permissions:</span>
+                    <span class="performance-warning">12 files with 777 permissions ⚠️</span>
+                </div>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <div class="security-score">95/100</div>
+                    <div>Security Score</div>
+                </div>
+            </section>
+
+            <!-- Predictive Analytics -->
+            <section class="predictive-analytics">
+                <h2>🔮 Predictive Analytics</h2>
+                <div class="prediction-item">
+                    <div><strong>Project Completion:</strong> 85% (Estimated: 2 weeks)</div>
+                </div>
+                <div class="prediction-item">
+                    <div><strong>Risk Level:</strong> Medium (3 potential issues)</div>
+                </div>
+                <div class="prediction-item">
+                    <div><strong>Resource Needs:</strong> 2 additional developers recommended</div>
+                </div>
+                <div class="prediction-item">
+                    <div><strong>Budget Impact:</strong> +15% (due to complexity increase)</div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <h4>Timeline Prediction:</h4>
+                    <div style="margin-top: 0.5rem;">
+                        <div>Q1 2025: ████████████ 100% Complete</div>
+                        <div>Q2 2025: ████████████ 100% Complete</div>
+                        <div>Q3 2025: ██████████ 85% Complete</div>
+                        <div>Q4 2025: ██████ 60% Complete</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Quality Breakdown -->
+            <section class="code-quality">
+                <h2>📊 Code Quality Breakdown</h2>
+                <div class="quality-item">
+                    <span>Maintainability:</span>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="quality-bar">
+                            <div class="quality-fill" style="width: 88%"></div>
+                        </div>
+                        <span>88/100</span>
+                    </div>
+                </div>
+                <div class="quality-item">
+                    <span>Reliability:</span>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="quality-bar">
+                            <div class="quality-fill" style="width: 92%"></div>
+                        </div>
+                        <span>92/100</span>
+                    </div>
+                </div>
+                <div class="quality-item">
+                    <span>Security:</span>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="quality-bar">
+                            <div class="quality-fill" style="width: 95%"></div>
+                        </div>
+                        <span>95/100</span>
+                    </div>
+                </div>
+                <div class="quality-item">
+                    <span>Performance:</span>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="quality-bar">
+                            <div class="quality-fill" style="width: 85%"></div>
+                        </div>
+                        <span>85/100</span>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <h4>Issues by Category:</h4>
+                    <div style="margin-top: 0.5rem;">
+                        <div>Code Smells: 12 (↓3 from last week)</div>
+                        <div>Bugs: 3 (↓1 from last week)</div>
+                        <div>Vulnerabilities: 2 (↑1 from last week)</div>
+                        <div>Duplications: 5% (↓2% from last week)</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Chart.js
+            const ctx = document.getElementById('codeQualityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Code Quality Score',
+                        data: [75, 80, 85, 88, 90, 92],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Add interactive functionality
+            const actionBtns = document.querySelectorAll('.action-btn');
+            actionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    console.log('Action clicked:', this.textContent);
+                });
+            });
+
+            // Simulate real-time updates
+            setInterval(() => {
+                updateMetrics();
+            }, 30000);
+        });
+
+        function updateMetrics() {
+            // Simulate real-time metric updates
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                if (metric.textContent.includes('/100')) {
+                    const currentValue = parseInt(metric.textContent);
+                    const change = Math.random() > 0.5 ? 1 : -1;
+                    const newValue = Math.max(0, Math.min(100, currentValue + change));
+                    metric.textContent = newValue + '/100';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

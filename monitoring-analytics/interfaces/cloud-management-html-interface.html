@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Management - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .cloud-management { display: flex; height: 100vh; }
+        .sidebar { width: 280px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .cloud-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; }
+        .cloud-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .cloud-subtitle { font-size: 1.1rem; opacity: 0.9; margin-bottom: 1.5rem; }
+        .cloud-stats { display: flex; gap: 2rem; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-label { font-size: 0.9rem; opacity: 0.8; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .metric-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .metric-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .metric-title { font-size: 0.9rem; font-weight: 500; color: #6b7280; }
+        .metric-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .metric-value { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+        .metric-change { font-size: 0.8rem; display: flex; align-items: center; gap: 0.25rem; }
+        .metric-change.positive { color: #10b981; }
+        .metric-change.negative { color: #ef4444; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .chart-container { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .chart-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem; }
+        .chart-canvas { width: 100%; height: 300px; }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .service-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.3s ease; }
+        .service-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .service-header { display: flex; align-items: center; margin-bottom: 1rem; }
+        .service-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 1rem; }
+        .service-info { flex: 1; }
+        .service-name { font-size: 1.1rem; font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; }
+        .service-type { color: #6b7280; font-size: 0.9rem; }
+        .service-status { padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500; }
+        .status-running { background: #dcfce7; color: #166534; }
+        .status-stopped { background: #f3f4f6; color: #6b7280; }
+        .status-error { background: #fef2f2; color: #dc2626; }
+        .service-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+        .service-metric { text-align: center; }
+        .service-metric-value { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .service-metric-label { color: #6b7280; font-size: 0.8rem; }
+        .service-actions { display: flex; gap: 0.5rem; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        .nav { padding: 1rem; }
+        .nav-item { display: block; padding: 0.75rem; color: #6b7280; text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .nav-item:hover, .nav-item.active { background: #eff6ff; color: #2563eb; }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-section-title { font-size: 0.8rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; padding: 0 0.75rem; }
+        .deployments-table { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .table-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .table-actions { display: flex; gap: 0.5rem; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .table th { background: #f8fafc; font-weight: 600; color: #374151; }
+        .table tbody tr:hover { background: #f8fafc; }
+        .status-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 500; }
+        .status-deployed { background: #dcfce7; color: #166534; }
+        .status-deploying { background: #dbeafe; color: #1e40af; }
+        .status-failed { background: #fef2f2; color: #dc2626; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .filters { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .filters-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .filter-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .filter-group label { font-size: 0.9rem; font-weight: 500; color: #374151; }
+        .filter-select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; font-size: 0.9rem; }
+        .search-input { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; width: 200px; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 12px; padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-title { font-size: 1.3rem; font-weight: 600; color: #1f2937; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; color: #6b7280; cursor: pointer; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .logs-section { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .logs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .logs-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .logs-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 300px; overflow-y: auto; }
+        .log-item { display: flex; align-items: center; padding: 0.75rem; background: #f8fafc; border-radius: 6px; }
+        .log-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem; font-size: 0.8rem; }
+        .log-content { flex: 1; }
+        .log-message { font-weight: 500; color: #1f2937; margin-bottom: 0.25rem; }
+        .log-time { color: #6b7280; font-size: 0.8rem; }
+        .log-status { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 500; margin-left: 0.5rem; }
+        .status-success { background: #dcfce7; color: #166534; }
+        .status-error { background: #fef2f2; color: #dc2626; }
+        .status-warning { background: #fef3c7; color: #92400e; }
+        .status-info { background: #dbeafe; color: #1e40af; }
+        @media (max-width: 768px) {
+            .cloud-management { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .charts-grid, .services-grid { grid-template-columns: 1fr; }
+            .filters-row { flex-direction: column; align-items: stretch; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cloud-management">
+        <div class="sidebar">
+            <div class="nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Облачные сервисы</div>
+                    <a href="#" class="nav-item active"><i class="fas fa-cloud"></i> Обзор</a>
+                    <a href="#" class="nav-item"><i class="fas fa-server"></i> Серверы</a>
+                    <a href="#" class="nav-item"><i class="fas fa-database"></i> Базы данных</a>
+                    <a href="#" class="nav-item"><i class="fas fa-storage"></i> Хранилище</a>
+                    <a href="#" class="nav-item"><i class="fas fa-network-wired"></i> Сеть</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Развертывание</div>
+                    <a href="#" class="nav-item"><i class="fas fa-rocket"></i> Деплои</a>
+                    <a href="#" class="nav-item"><i class="fas fa-cogs"></i> CI/CD</a>
+                    <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Мониторинг</a>
+                    <a href="#" class="nav-item"><i class="fas fa-shield-alt"></i> Безопасность</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Провайдеры</div>
+                    <a href="#" class="nav-item"><i class="fab fa-aws"></i> AWS</a>
+                    <a href="#" class="nav-item"><i class="fab fa-microsoft"></i> Azure</a>
+                    <a href="#" class="nav-item"><i class="fab fa-google"></i> GCP</a>
+                    <a href="#" class="nav-item"><i class="fas fa-cube"></i> Kubernetes</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-cloud"></i> Cloud Management</h1>
+                <div>
+                    <button class="btn btn-primary" onclick="openDeployModal()">
+                        <i class="fas fa-rocket"></i> Развернуть
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshCloud()">
+                        <i class="fas fa-sync"></i> Обновить
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="cloud-header">
+                    <div class="cloud-title">Облачная инфраструктура</div>
+                    <div class="cloud-subtitle">Управление облачными сервисами и развертывание приложений</div>
+                    <div class="cloud-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Активных сервисов</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Развертываний</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">99.9%</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">$2,450</div>
+                            <div class="stat-label">За месяц</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filters">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label>Провайдер</label>
+                            <select class="filter-select" id="providerFilter">
+                                <option value="all">Все провайдеры</option>
+                                <option value="aws">AWS</option>
+                                <option value="azure">Azure</option>
+                                <option value="gcp">Google Cloud</option>
+                                <option value="kubernetes">Kubernetes</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Статус</label>
+                            <select class="filter-select" id="statusFilter">
+                                <option value="all">Все статусы</option>
+                                <option value="running">Запущено</option>
+                                <option value="stopped">Остановлено</option>
+                                <option value="error">Ошибка</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Поиск</label>
+                            <input type="text" class="search-input" placeholder="Поиск сервисов...">
+                        </div>
+                        <button class="btn btn-primary" onclick="applyFilters()">Применить</button>
+                    </div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">CPU Использование</span>
+                            <div class="metric-icon" style="background: #2563eb; color: white;">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">67%</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +5% за час
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Память</span>
+                            <div class="metric-icon" style="background: #10b981; color: white;">
+                                <i class="fas fa-memory"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">4.2GB</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +0.3GB за час
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Диск</span>
+                            <div class="metric-icon" style="background: #f59e0b; color: white;">
+                                <i class="fas fa-hdd"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">156GB</div>
+                        <div class="metric-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            -2GB за час
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Сеть</span>
+                            <div class="metric-icon" style="background: #8b5cf6; color: white;">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">2.1MB/s</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +0.3MB/s за час
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">Использование ресурсов</div>
+                        <canvas id="resourceChart" class="chart-canvas"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">Стоимость по провайдерам</div>
+                        <canvas id="costChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon" style="background: #ff9900; color: white;">
+                                <i class="fab fa-aws"></i>
+                            </div>
+                            <div class="service-info">
+                                <div class="service-name">EC2 Instance</div>
+                                <div class="service-type">AWS - t3.medium</div>
+                            </div>
+                            <span class="service-status status-running">Запущено</span>
+                        </div>
+                        <div class="service-metrics">
+                            <div class="service-metric">
+                                <div class="service-metric-value">67%</div>
+                                <div class="service-metric-label">CPU</div>
+                            </div>
+                            <div class="service-metric">
+                                <div class="service-metric-value">4.2GB</div>
+                                <div class="service-metric-label">RAM</div>
+                            </div>
+                            <div class="service-metric">
+                                <div class="service-metric-value">156GB</div>
+                                <div class="service-metric-label">Диск</div>
+                            </div>
+                            <div class="service-metric">
+                                <div class="service-metric-value">$45</div>
+                                <div class="service-metric-label">За месяц</div>
+                            </div>
+                        </div>
+                        <div class="service-actions">
+                            <button class="btn btn-sm btn-primary" onclick="manageService('ec2')">Управление</button>
+                            <button class="btn btn-sm btn-warning" onclick="restartService('ec2')">Перезапуск</button>
+                            <button class="btn btn-sm btn-danger" onclick="stopService('ec2')">Остановить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon" style="background: #0078d4; color: white;">
+                                <i class="fab fa-microsoft"></i>
+                            </div>
+                            <div class="service-info">
+                                <div class="service-name">Azure App Service</div>
+                                <div class="service-type">Azure - B1</div>
+                            </div>
+                            <span class="service-status status-running">Запущено</span>
+                        </div>
+                        <div class="service-metrics">
+                            <div class="service-metric">
+                                <div class="service-metric-value">45%</div>
+                                <div class="service-metric-label">CPU</div>
+                            </div>
+                            <div class="service-metric">
+                                <div class="service-metric-value">1.7GB</div>
+                                <div class="service-metric-label">RAM</div>
+                            </div>
+                            <div class="service-metric">
+                                <div class="service-metric-value">89GB</div>
+                                <div class="service-metric-label">Диск</div>
+                            </div>
+                            <div class="service-metric">
+                                <div class="service-metric-value">$32</div>
+                                <div class="service-metric-label">За месяц</div>
+                            </div>
+                        </div>
+                        <div class="service-actions">
+                            <button class="btn btn-sm btn-primary" onclick="manageService('azure')">Управление</button>
+                            <button class="btn btn-sm btn-warning" onclick="restartService('azure')">Перезапуск</button>
+                            <button class="btn btn-sm btn-danger" onclick="stopService('azure')">Остановить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon" style="background: #4285f4; color: white;">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="service-info">
+                                <div class="service-name">GKE Cluster</div>
+                                <div class="service-type">Google Cloud - n1-standard-2</div>
+                            </div>
+                            <span class="service-status status-running">Запущено</span>
+                        </div>
+                        <div class="service-metrics">
+                            <div class="service-metric">
+                                <div class="service-metric-value">78%</div>
+                                <div class="service-metric-label">CPU</div>
+                            </div>
+                            <div class="service-metric">
+                                <div class="service-metric-value">7.5GB</div>
+                                <div class="service-metric-label">RAM</div>
+                            </div>
+                            <div class="service-metric">
+                                <div class="service-metric-value">234GB</div>
+                                <div class="service-metric-label">Диск</div>
+                            </div>
+                            <div class="service-metric">
+                                <div class="service-metric-value">$68</div>
+                                <div class="service-metric-label">За месяц</div>
+                            </div>
+                        </div>
+                        <div class="service-actions">
+                            <button class="btn btn-sm btn-primary" onclick="manageService('gke')">Управление</button>
+                            <button class="btn btn-sm btn-warning" onclick="restartService('gke')">Перезапуск</button>
+                            <button class="btn btn-sm btn-danger" onclick="stopService('gke')">Остановить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon" style="background: #326ce5; color: white;">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <div class="service-info">
+                                <div class="service-name">Kubernetes Pod</div>
+                                <div class="service-type">K8s - 2 replicas</div>
+                            </div>
+                            <span class="service-status status-error">Ошибка</span>
+                        </div>
+                        <div class="service-metrics">
+                            <div class="service-metric">
+                                <div class="service-metric-value">0%</div>
+                                <div class="service-metric-label">CPU</div>
+                            </div>
+                            <div class="service-metric">
+                                <div class="service-metric-value">0GB</div>
+                                <div class="service-metric-label">RAM</div>
+                            </div>
+                            <div class="service-metric">
+                                <div class="service-metric-value">0GB</div>
+                                <div class="service-metric-label">Диск</div>
+                            </div>
+                            <div class="service-metric">
+                                <div class="service-metric-value">$0</div>
+                                <div class="service-metric-label">За месяц</div>
+                            </div>
+                        </div>
+                        <div class="service-actions">
+                            <button class="btn btn-sm btn-primary" onclick="manageService('k8s')">Управление</button>
+                            <button class="btn btn-sm btn-success" onclick="startService('k8s')">Запустить</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewLogs('k8s')">Логи</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="deployments-table">
+                    <div class="table-header">
+                        <div class="table-title">Развертывания</div>
+                        <div class="table-actions">
+                            <button class="btn btn-sm btn-primary" onclick="refreshDeployments()">Обновить</button>
+                            <button class="btn btn-sm btn-success" onclick="openDeployModal()">Новое развертывание</button>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Приложение</th>
+                                <th>Версия</th>
+                                <th>Провайдер</th>
+                                <th>Статус</th>
+                                <th>Время развертывания</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center;">
+                                        <div style="width: 32px; height: 32px; border-radius: 6px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; margin-right: 8px; font-size: 12px;">R</div>
+                                        <div>
+                                            <div style="font-weight: 500;">React E-commerce</div>
+                                            <div style="font-size: 12px; color: #6b7280;">production</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>v2.1.0</td>
+                                <td>AWS</td>
+                                <td><span class="status-badge status-deployed">Развернуто</span></td>
+                                <td>2 часа назад</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="viewDeployment('react')">Просмотр</button>
+                                    <button class="btn btn-sm btn-danger" onclick="rollbackDeployment('react')">Откат</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center;">
+                                        <div style="width: 32px; height: 32px; border-radius: 6px; background: #10b981; color: white; display: flex; align-items: center; justify-content: center; margin-right: 8px; font-size: 12px;">V</div>
+                                        <div>
+                                            <div style="font-weight: 500;">Vue Dashboard</div>
+                                            <div style="font-size: 12px; color: #6b7280;">staging</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>v1.5.2</td>
+                                <td>Azure</td>
+                                <td><span class="status-badge status-deploying">Развертывание</span></td>
+                                <td>15 минут назад</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="viewDeployment('vue')">Просмотр</button>
+                                    <button class="btn btn-sm btn-warning" onclick="cancelDeployment('vue')">Отмена</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center;">
+                                        <div style="width: 32px; height: 32px; border-radius: 6px; background: #f59e0b; color: white; display: flex; align-items: center; justify-content: center; margin-right: 8px; font-size: 12px;">N</div>
+                                        <div>
+                                            <div style="font-weight: 500;">Node.js API</div>
+                                            <div style="font-size: 12px; color: #6b7280;">development</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>v3.0.1</td>
+                                <td>GCP</td>
+                                <td><span class="status-badge status-failed">Ошибка</span></td>
+                                <td>1 час назад</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="viewDeployment('node')">Просмотр</button>
+                                    <button class="btn btn-sm btn-success" onclick="retryDeployment('node')">Повторить</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="logs-section">
+                    <div class="logs-header">
+                        <h3 class="logs-title">Логи развертывания</h3>
+                        <button class="btn btn-sm btn-secondary" onclick="refreshLogs()">Обновить</button>
+                    </div>
+                    <div class="logs-list">
+                        <div class="log-item">
+                            <div class="log-icon" style="background: #10b981; color: white;">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="log-content">
+                                <div class="log-message">React E-commerce успешно развернут на AWS</div>
+                                <div class="log-time">2 часа назад</div>
+                            </div>
+                            <span class="log-status status-success">Успешно</span>
+                        </div>
+                        <div class="log-item">
+                            <div class="log-icon" style="background: #2563eb; color: white;">
+                                <i class="fas fa-info"></i>
+                            </div>
+                            <div class="log-content">
+                                <div class="log-message">Vue Dashboard развертывается на Azure</div>
+                                <div class="log-time">15 минут назад</div>
+                            </div>
+                            <span class="log-status status-info">Информация</span>
+                        </div>
+                        <div class="log-item">
+                            <div class="log-icon" style="background: #ef4444; color: white;">
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <div class="log-content">
+                                <div class="log-message">Ошибка развертывания Node.js API на GCP</div>
+                                <div class="log-time">1 час назад</div>
+                            </div>
+                            <span class="log-status status-error">Ошибка</span>
+                        </div>
+                        <div class="log-item">
+                            <div class="log-icon" style="background: #f59e0b; color: white;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="log-content">
+                                <div class="log-message">Kubernetes Pod не может запуститься</div>
+                                <div class="log-time">3 часа назад</div>
+                            </div>
+                            <span class="log-status status-warning">Предупреждение</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Deploy Modal -->
+    <div id="deployModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Новое развертывание</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="deployForm">
+                <div class="form-group">
+                    <label for="appName">Название приложения</label>
+                    <input type="text" id="appName" placeholder="Введите название приложения" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="appVersion">Версия</label>
+                        <input type="text" id="appVersion" placeholder="v1.0.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="provider">Провайдер</label>
+                        <select id="provider" required>
+                            <option value="">Выберите провайдера</option>
+                            <option value="aws">AWS</option>
+                            <option value="azure">Azure</option>
+                            <option value="gcp">Google Cloud</option>
+                            <option value="kubernetes">Kubernetes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="environment">Окружение</label>
+                    <select id="environment" required>
+                        <option value="development">Development</option>
+                        <option value="staging">Staging</option>
+                        <option value="production">Production</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="deployConfig">Конфигурация развертывания</label>
+                    <textarea id="deployConfig" placeholder="YAML конфигурация или команды развертывания"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Развернуть</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            setupEventListeners();
+        });
+        
+        function initializeCharts() {
+            // Resource Usage Chart
+            const resourceCtx = document.getElementById('resourceChart').getContext('2d');
+            new Chart(resourceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                    datasets: [{
+                        label: 'CPU (%)',
+                        data: [45, 52, 48, 67, 72, 65, 58],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Memory (%)',
+                        data: [35, 42, 38, 55, 62, 58, 52],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+            
+            // Cost Chart
+            const costCtx = document.getElementById('costChart').getContext('2d');
+            new Chart(costCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['AWS', 'Azure', 'Google Cloud', 'Kubernetes'],
+                    datasets: [{
+                        data: [45, 32, 18, 5],
+                        backgroundColor: ['#ff9900', '#0078d4', '#4285f4', '#326ce5']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function setupEventListeners() {
+            // Form submission
+            document.getElementById('deployForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                deployApplication();
+            });
+        }
+        
+        function openDeployModal() {
+            document.getElementById('deployModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+        
+        function deployApplication() {
+            const form = document.getElementById('deployForm');
+            const formData = new FormData(form);
+            
+            // Simulate deployment
+            alert('Развертывание запущено!');
+            form.reset();
+            closeModal();
+        }
+        
+        function manageService(service) {
+            alert(`Управление сервисом: ${service}`);
+        }
+        
+        function restartService(service) {
+            if (confirm(`Перезапустить сервис ${service}?`)) {
+                alert(`Сервис ${service} перезапущен!`);
+            }
+        }
+        
+        function stopService(service) {
+            if (confirm(`Остановить сервис ${service}?`)) {
+                alert(`Сервис ${service} остановлен!`);
+            }
+        }
+        
+        function startService(service) {
+            alert(`Сервис ${service} запущен!`);
+        }
+        
+        function viewLogs(service) {
+            alert(`Логи сервиса: ${service}`);
+        }
+        
+        function viewDeployment(deployment) {
+            alert(`Просмотр развертывания: ${deployment}`);
+        }
+        
+        function rollbackDeployment(deployment) {
+            if (confirm(`Откатить развертывание ${deployment}?`)) {
+                alert(`Развертывание ${deployment} откачено!`);
+            }
+        }
+        
+        function cancelDeployment(deployment) {
+            if (confirm(`Отменить развертывание ${deployment}?`)) {
+                alert(`Развертывание ${deployment} отменено!`);
+            }
+        }
+        
+        function retryDeployment(deployment) {
+            alert(`Повтор развертывания: ${deployment}`);
+        }
+        
+        function refreshCloud() {
+            alert('Облачная инфраструктура обновлена!');
+        }
+        
+        function refreshDeployments() {
+            alert('Развертывания обновлены!');
+        }
+        
+        function refreshLogs() {
+            alert('Логи обновлены!');
+        }
+        
+        function applyFilters() {
+            const provider = document.getElementById('providerFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            console.log('Applying filters:', { provider, status });
+            alert('Фильтры применены!');
+        }
+        
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

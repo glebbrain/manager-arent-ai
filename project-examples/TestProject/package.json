@@ -1,0 +1,21 @@
+{
+  "name": "test-project",
+  "version": "1.0.0",
+  "description": "Test project for DEV->PROM->PROD deployment workflow",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 3000",
+    "test": "echo 'Tests passed!'",
+    "build": "echo 'Build completed!'"
+  },
+  "keywords": [
+    "test",
+    "deployment",
+    "dev-prom-prod"
+  ],
+  "author": "ManagerAgentAI",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

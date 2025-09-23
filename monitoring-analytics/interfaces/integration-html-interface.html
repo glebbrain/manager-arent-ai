@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrations - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .integrations { display: flex; height: 100vh; }
+        .sidebar { width: 280px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .integrations-header { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .integrations-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+        .integrations-subtitle { color: #6b7280; font-size: 1.1rem; margin-bottom: 1rem; }
+        .integrations-stats { display: flex; gap: 2rem; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: #1f2937; }
+        .stat-label { color: #6b7280; font-size: 0.9rem; }
+        .integrations-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .integration-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.3s ease; }
+        .integration-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .integration-header { display: flex; align-items: center; margin-bottom: 1rem; }
+        .integration-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 1rem; }
+        .integration-info { flex: 1; }
+        .integration-name { font-size: 1.2rem; font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; }
+        .integration-category { color: #6b7280; font-size: 0.9rem; }
+        .integration-status { padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500; }
+        .status-connected { background: #dcfce7; color: #166534; }
+        .status-disconnected { background: #f3f4f6; color: #6b7280; }
+        .status-error { background: #fef2f2; color: #dc2626; }
+        .integration-description { color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.5; }
+        .integration-features { margin-bottom: 1rem; }
+        .feature-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .feature-tag { padding: 0.25rem 0.5rem; background: #eff6ff; color: #2563eb; border-radius: 4px; font-size: 0.8rem; }
+        .integration-actions { display: flex; gap: 0.5rem; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-outline { background: transparent; border: 1px solid #d1d5db; color: #374151; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        .nav { padding: 1rem; }
+        .nav-item { display: block; padding: 0.75rem; color: #6b7280; text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .nav-item:hover, .nav-item.active { background: #eff6ff; color: #2563eb; }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-section-title { font-size: 0.8rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; padding: 0 0.75rem; }
+        .filters { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .filters-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .filter-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .filter-group label { font-size: 0.9rem; font-weight: 500; color: #374151; }
+        .filter-select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; font-size: 0.9rem; }
+        .search-input { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; width: 200px; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 12px; padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-title { font-size: 1.3rem; font-weight: 600; color: #1f2937; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; color: #6b7280; cursor: pointer; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .integration-details { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .details-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .details-actions { display: flex; gap: 0.5rem; }
+        .details-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        .detail-item { background: #f8fafc; border-radius: 8px; padding: 1rem; }
+        .detail-label { font-size: 0.8rem; font-weight: 500; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .detail-value { font-weight: 600; color: #1f2937; }
+        .logs-section { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .logs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .logs-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .logs-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .log-item { display: flex; align-items: center; padding: 0.75rem; background: #f8fafc; border-radius: 6px; }
+        .log-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem; font-size: 0.8rem; }
+        .log-content { flex: 1; }
+        .log-message { font-weight: 500; color: #1f2937; margin-bottom: 0.25rem; }
+        .log-time { color: #6b7280; font-size: 0.8rem; }
+        .log-status { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 500; margin-left: 0.5rem; }
+        .status-success { background: #dcfce7; color: #166534; }
+        .status-error { background: #fef2f2; color: #dc2626; }
+        .status-warning { background: #fef3c7; color: #92400e; }
+        .api-keys { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .api-key-item { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #f8fafc; border-radius: 8px; margin-bottom: 1rem; }
+        .api-key-info { flex: 1; }
+        .api-key-name { font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; }
+        .api-key-value { font-family: 'Monaco', 'Consolas', monospace; color: #6b7280; font-size: 0.9rem; }
+        .api-key-actions { display: flex; gap: 0.5rem; }
+        @media (max-width: 768px) {
+            .integrations { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .integrations-grid { grid-template-columns: 1fr; }
+            .filters-row { flex-direction: column; align-items: stretch; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="integrations">
+        <div class="sidebar">
+            <div class="nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Навигация</div>
+                    <a href="#" class="nav-item active"><i class="fas fa-plug"></i> Все интеграции</a>
+                    <a href="#" class="nav-item"><i class="fas fa-check-circle"></i> Активные</a>
+                    <a href="#" class="nav-item"><i class="fas fa-times-circle"></i> Неактивные</a>
+                    <a href="#" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Ошибки</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Категории</div>
+                    <a href="#" class="nav-item"><i class="fab fa-github"></i> Git репозитории</a>
+                    <a href="#" class="nav-item"><i class="fas fa-project-diagram"></i> Управление проектами</a>
+                    <a href="#" class="nav-item"><i class="fas fa-comments"></i> Коммуникации</a>
+                    <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Аналитика</a>
+                    <a href="#" class="nav-item"><i class="fas fa-cloud"></i> Облачные сервисы</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-plug"></i> Интеграции</h1>
+                <div>
+                    <button class="btn btn-primary" onclick="openAddIntegrationModal()">
+                        <i class="fas fa-plus"></i> Добавить интеграцию
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshIntegrations()">
+                        <i class="fas fa-sync"></i> Обновить
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="integrations-header">
+                    <div class="integrations-title">Управление интеграциями</div>
+                    <div class="integrations-subtitle">Подключите внешние сервисы для расширения функциональности Universal Project Manager</div>
+                    <div class="integrations-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Активных</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Ошибок</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">25</div>
+                            <div class="stat-label">Доступно</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filters">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label>Категория</label>
+                            <select class="filter-select" id="categoryFilter">
+                                <option value="all">Все категории</option>
+                                <option value="git">Git репозитории</option>
+                                <option value="project">Управление проектами</option>
+                                <option value="communication">Коммуникации</option>
+                                <option value="analytics">Аналитика</option>
+                                <option value="cloud">Облачные сервисы</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Статус</label>
+                            <select class="filter-select" id="statusFilter">
+                                <option value="all">Все статусы</option>
+                                <option value="connected">Подключено</option>
+                                <option value="disconnected">Отключено</option>
+                                <option value="error">Ошибка</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Поиск</label>
+                            <input type="text" class="search-input" placeholder="Поиск интеграций...">
+                        </div>
+                        <button class="btn btn-primary" onclick="applyFilters()">Применить</button>
+                    </div>
+                </div>
+                
+                <div class="integrations-grid">
+                    <div class="integration-card">
+                        <div class="integration-header">
+                            <div class="integration-icon" style="background: #24292e; color: white;">
+                                <i class="fab fa-github"></i>
+                            </div>
+                            <div class="integration-info">
+                                <div class="integration-name">GitHub</div>
+                                <div class="integration-category">Git репозитории</div>
+                            </div>
+                            <span class="integration-status status-connected">Подключено</span>
+                        </div>
+                        <div class="integration-description">
+                            Синхронизация репозиториев, коммитов и pull requests. Автоматическое создание задач из issues.
+                        </div>
+                        <div class="integration-features">
+                            <div class="feature-list">
+                                <span class="feature-tag">Синхронизация репозиториев</span>
+                                <span class="feature-tag">Автоматические задачи</span>
+                                <span class="feature-tag">Code review</span>
+                            </div>
+                        </div>
+                        <div class="integration-actions">
+                            <button class="btn btn-sm btn-primary" onclick="configureIntegration('github')">Настроить</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewDetails('github')">Детали</button>
+                            <button class="btn btn-sm btn-danger" onclick="disconnectIntegration('github')">Отключить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="integration-card">
+                        <div class="integration-header">
+                            <div class="integration-icon" style="background: #007acc; color: white;">
+                                <i class="fab fa-microsoft"></i>
+                            </div>
+                            <div class="integration-info">
+                                <div class="integration-name">Azure DevOps</div>
+                                <div class="integration-category">Управление проектами</div>
+                            </div>
+                            <span class="integration-status status-connected">Подключено</span>
+                        </div>
+                        <div class="integration-description">
+                            Интеграция с Azure DevOps для управления проектами, CI/CD пайплайнами и рабочими элементами.
+                        </div>
+                        <div class="integration-features">
+                            <div class="feature-list">
+                                <span class="feature-tag">Work Items</span>
+                                <span class="feature-tag">CI/CD пайплайны</span>
+                                <span class="feature-tag">Тестирование</span>
+                            </div>
+                        </div>
+                        <div class="integration-actions">
+                            <button class="btn btn-sm btn-primary" onclick="configureIntegration('azure')">Настроить</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewDetails('azure')">Детали</button>
+                            <button class="btn btn-sm btn-danger" onclick="disconnectIntegration('azure')">Отключить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="integration-card">
+                        <div class="integration-header">
+                            <div class="integration-icon" style="background: #ff6b6b; color: white;">
+                                <i class="fas fa-trello"></i>
+                            </div>
+                            <div class="integration-info">
+                                <div class="integration-name">Trello</div>
+                                <div class="integration-category">Управление проектами</div>
+                            </div>
+                            <span class="integration-status status-connected">Подключено</span>
+                        </div>
+                        <div class="integration-description">
+                            Синхронизация досок Trello с проектами. Автоматическое создание задач из карточек.
+                        </div>
+                        <div class="integration-features">
+                            <div class="feature-list">
+                                <span class="feature-tag">Синхронизация досок</span>
+                                <span class="feature-tag">Автоматические задачи</span>
+                                <span class="feature-tag">Комментарии</span>
+                            </div>
+                        </div>
+                        <div class="integration-actions">
+                            <button class="btn btn-sm btn-primary" onclick="configureIntegration('trello')">Настроить</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewDetails('trello')">Детали</button>
+                            <button class="btn btn-sm btn-danger" onclick="disconnectIntegration('trello')">Отключить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="integration-card">
+                        <div class="integration-header">
+                            <div class="integration-icon" style="background: #00d4aa; color: white;">
+                                <i class="fas fa-slack"></i>
+                            </div>
+                            <div class="integration-info">
+                                <div class="integration-name">Slack</div>
+                                <div class="integration-category">Коммуникации</div>
+                            </div>
+                            <span class="integration-status status-disconnected">Отключено</span>
+                        </div>
+                        <div class="integration-description">
+                            Уведомления о проектах и задачах в Slack. Интеграция с каналами команды.
+                        </div>
+                        <div class="integration-features">
+                            <div class="feature-list">
+                                <span class="feature-tag">Уведомления</span>
+                                <span class="feature-tag">Каналы команды</span>
+                                <span class="feature-tag">Боты</span>
+                            </div>
+                        </div>
+                        <div class="integration-actions">
+                            <button class="btn btn-sm btn-success" onclick="connectIntegration('slack')">Подключить</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewDetails('slack')">Детали</button>
+                        </div>
+                    </div>
+                    
+                    <div class="integration-card">
+                        <div class="integration-header">
+                            <div class="integration-icon" style="background: #f59e0b; color: white;">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="integration-info">
+                                <div class="integration-name">Google Analytics</div>
+                                <div class="integration-category">Аналитика</div>
+                            </div>
+                            <span class="integration-status status-error">Ошибка</span>
+                        </div>
+                        <div class="integration-description">
+                            Интеграция с Google Analytics для отслеживания производительности проектов.
+                        </div>
+                        <div class="integration-features">
+                            <div class="feature-list">
+                                <span class="feature-tag">Метрики</span>
+                                <span class="feature-tag">Отчеты</span>
+                                <span class="feature-tag">Дашборды</span>
+                            </div>
+                        </div>
+                        <div class="integration-actions">
+                            <button class="btn btn-sm btn-primary" onclick="configureIntegration('analytics')">Настроить</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewDetails('analytics')">Детали</button>
+                            <button class="btn btn-sm btn-danger" onclick="disconnectIntegration('analytics')">Отключить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="integration-card">
+                        <div class="integration-header">
+                            <div class="integration-icon" style="background: #8b5cf6; color: white;">
+                                <i class="fas fa-cloud"></i>
+                            </div>
+                            <div class="integration-info">
+                                <div class="integration-name">AWS</div>
+                                <div class="integration-category">Облачные сервисы</div>
+                            </div>
+                            <span class="integration-status status-disconnected">Отключено</span>
+                        </div>
+                        <div class="integration-description">
+                            Интеграция с AWS для мониторинга ресурсов и автоматического развертывания.
+                        </div>
+                        <div class="integration-features">
+                            <div class="feature-list">
+                                <span class="feature-tag">Мониторинг</span>
+                                <span class="feature-tag">Развертывание</span>
+                                <span class="feature-tag">Ресурсы</span>
+                            </div>
+                        </div>
+                        <div class="integration-actions">
+                            <button class="btn btn-sm btn-success" onclick="connectIntegration('aws')">Подключить</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewDetails('aws')">Детали</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="api-keys">
+                    <h3 style="margin-bottom: 1.5rem; color: #1f2937;">API ключи</h3>
+                    <div class="api-key-item">
+                        <div class="api-key-info">
+                            <div class="api-key-name">GitHub API</div>
+                            <div class="api-key-value">ghp_1234567890abcdef</div>
+                        </div>
+                        <div class="api-key-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="copyApiKey('github')">Копировать</button>
+                            <button class="btn btn-sm btn-danger" onclick="regenerateApiKey('github')">Обновить</button>
+                        </div>
+                    </div>
+                    <div class="api-key-item">
+                        <div class="api-key-info">
+                            <div class="api-key-name">Azure DevOps</div>
+                            <div class="api-key-value">azd_abcdef1234567890</div>
+                        </div>
+                        <div class="api-key-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="copyApiKey('azure')">Копировать</button>
+                            <button class="btn btn-sm btn-danger" onclick="regenerateApiKey('azure')">Обновить</button>
+                        </div>
+                    </div>
+                    <div class="api-key-item">
+                        <div class="api-key-info">
+                            <div class="api-key-name">Trello API</div>
+                            <div class="api-key-value">trello_1234567890abcdef</div>
+                        </div>
+                        <div class="api-key-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="copyApiKey('trello')">Копировать</button>
+                            <button class="btn btn-sm btn-danger" onclick="regenerateApiKey('trello')">Обновить</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="logs-section">
+                    <div class="logs-header">
+                        <h3 class="logs-title">Логи интеграций</h3>
+                        <button class="btn btn-sm btn-secondary" onclick="refreshLogs()">Обновить</button>
+                    </div>
+                    <div class="logs-list">
+                        <div class="log-item">
+                            <div class="log-icon" style="background: #10b981; color: white;">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="log-content">
+                                <div class="log-message">GitHub интеграция успешно синхронизирована</div>
+                                <div class="log-time">2 минуты назад</div>
+                            </div>
+                            <span class="log-status status-success">Успешно</span>
+                        </div>
+                        <div class="log-item">
+                            <div class="log-icon" style="background: #ef4444; color: white;">
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <div class="log-content">
+                                <div class="log-message">Ошибка подключения к Google Analytics API</div>
+                                <div class="log-time">15 минут назад</div>
+                            </div>
+                            <span class="log-status status-error">Ошибка</span>
+                        </div>
+                        <div class="log-item">
+                            <div class="log-icon" style="background: #f59e0b; color: white;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="log-content">
+                                <div class="log-message">Trello API ключ истекает через 7 дней</div>
+                                <div class="log-time">1 час назад</div>
+                            </div>
+                            <span class="log-status status-warning">Предупреждение</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Integration Modal -->
+    <div id="addIntegrationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Добавить интеграцию</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="addIntegrationForm">
+                <div class="form-group">
+                    <label for="integrationType">Тип интеграции</label>
+                    <select id="integrationType" required>
+                        <option value="">Выберите тип интеграции</option>
+                        <option value="github">GitHub</option>
+                        <option value="azure">Azure DevOps</option>
+                        <option value="trello">Trello</option>
+                        <option value="slack">Slack</option>
+                        <option value="analytics">Google Analytics</option>
+                        <option value="aws">AWS</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="integrationName">Название</label>
+                    <input type="text" id="integrationName" placeholder="Введите название интеграции" required>
+                </div>
+                <div class="form-group">
+                    <label for="apiKey">API ключ</label>
+                    <input type="text" id="apiKey" placeholder="Введите API ключ" required>
+                </div>
+                <div class="form-group">
+                    <label for="webhookUrl">Webhook URL (необязательно)</label>
+                    <input type="url" id="webhookUrl" placeholder="https://example.com/webhook">
+                </div>
+                <div class="form-group">
+                    <label for="integrationDescription">Описание</label>
+                    <textarea id="integrationDescription" placeholder="Описание интеграции (необязательно)"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить интеграцию</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            // Form submission
+            document.getElementById('addIntegrationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addIntegration();
+            });
+            
+            // Search functionality
+            document.querySelector('.search-input').addEventListener('input', function(e) {
+                searchIntegrations(e.target.value);
+            });
+        }
+        
+        function openAddIntegrationModal() {
+            document.getElementById('addIntegrationModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+        
+        function addIntegration() {
+            const form = document.getElementById('addIntegrationForm');
+            const formData = new FormData(form);
+            
+            // Simulate adding integration
+            alert('Интеграция добавлена!');
+            form.reset();
+            closeModal();
+        }
+        
+        function configureIntegration(integration) {
+            alert(`Настройка интеграции: ${integration}`);
+        }
+        
+        function viewDetails(integration) {
+            alert(`Детали интеграции: ${integration}`);
+        }
+        
+        function connectIntegration(integration) {
+            if (confirm(`Подключить интеграцию ${integration}?`)) {
+                alert(`Интеграция ${integration} подключена!`);
+            }
+        }
+        
+        function disconnectIntegration(integration) {
+            if (confirm(`Отключить интеграцию ${integration}?`)) {
+                alert(`Интеграция ${integration} отключена!`);
+            }
+        }
+        
+        function copyApiKey(service) {
+            const apiKeys = {
+                'github': 'ghp_1234567890abcdef',
+                'azure': 'azd_abcdef1234567890',
+                'trello': 'trello_1234567890abcdef'
+            };
+            
+            navigator.clipboard.writeText(apiKeys[service]).then(() => {
+                alert('API ключ скопирован в буфер обмена!');
+            });
+        }
+        
+        function regenerateApiKey(service) {
+            if (confirm(`Обновить API ключ для ${service}?`)) {
+                alert(`API ключ для ${service} обновлен!`);
+            }
+        }
+        
+        function refreshIntegrations() {
+            alert('Интеграции обновлены!');
+        }
+        
+        function refreshLogs() {
+            alert('Логи обновлены!');
+        }
+        
+        function applyFilters() {
+            const category = document.getElementById('categoryFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            console.log('Applying filters:', { category, status });
+            alert('Фильтры применены!');
+        }
+        
+        function searchIntegrations(query) {
+            const cards = document.querySelectorAll('.integration-card');
+            const searchTerm = query.toLowerCase();
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = searchTerm ? 'none' : 'block';
+                }
+            });
+        }
+        
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

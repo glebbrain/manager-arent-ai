@@ -1,0 +1,85 @@
+{
+  "name": "advanced-performance-optimization-v3.2",
+  "version": "3.2.0",
+  "description": "Advanced Performance Optimization v3.2 - Comprehensive performance optimization for ManagerAgentAI ecosystem",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:performance": "jest --testNamePattern=Performance",
+    "test:load": "artillery run tests/load/load-test.yml",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "build": "npm run lint && npm test",
+    "docker:build": "docker build -t advanced-performance-v3.2 .",
+    "docker:run": "docker run -p 3000:3000 advanced-performance-v3.2",
+    "k8s:deploy": "kubectl apply -f k8s/",
+    "k8s:delete": "kubectl delete -f k8s/"
+  },
+  "keywords": [
+    "performance",
+    "optimization",
+    "caching",
+    "load-balancing",
+    "monitoring",
+    "analytics"
+  ],
+  "author": "ManagerAgentAI Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1",
+    "joi": "^17.11.0",
+    "redis": "^4.6.10",
+    "ioredis": "^5.3.2",
+    "prom-client": "^15.0.0",
+    "node-cache": "^5.1.2",
+    "lru-cache": "^10.1.0",
+    "cluster": "^0.7.2",
+    "os": "^0.1.2",
+    "axios": "^1.6.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.1",
+    "crypto": "^1.0.1",
+    "mathjs": "^11.11.1",
+    "artillery": "^2.0.0",
+    "autocannon": "^7.12.0",
+    "clinic": "^12.0.0",
+    "0x": "^5.4.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "nodemon": "^3.0.2",
+    "eslint": "^8.55.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-jest": "^27.6.0",
+    "@types/jest": "^29.5.8",
+    "artillery": "^2.0.0",
+    "autocannon": "^7.12.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/advanced-performance-optimization-v3.2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/advanced-performance-optimization-v3.2/issues"
+  },
+  "homepage": "https://github.com/your-org/advanced-performance-optimization-v3.2#readme"
+}

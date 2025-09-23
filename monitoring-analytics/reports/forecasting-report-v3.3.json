@@ -1,0 +1,114 @@
+{
+  "PerformanceRequirements": {
+    "ResponseTime": [
+      140.0,
+      135.0,
+      130.0,
+      125.0,
+      120.0,
+      115.0
+    ],
+    "Throughput": [
+      740.0,
+      760.0,
+      780.0,
+      800.0,
+      820.0,
+      840.0
+    ],
+    "Uptime": [
+      100.15,
+      100.24,
+      100.33,
+      100.43,
+      100.52,
+      100.61
+    ],
+    "ErrorRate": [
+      0.28,
+      0.1,
+      -0.08,
+      -0.26,
+      -0.44,
+      -0.62
+    ]
+  },
+  "RiskFactors": [
+    "Resource constraints may limit growth",
+    "Technology debt could impact performance",
+    "Team capacity may not meet demand",
+    "Security requirements may increase complexity"
+  ],
+  "TechnologyTrends": {
+    "DevOps_Automation": "High Growth - 100% increase expected",
+    "AI_ML_Adoption": "Rapid Growth - 200% increase expected",
+    "Cloud_Native": "Steady Growth - 50% increase expected",
+    "Microservices": "Moderate Growth - 30% increase expected"
+  },
+  "TeamGrowth": {
+    "CodeReviewCapacity": [
+      77.27,
+      79.78,
+      82.28,
+      84.78,
+      87.29,
+      89.79
+    ],
+    "FeatureDelivery": [
+      9.09,
+      9.57,
+      10.04,
+      10.52,
+      10.99,
+      11.47
+    ],
+    "TasksCapacity": [
+      33.64,
+      35.0,
+      36.37,
+      37.74,
+      39.1,
+      40.47
+    ]
+  },
+  "ResourceNeeds": {
+    "CPU": [
+      49.82,
+      49.94,
+      50.07,
+      50.2,
+      50.32,
+      50.45
+    ],
+    "Storage": [
+      617.12,
+      624.5,
+      631.88,
+      639.25,
+      646.63,
+      654.01
+    ],
+    "Memory": [
+      193.77,
+      194.28,
+      194.78,
+      195.28,
+      195.79,
+      196.29
+    ],
+    "Network": [
+      113.77,
+      114.28,
+      114.78,
+      115.28,
+      115.79,
+      116.29
+    ]
+  },
+  "Opportunities": [
+    "AI/ML integration for automation",
+    "Cloud migration for scalability",
+    "Microservices for better maintainability",
+    "Advanced monitoring and analytics"
+  ]
+}

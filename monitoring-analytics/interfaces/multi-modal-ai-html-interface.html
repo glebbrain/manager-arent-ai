@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Modal AI - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .multi-modal-ai { display: flex; height: 100vh; }
+        .sidebar { width: 280px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .ai-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; }
+        .ai-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .ai-subtitle { font-size: 1.1rem; opacity: 0.9; margin-bottom: 1.5rem; }
+        .ai-stats { display: flex; gap: 2rem; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-label { font-size: 0.9rem; opacity: 0.8; }
+        .upload-section { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .upload-area { border: 2px dashed #d1d5db; border-radius: 8px; padding: 3rem; text-align: center; margin-bottom: 1rem; transition: all 0.3s ease; }
+        .upload-area.dragover { border-color: #2563eb; background: #eff6ff; }
+        .upload-icon { font-size: 3rem; color: #6b7280; margin-bottom: 1rem; }
+        .upload-text { font-size: 1.1rem; color: #6b7280; margin-bottom: 0.5rem; }
+        .upload-subtext { font-size: 0.9rem; color: #9ca3af; }
+        .file-types { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+        .file-type { padding: 0.5rem 1rem; background: #f3f4f6; border-radius: 20px; font-size: 0.9rem; color: #6b7280; }
+        .processing-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .processing-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .processing-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .processing-actions { display: flex; gap: 0.5rem; }
+        .file-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .file-item { display: flex; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 8px; }
+        .file-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 1rem; font-size: 1.2rem; }
+        .file-info { flex: 1; }
+        .file-name { font-weight: 500; color: #1f2937; margin-bottom: 0.25rem; }
+        .file-size { color: #6b7280; font-size: 0.9rem; }
+        .file-status { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 500; margin-left: 0.5rem; }
+        .status-processing { background: #dbeafe; color: #1e40af; }
+        .status-completed { background: #dcfce7; color: #166534; }
+        .status-error { background: #fef2f2; color: #dc2626; }
+        .results-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .results-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .result-card { background: #f8fafc; border-radius: 8px; padding: 1.5rem; }
+        .result-header { display: flex; align-items: center; margin-bottom: 1rem; }
+        .result-icon { width: 40px; height: 40px; border-radius: 8px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; margin-right: 1rem; }
+        .result-title { font-weight: 600; color: #1f2937; }
+        .result-content { color: #6b7280; line-height: 1.6; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        .nav { padding: 1rem; }
+        .nav-item { display: block; padding: 0.75rem; color: #6b7280; text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .nav-item:hover, .nav-item.active { background: #eff6ff; color: #2563eb; }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-section-title { font-size: 0.8rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; padding: 0 0.75rem; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 12px; padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-title { font-size: 1.3rem; font-weight: 600; color: #1f2937; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; color: #6b7280; cursor: pointer; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        @media (max-width: 768px) {
+            .multi-modal-ai { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .results-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="multi-modal-ai">
+        <div class="sidebar">
+            <div class="nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Multi-Modal AI</div>
+                    <a href="#" class="nav-item active"><i class="fas fa-upload"></i> Загрузка файлов</a>
+                    <a href="#" class="nav-item"><i class="fas fa-cog"></i> Обработка</a>
+                    <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Результаты</a>
+                    <a href="#" class="nav-item"><i class="fas fa-history"></i> История</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Типы файлов</div>
+                    <a href="#" class="nav-item"><i class="fas fa-image"></i> Изображения</a>
+                    <a href="#" class="nav-item"><i class="fas fa-video"></i> Видео</a>
+                    <a href="#" class="nav-item"><i class="fas fa-microphone"></i> Аудио</a>
+                    <a href="#" class="nav-item"><i class="fas fa-file-text"></i> Тексты</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-brain"></i> Multi-Modal AI</h1>
+                <div>
+                    <button class="btn btn-primary" onclick="openSettingsModal()">
+                        <i class="fas fa-cog"></i> Настройки
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearAll()">
+                        <i class="fas fa-trash"></i> Очистить все
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="ai-header">
+                    <div class="ai-title">Multi-Modal AI Processing</div>
+                    <div class="ai-subtitle">Обработка различных типов файлов с помощью искусственного интеллекта</div>
+                    <div class="ai-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">24</div>
+                            <div class="stat-label">Файлов обработано</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">5</div>
+                            <div class="stat-label">Типов файлов</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">98.5%</div>
+                            <div class="stat-label">Точность</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">2.3s</div>
+                            <div class="stat-label">Среднее время</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="upload-section">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">Перетащите файлы сюда или нажмите для выбора</div>
+                        <div class="upload-subtext">Поддерживаются изображения, видео, аудио и текстовые файлы</div>
+                        <input type="file" id="fileInput" multiple accept="image/*,video/*,audio/*,.txt,.pdf,.doc,.docx" style="display: none;">
+                    </div>
+                    <div class="file-types">
+                        <span class="file-type">JPG, PNG, GIF</span>
+                        <span class="file-type">MP4, AVI, MOV</span>
+                        <span class="file-type">MP3, WAV, AAC</span>
+                        <span class="file-type">TXT, PDF, DOC</span>
+                    </div>
+                </div>
+                
+                <div class="processing-section">
+                    <div class="processing-header">
+                        <div class="processing-title">Обработка файлов</div>
+                        <div class="processing-actions">
+                            <button class="btn btn-sm btn-primary" onclick="processAll()">Обработать все</button>
+                            <button class="btn btn-sm btn-secondary" onclick="refreshFiles()">Обновить</button>
+                        </div>
+                    </div>
+                    <div class="file-list" id="fileList">
+                        <div class="file-item">
+                            <div class="file-icon" style="background: #10b981; color: white;">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name">screenshot.png</div>
+                                <div class="file-size">2.3 MB</div>
+                            </div>
+                            <span class="file-status status-completed">Обработано</span>
+                        </div>
+                        <div class="file-item">
+                            <div class="file-icon" style="background: #2563eb; color: white;">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name">presentation.mp4</div>
+                                <div class="file-size">15.7 MB</div>
+                            </div>
+                            <span class="file-status status-processing">Обработка...</span>
+                        </div>
+                        <div class="file-item">
+                            <div class="file-icon" style="background: #f59e0b; color: white;">
+                                <i class="fas fa-microphone"></i>
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name">meeting.wav</div>
+                                <div class="file-size">8.2 MB</div>
+                            </div>
+                            <span class="file-status status-completed">Обработано</span>
+                        </div>
+                        <div class="file-item">
+                            <div class="file-icon" style="background: #6b7280; color: white;">
+                                <i class="fas fa-file-text"></i>
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name">document.pdf</div>
+                                <div class="file-size">1.1 MB</div>
+                            </div>
+                            <span class="file-status status-error">Ошибка</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results-section">
+                    <div class="results-header">
+                        <div class="results-title">Результаты анализа</div>
+                        <div class="processing-actions">
+                            <button class="btn btn-sm btn-primary" onclick="exportResults()">Экспорт</button>
+                            <button class="btn btn-sm btn-secondary" onclick="refreshResults()">Обновить</button>
+                        </div>
+                    </div>
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-header">
+                                <div class="result-icon">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="result-title">Анализ изображения</div>
+                            </div>
+                            <div class="result-content">
+                                На изображении обнаружены: человек (95% уверенности), автомобиль (87% уверенности), здание (92% уверенности). Общее настроение: позитивное.
+                            </div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-header">
+                                <div class="result-icon">
+                                    <i class="fas fa-volume-up"></i>
+                                </div>
+                                <div class="result-title">Транскрипция аудио</div>
+                            </div>
+                            <div class="result-content">
+                                "Добро пожаловать на нашу встречу. Сегодня мы обсудим новые проекты и планы развития компании. Начнем с презентации результатов за квартал."
+                            </div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-header">
+                                <div class="result-icon">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="result-title">Анализ текста</div>
+                            </div>
+                            <div class="result-content">
+                                Тон: профессиональный. Ключевые темы: технологии, инновации, развитие. Эмоциональная окраска: нейтральная. Рекомендации по улучшению: добавить больше конкретных примеров.
+                            </div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-header">
+                                <div class="result-icon">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <div class="result-title">Анализ видео</div>
+                            </div>
+                            <div class="result-content">
+                                Длительность: 5:23. Основные объекты: презентация, экран, человек. Качество: HD. Рекомендации: улучшить освещение, добавить субтитры.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Настройки Multi-Modal AI</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label for="aiModel">AI Модель</label>
+                    <select id="aiModel" required>
+                        <option value="gpt4v">GPT-4 Vision</option>
+                        <option value="claude3">Claude-3 Opus</option>
+                        <option value="gemini">Gemini 2.0</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="maxFileSize">Максимальный размер файла (MB)</label>
+                        <input type="number" id="maxFileSize" value="100" min="1" max="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="processingQuality">Качество обработки</label>
+                        <select id="processingQuality">
+                            <option value="fast">Быстро</option>
+                            <option value="balanced" selected>Сбалансированно</option>
+                            <option value="high">Высокое</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="outputFormat">Формат вывода</label>
+                    <select id="outputFormat">
+                        <option value="json">JSON</option>
+                        <option value="text" selected>Текст</option>
+                        <option value="markdown">Markdown</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            // File upload
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            uploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+            
+            // Form submission
+            document.getElementById('settingsForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveSettings();
+            });
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+        
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            processFiles(files);
+        }
+        
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            processFiles(files);
+        }
+        
+        function processFiles(files) {
+            Array.from(files).forEach(file => {
+                addFileToList(file);
+                processFile(file);
+            });
+        }
+        
+        function addFileToList(file) {
+            const fileList = document.getElementById('fileList');
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            
+            const icon = getFileIcon(file.type);
+            const size = formatFileSize(file.size);
+            
+            fileItem.innerHTML = `
+                <div class="file-icon" style="background: ${icon.color}; color: white;">
+                    <i class="${icon.class}"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${size}</div>
+                </div>
+                <span class="file-status status-processing">Обработка...</span>
+            `;
+            
+            fileList.appendChild(fileItem);
+        }
+        
+        function getFileIcon(type) {
+            if (type.startsWith('image/')) {
+                return { class: 'fas fa-image', color: '#10b981' };
+            } else if (type.startsWith('video/')) {
+                return { class: 'fas fa-video', color: '#2563eb' };
+            } else if (type.startsWith('audio/')) {
+                return { class: 'fas fa-microphone', color: '#f59e0b' };
+            } else {
+                return { class: 'fas fa-file-text', color: '#6b7280' };
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function processFile(file) {
+            // Simulate file processing
+            setTimeout(() => {
+                const fileItems = document.querySelectorAll('.file-item');
+                const lastItem = fileItems[fileItems.length - 1];
+                const status = lastItem.querySelector('.file-status');
+                status.textContent = 'Обработано';
+                status.className = 'file-status status-completed';
+            }, Math.random() * 3000 + 1000);
+        }
+        
+        function processAll() {
+            const processingItems = document.querySelectorAll('.file-status.status-processing');
+            processingItems.forEach(item => {
+                item.textContent = 'Обработка...';
+                item.className = 'file-status status-processing';
+                
+                setTimeout(() => {
+                    item.textContent = 'Обработано';
+                    item.className = 'file-status status-completed';
+                }, Math.random() * 5000 + 2000);
+            });
+        }
+        
+        function refreshFiles() {
+            alert('Список файлов обновлен!');
+        }
+        
+        function exportResults() {
+            alert('Экспорт результатов...');
+        }
+        
+        function refreshResults() {
+            alert('Результаты обновлены!');
+        }
+        
+        function clearAll() {
+            if (confirm('Очистить все файлы и результаты?')) {
+                document.getElementById('fileList').innerHTML = '';
+                alert('Все очищено!');
+            }
+        }
+        
+        function openSettingsModal() {
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+        
+        function saveSettings() {
+            const form = document.getElementById('settingsForm');
+            const formData = new FormData(form);
+            
+            alert('Настройки сохранены!');
+            closeModal();
+        }
+        
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,830 @@
+# Docker Compose v3.8 - ManagerAgentAI v2.4
+
+# ManagerAgentAI Containerization v2.4
+# Complete containerization with enhanced security, monitoring, and scalability
+
+services:
+  # API Gateway
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.api-gateway
+    container_name: manager-agent-ai-api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - LOG_LEVEL=info
+    volumes:
+      - ./api-gateway/config:/app/config:ro
+      - ./api-gateway/logs:/app/logs
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - event-bus
+      - project-manager
+      - ai-planner
+      - workflow-orchestrator
+      - smart-notifications
+      - template-generator
+      - consistency-manager
+      - api-versioning
+      - deadline-prediction
+      - task-distribution
+      - automatic-status-updates
+      - sprint-planning
+      - task-dependency-management
+      - benchmarking
+      - forecasting
+      - interactive-dashboards
+      - data-export
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: manager-agent-ai-dashboard
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - WS_PORT=3001
+    volumes:
+      - ./dashboard/logs:/app/logs
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Event Bus
+  event-bus:
+    build:
+      context: .
+      dockerfile: Dockerfile.event-bus
+    container_name: manager-agent-ai-event-bus
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - LOG_LEVEL=info
+    volumes:
+      - ./event-bus/config:/app/config:ro
+      - ./event-bus/data:/app/data
+      - ./event-bus/logs:/app/logs
+    networks:
+      - manager-agent-ai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Project Manager Service
+  project-manager:
+    build:
+      context: .
+      dockerfile: Dockerfile.microservices
+    container_name: manager-agent-ai-project-manager
+    ports:
+      - "3002:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SERVICE_NAME=project-manager
+      - LOG_LEVEL=info
+      - EVENT_BUS_URL=http://event-bus:4000
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./microservices/config:/app/config:ro
+      - ./microservices/logs:/app/logs
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # AI Planner Service
+  ai-planner:
+    build:
+      context: .
+      dockerfile: Dockerfile.microservices
+    container_name: manager-agent-ai-ai-planner
+    ports:
+      - "3003:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SERVICE_NAME=ai-planner
+      - LOG_LEVEL=info
+      - EVENT_BUS_URL=http://event-bus:4000
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./microservices/config:/app/config:ro
+      - ./microservices/logs:/app/logs
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Workflow Orchestrator Service
+  workflow-orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.microservices
+    container_name: manager-agent-ai-workflow-orchestrator
+    ports:
+      - "3004:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SERVICE_NAME=workflow-orchestrator
+      - LOG_LEVEL=info
+      - EVENT_BUS_URL=http://event-bus:4000
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./microservices/config:/app/config:ro
+      - ./microservices/logs:/app/logs
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Smart Notifications Service
+  smart-notifications:
+    build:
+      context: .
+      dockerfile: Dockerfile.microservices
+    container_name: manager-agent-ai-smart-notifications
+    ports:
+      - "3005:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SERVICE_NAME=smart-notifications
+      - LOG_LEVEL=info
+      - EVENT_BUS_URL=http://event-bus:4000
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./microservices/config:/app/config:ro
+      - ./microservices/logs:/app/logs
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Template Generator Service
+  template-generator:
+    build:
+      context: .
+      dockerfile: Dockerfile.microservices
+    container_name: manager-agent-ai-template-generator
+    ports:
+      - "3006:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SERVICE_NAME=template-generator
+      - LOG_LEVEL=info
+      - EVENT_BUS_URL=http://event-bus:4000
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./microservices/config:/app/config:ro
+      - ./microservices/logs:/app/logs
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Consistency Manager Service
+  consistency-manager:
+    build:
+      context: .
+      dockerfile: Dockerfile.microservices
+    container_name: manager-agent-ai-consistency-manager
+    ports:
+      - "3007:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SERVICE_NAME=consistency-manager
+      - LOG_LEVEL=info
+      - EVENT_BUS_URL=http://event-bus:4000
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./microservices/config:/app/config:ro
+      - ./microservices/logs:/app/logs
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # API Versioning Service
+  api-versioning:
+    build:
+      context: .
+      dockerfile: Dockerfile.api-versioning
+    container_name: manager-agent-ai-api-versioning
+    ports:
+      - "3008:3008"
+    environment:
+      - NODE_ENV=production
+      - PORT=3008
+      - LOG_LEVEL=info
+    volumes:
+      - ./api-versioning/logs:/app/logs
+    networks:
+      - manager-agent-ai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3008/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Deadline Prediction Service
+  deadline-prediction:
+    build:
+      context: .
+      dockerfile: Dockerfile.deadline-prediction
+    container_name: manager-agent-ai-deadline-prediction
+    ports:
+      - "3009:3009"
+    environment:
+      - NODE_ENV=production
+      - PORT=3009
+      - LOG_LEVEL=info
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./deadline-prediction/logs:/app/logs
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3009/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Task Distribution Service
+  task-distribution:
+    build:
+      context: .
+      dockerfile: Dockerfile.task-distribution
+    container_name: manager-agent-ai-task-distribution
+    ports:
+      - "3010:3010"
+    environment:
+      - NODE_ENV=production
+      - PORT=3010
+      - LOG_LEVEL=info
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./task-distribution/logs:/app/logs
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Automatic Status Updates Service
+  automatic-status-updates:
+    build:
+      context: .
+      dockerfile: Dockerfile.automatic-status-updates
+    container_name: manager-agent-ai-automatic-status-updates
+    ports:
+      - "3011:3011"
+    environment:
+      - NODE_ENV=production
+      - PORT=3011
+      - SERVICE_NAME=automatic-status-updates
+      - LOG_LEVEL=info
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+      - EVENT_BUS_URL=http://event-bus:4000
+    volumes:
+      - ./automatic-status-updates/logs:/app/logs
+      - ./automatic-status-updates/reports:/app/reports
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3011/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Sprint Planning Service
+  sprint-planning:
+    build:
+      context: .
+      dockerfile: Dockerfile.sprint-planning
+    container_name: manager-agent-ai-sprint-planning
+    ports:
+      - "3012:3012"
+    environment:
+      - NODE_ENV=production
+      - PORT=3012
+      - SERVICE_NAME=sprint-planning
+      - LOG_LEVEL=info
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+      - EVENT_BUS_URL=http://event-bus:4000
+    volumes:
+      - ./sprint-planning/logs:/app/logs
+      - ./sprint-planning/reports:/app/reports
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3012/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Task Dependency Management Service
+  task-dependency-management:
+    build:
+      context: .
+      dockerfile: Dockerfile.task-dependency-management
+    container_name: manager-agent-ai-task-dependency-management
+    ports:
+      - "3013:3013"
+    environment:
+      - NODE_ENV=production
+      - PORT=3013
+      - SERVICE_NAME=task-dependency-management
+      - LOG_LEVEL=info
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+      - EVENT_BUS_URL=http://event-bus:4000
+    volumes:
+      - ./task-dependency-management/logs:/app/logs
+      - ./task-dependency-management/reports:/app/reports
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3013/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Benchmarking Service
+  benchmarking:
+    build:
+      context: .
+      dockerfile: Dockerfile.benchmarking
+    container_name: manager-agent-ai-benchmarking
+    ports:
+      - "3014:3014"
+    environment:
+      - NODE_ENV=production
+      - PORT=3014
+      - SERVICE_NAME=benchmarking
+      - LOG_LEVEL=info
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+      - EVENT_BUS_URL=http://event-bus:4000
+    volumes:
+      - ./benchmarking/logs:/app/logs
+      - ./benchmarking/reports:/app/reports
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3014/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Forecasting Service
+  forecasting:
+    build:
+      context: .
+      dockerfile: Dockerfile.forecasting
+    container_name: manager-agent-ai-forecasting
+    ports:
+      - "3016:3016"
+    environment:
+      - NODE_ENV=production
+      - PORT=3016
+      - SERVICE_NAME=forecasting
+      - LOG_LEVEL=info
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+      - EVENT_BUS_URL=http://event-bus:4000
+    volumes:
+      - ./forecasting/logs:/app/logs
+      - ./forecasting/reports:/app/reports
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3016/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Interactive Dashboards Service
+  interactive-dashboards:
+    build:
+      context: .
+      dockerfile: Dockerfile.interactive-dashboards
+    container_name: manager-agent-ai-interactive-dashboards
+    ports:
+      - "3017:3017"
+    environment:
+      - NODE_ENV=production
+      - PORT=3017
+      - SERVICE_NAME=interactive-dashboards
+      - LOG_LEVEL=info
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+      - EVENT_BUS_URL=http://event-bus:4000
+    volumes:
+      - ./interactive-dashboards/logs:/app/logs
+      - ./interactive-dashboards/reports:/app/reports
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3017/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Data Export Service
+  data-export:
+    build:
+      context: .
+      dockerfile: Dockerfile.data-export
+    container_name: manager-agent-ai-data-export
+    ports:
+      - "3018:3018"
+    environment:
+      - NODE_ENV=production
+      - PORT=3018
+      - SERVICE_NAME=data-export
+      - LOG_LEVEL=info
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/manager_agent_ai
+      - REDIS_URL=redis://redis:6379
+      - EVENT_BUS_URL=http://event-bus:4000
+    volumes:
+      - ./data-export/logs:/app/logs
+      - ./data-export/exports:/app/exports
+      - ./data-export/temp:/app/temp
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+      - redis
+      - event-bus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3018/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: manager-agent-ai-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=manager_agent_ai
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - manager-agent-ai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d manager_agent_ai"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: manager-agent-ai-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass password
+    volumes:
+      - redis_data:/data
+    networks:
+      - manager-agent-ai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Nginx Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: manager-agent-ai-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - api-gateway
+      - dashboard
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Prometheus Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: manager-agent-ai-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - manager-agent-ai-network
+    restart: unless-stopped
+
+  # Grafana Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: manager-agent-ai-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # Jaeger Tracing
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: manager-agent-ai-jaeger
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - manager-agent-ai-network
+    restart: unless-stopped
+
+  # Elasticsearch for logging
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: manager-agent-ai-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - manager-agent-ai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Kibana for log visualization
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: manager-agent-ai-kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  # Logstash for log processing
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: manager-agent-ai-logstash
+    volumes:
+      - ./monitoring/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./monitoring/logstash/config:/usr/share/logstash/config:ro
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  # Redis Commander for Redis management
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: manager-agent-ai-redis-commander
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # pgAdmin for PostgreSQL management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: manager-agent-ai-pgadmin
+    ports:
+      - "8080:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@manageragentai.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - manager-agent-ai-network
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  manager-agent-ai-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

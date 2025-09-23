@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: manager-agent-ai
+  labels:
+    name: manager-agent-ai
+    app: manager-agent-ai
+    version: "2.4"

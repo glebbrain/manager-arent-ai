@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Monitoring - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .performance-monitoring { display: flex; height: 100vh; }
+        .sidebar { width: 280px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .performance-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; }
+        .performance-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .performance-subtitle { font-size: 1.1rem; opacity: 0.9; margin-bottom: 1.5rem; }
+        .performance-stats { display: flex; gap: 2rem; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-label { font-size: 0.9rem; opacity: 0.8; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .metric-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .metric-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .metric-title { font-size: 0.9rem; font-weight: 500; color: #6b7280; }
+        .metric-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .metric-value { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+        .metric-change { font-size: 0.8rem; display: flex; align-items: center; gap: 0.25rem; }
+        .metric-change.positive { color: #10b981; }
+        .metric-change.negative { color: #ef4444; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .chart-container { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .chart-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem; }
+        .chart-canvas { width: 100%; height: 300px; }
+        .alerts-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .alerts-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .alerts-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .alerts-actions { display: flex; gap: 0.5rem; }
+        .alert-item { display: flex; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 8px; margin-bottom: 1rem; }
+        .alert-item:last-child { margin-bottom: 0; }
+        .alert-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem; font-size: 1.2rem; }
+        .alert-content { flex: 1; }
+        .alert-title { font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; }
+        .alert-description { color: #6b7280; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .alert-time { color: #6b7280; font-size: 0.8rem; }
+        .alert-severity { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 500; margin-left: 0.5rem; }
+        .severity-critical { background: #fef2f2; color: #dc2626; }
+        .severity-warning { background: #fef3c7; color: #92400e; }
+        .severity-info { background: #dbeafe; color: #1e40af; }
+        .servers-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .servers-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .servers-title { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .servers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .server-card { background: #f8fafc; border-radius: 8px; padding: 1.5rem; }
+        .server-header { display: flex; align-items: center; margin-bottom: 1rem; }
+        .server-icon { width: 40px; height: 40px; border-radius: 8px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; margin-right: 1rem; }
+        .server-info { flex: 1; }
+        .server-name { font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; }
+        .server-status { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 500; }
+        .status-online { background: #dcfce7; color: #166534; }
+        .status-offline { background: #fef2f2; color: #dc2626; }
+        .status-warning { background: #fef3c7; color: #92400e; }
+        .server-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+        .server-metric { text-align: center; }
+        .server-metric-value { font-size: 1.2rem; font-weight: 600; color: #1f2937; }
+        .server-metric-label { color: #6b7280; font-size: 0.8rem; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        .nav { padding: 1rem; }
+        .nav-item { display: block; padding: 0.75rem; color: #6b7280; text-decoration: none; border-radius: 6px; margin-bottom: 0.5rem; transition: all 0.3s ease; }
+        .nav-item:hover, .nav-item.active { background: #eff6ff; color: #2563eb; }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-section-title { font-size: 0.8rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; padding: 0 0.75rem; }
+        .filters { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .filters-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .filter-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .filter-group label { font-size: 0.9rem; font-weight: 500; color: #374151; }
+        .filter-select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; font-size: 0.9rem; }
+        .search-input { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; width: 200px; }
+        .real-time-indicator { display: flex; align-items: center; gap: 0.5rem; color: #10b981; font-size: 0.9rem; }
+        .pulse { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @media (max-width: 768px) {
+            .performance-monitoring { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .charts-grid, .servers-grid { grid-template-columns: 1fr; }
+            .filters-row { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <div class="performance-monitoring">
+        <div class="sidebar">
+            <div class="nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Мониторинг</div>
+                    <a href="#" class="nav-item active"><i class="fas fa-tachometer-alt"></i> Обзор</a>
+                    <a href="#" class="nav-item"><i class="fas fa-server"></i> Серверы</a>
+                    <a href="#" class="nav-item"><i class="fas fa-database"></i> База данных</a>
+                    <a href="#" class="nav-item"><i class="fas fa-network-wired"></i> Сеть</a>
+                    <a href="#" class="nav-item"><i class="fas fa-memory"></i> Память</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Аналитика</div>
+                    <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Производительность</a>
+                    <a href="#" class="nav-item"><i class="fas fa-chart-bar"></i> Использование</a>
+                    <a href="#" class="nav-item"><i class="fas fa-clock"></i> Время отклика</a>
+                    <a href="#" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Алерты</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Настройки</div>
+                    <a href="#" class="nav-item"><i class="fas fa-cog"></i> Конфигурация</a>
+                    <a href="#" class="nav-item"><i class="fas fa-bell"></i> Уведомления</a>
+                    <a href="#" class="nav-item"><i class="fas fa-download"></i> Экспорт</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="fas fa-tachometer-alt"></i> Performance Monitoring</h1>
+                <div>
+                    <div class="real-time-indicator">
+                        <div class="pulse"></div>
+                        <span>Real-time</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="refreshMetrics()">
+                        <i class="fas fa-sync"></i> Обновить
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="performance-header">
+                    <div class="performance-title">Мониторинг производительности</div>
+                    <div class="performance-subtitle">Real-time мониторинг системы и анализ производительности</div>
+                    <div class="performance-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">99.9%</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">45ms</div>
+                            <div class="stat-label">Средний отклик</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">1,247</div>
+                            <div class="stat-label">RPS</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Ошибок</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filters">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label>Период</label>
+                            <select class="filter-select" id="timeFilter">
+                                <option value="1h">Последний час</option>
+                                <option value="24h" selected>Последние 24 часа</option>
+                                <option value="7d">Последние 7 дней</option>
+                                <option value="30d">Последние 30 дней</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Сервер</label>
+                            <select class="filter-select" id="serverFilter">
+                                <option value="all">Все серверы</option>
+                                <option value="web">Web серверы</option>
+                                <option value="db">База данных</option>
+                                <option value="cache">Кэш серверы</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Поиск</label>
+                            <input type="text" class="search-input" placeholder="Поиск метрик...">
+                        </div>
+                        <button class="btn btn-primary" onclick="applyFilters()">Применить</button>
+                    </div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">CPU Использование</span>
+                            <div class="metric-icon" style="background: #2563eb; color: white;">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">67%</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +5% за час
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Память</span>
+                            <div class="metric-icon" style="background: #10b981; color: white;">
+                                <i class="fas fa-memory"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">4.2GB</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +0.3GB за час
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Диск</span>
+                            <div class="metric-icon" style="background: #f59e0b; color: white;">
+                                <i class="fas fa-hdd"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">156GB</div>
+                        <div class="metric-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            -2GB за час
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Сеть</span>
+                            <div class="metric-icon" style="background: #8b5cf6; color: white;">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                        </div>
+                        <div class="metric-value">2.1MB/s</div>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +0.3MB/s за час
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">Производительность системы</div>
+                        <canvas id="performanceChart" class="chart-canvas"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">Использование ресурсов</div>
+                        <canvas id="resourcesChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="alerts-section">
+                    <div class="alerts-header">
+                        <div class="alerts-title">Активные алерты</div>
+                        <div class="alerts-actions">
+                            <button class="btn btn-sm btn-primary" onclick="refreshAlerts()">Обновить</button>
+                            <button class="btn btn-sm btn-secondary" onclick="clearAlerts()">Очистить</button>
+                        </div>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-icon" style="background: #ef4444; color: white;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">Высокая нагрузка на CPU</div>
+                            <div class="alert-description">CPU использование превышает 90% в течение 5 минут</div>
+                            <div class="alert-time">2 минуты назад</div>
+                        </div>
+                        <span class="alert-severity severity-critical">Критический</span>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-icon" style="background: #f59e0b; color: white;">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">Недостаточно места на диске</div>
+                            <div class="alert-description">Свободное место на диске C: менее 10%</div>
+                            <div class="alert-time">15 минут назад</div>
+                        </div>
+                        <span class="alert-severity severity-warning">Предупреждение</span>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-icon" style="background: #2563eb; color: white;">
+                            <i class="fas fa-info"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">Обновление системы</div>
+                            <div class="alert-description">Доступно новое обновление системы</div>
+                            <div class="alert-time">1 час назад</div>
+                        </div>
+                        <span class="alert-severity severity-info">Информация</span>
+                    </div>
+                </div>
+                
+                <div class="servers-section">
+                    <div class="servers-header">
+                        <div class="servers-title">Статус серверов</div>
+                        <div class="alerts-actions">
+                            <button class="btn btn-sm btn-primary" onclick="refreshServers()">Обновить</button>
+                        </div>
+                    </div>
+                    <div class="servers-grid">
+                        <div class="server-card">
+                            <div class="server-header">
+                                <div class="server-icon">
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <div class="server-info">
+                                    <div class="server-name">Web Server 01</div>
+                                    <div class="server-status status-online">Онлайн</div>
+                                </div>
+                            </div>
+                            <div class="server-metrics">
+                                <div class="server-metric">
+                                    <div class="server-metric-value">45%</div>
+                                    <div class="server-metric-label">CPU</div>
+                                </div>
+                                <div class="server-metric">
+                                    <div class="server-metric-value">2.1GB</div>
+                                    <div class="server-metric-label">RAM</div>
+                                </div>
+                                <div class="server-metric">
+                                    <div class="server-metric-value">89GB</div>
+                                    <div class="server-metric-label">Диск</div>
+                                </div>
+                                <div class="server-metric">
+                                    <div class="server-metric-value">1.2ms</div>
+                                    <div class="server-metric-label">Ping</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="server-card">
+                            <div class="server-header">
+                                <div class="server-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div class="server-info">
+                                    <div class="server-name">Database Server</div>
+                                    <div class="server-status status-online">Онлайн</div>
+                                </div>
+                            </div>
+                            <div class="server-metrics">
+                                <div class="server-metric">
+                                    <div class="server-metric-value">78%</div>
+                                    <div class="server-metric-label">CPU</div>
+                                </div>
+                                <div class="server-metric">
+                                    <div class="server-metric-value">7.5GB</div>
+                                    <div class="server-metric-label">RAM</div>
+                                </div>
+                                <div class="server-metric">
+                                    <div class="server-metric-value">234GB</div>
+                                    <div class="server-metric-label">Диск</div>
+                                </div>
+                                <div class="server-metric">
+                                    <div class="server-metric-value">0.8ms</div>
+                                    <div class="server-metric-label">Ping</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="server-card">
+                            <div class="server-header">
+                                <div class="server-icon">
+                                    <i class="fas fa-memory"></i>
+                                </div>
+                                <div class="server-info">
+                                    <div class="server-name">Cache Server</div>
+                                    <div class="server-status status-warning">Предупреждение</div>
+                                </div>
+                            </div>
+                            <div class="server-metrics">
+                                <div class="server-metric">
+                                    <div class="server-metric-value">92%</div>
+                                    <div class="server-metric-label">CPU</div>
+                                </div>
+                                <div class="server-metric">
+                                    <div class="server-metric-value">1.8GB</div>
+                                    <div class="server-metric-label">RAM</div>
+                                </div>
+                                <div class="server-metric">
+                                    <div class="server-metric-value">45GB</div>
+                                    <div class="server-metric-label">Диск</div>
+                                </div>
+                                <div class="server-metric">
+                                    <div class="server-metric-value">2.1ms</div>
+                                    <div class="server-metric-label">Ping</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="server-card">
+                            <div class="server-header">
+                                <div class="server-icon">
+                                    <i class="fas fa-network-wired"></i>
+                                </div>
+                                <div class="server-info">
+                                    <div class="server-name">Load Balancer</div>
+                                    <div class="server-status status-offline">Офлайн</div>
+                                </div>
+                            </div>
+                            <div class="server-metrics">
+                                <div class="server-metric">
+                                    <div class="server-metric-value">0%</div>
+                                    <div class="server-metric-label">CPU</div>
+                                </div>
+                                <div class="server-metric">
+                                    <div class="server-metric-value">0GB</div>
+                                    <div class="server-metric-label">RAM</div>
+                                </div>
+                                <div class="server-metric">
+                                    <div class="server-metric-value">0GB</div>
+                                    <div class="server-metric-label">Диск</div>
+                                </div>
+                                <div class="server-metric">
+                                    <div class="server-metric-value">-</div>
+                                    <div class="server-metric-label">Ping</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            setupEventListeners();
+        });
+        
+        function initializeCharts() {
+            // Performance Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                    datasets: [{
+                        label: 'CPU (%)',
+                        data: [45, 52, 48, 67, 72, 65, 58],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Memory (%)',
+                        data: [35, 42, 38, 55, 62, 58, 52],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Disk (%)',
+                        data: [25, 28, 32, 35, 38, 42, 45],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+            
+            // Resources Chart
+            const resourcesCtx = document.getElementById('resourcesChart').getContext('2d');
+            new Chart(resourcesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['CPU', 'Memory', 'Disk', 'Network'],
+                    datasets: [{
+                        data: [67, 45, 35, 25],
+                        backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function setupEventListeners() {
+            // Auto-refresh every 30 seconds
+            setInterval(refreshMetrics, 30000);
+        }
+        
+        function refreshMetrics() {
+            // Simulate real-time data update
+            console.log('Refreshing metrics...');
+            
+            // Update metric values
+            const metricValues = document.querySelectorAll('.metric-value');
+            metricValues.forEach(value => {
+                const currentValue = parseFloat(value.textContent);
+                const change = (Math.random() - 0.5) * 10;
+                const newValue = Math.max(0, Math.min(100, currentValue + change));
+                value.textContent = newValue.toFixed(1) + (value.textContent.includes('%') ? '%' : '');
+            });
+        }
+        
+        function refreshAlerts() {
+            alert('Алерты обновлены!');
+        }
+        
+        function clearAlerts() {
+            if (confirm('Очистить все алерты?')) {
+                document.querySelector('.alerts-section').innerHTML = `
+                    <div class="alerts-header">
+                        <div class="alerts-title">Активные алерты</div>
+                        <div class="alerts-actions">
+                            <button class="btn btn-sm btn-primary" onclick="refreshAlerts()">Обновить</button>
+                            <button class="btn btn-sm btn-secondary" onclick="clearAlerts()">Очистить</button>
+                        </div>
+                    </div>
+                    <div style="text-align: center; padding: 2rem; color: #6b7280;">
+                        <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <div>Нет активных алертов</div>
+                    </div>
+                `;
+            }
+        }
+        
+        function refreshServers() {
+            alert('Статус серверов обновлен!');
+        }
+        
+        function applyFilters() {
+            const time = document.getElementById('timeFilter').value;
+            const server = document.getElementById('serverFilter').value;
+            
+            console.log('Applying filters:', { time, server });
+            alert('Фильтры применены!');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ai-enhanced-virtual-service
+  namespace: manager-agent-ai
+  labels:
+    app: manager-agent-ai
+    version: v2.9
+    ai-enhanced: "true"
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - manager-agent-ai-gateway
+  http:
+  # AI-Powered Intelligent Routing
+  - match:
+    - headers:
+        x-ai-optimization:
+          exact: "true"
+    - queryParams:
+        ai_route:
+          exact: "intelligent"
+    route:
+    - destination:
+        host: ai-enhanced-api-gateway
+        port:
+          number: 3000
+        subset: ai-optimized
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: "5xx,reset,connect-failure,refused-stream"
+    fault:
+      delay:
+        percentage:
+          value: 0.1
+        fixedDelay: 5s
+      abort:
+        percentage:
+          value: 0.1
+        httpStatus: 503
+
+  # Performance-Based Routing
+  - match:
+    - headers:
+        x-performance-tier:
+          exact: "high"
+    route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+        subset: high-performance
+    timeout: 15s
+    retries:
+      attempts: 2
+      perTryTimeout: 5s
+
+  # Geographic Routing
+  - match:
+    - headers:
+        x-region:
+          exact: "us-east"
+    route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+        subset: us-east
+    timeout: 20s
+
+  - match:
+    - headers:
+        x-region:
+          exact: "eu-west"
+    route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+        subset: eu-west
+    timeout: 25s
+
+  # Mobile Optimization
+  - match:
+    - headers:
+        user-agent:
+          regex: ".*Mobile.*"
+    route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+        subset: mobile-optimized
+    timeout: 20s
+    retries:
+      attempts: 2
+      perTryTimeout: 8s
+
+  # API Versioning with Intelligent Fallback
+  - match:
+    - uri:
+        prefix: /api/v2/
+    route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+        subset: v2
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+    fallback:
+      destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+        subset: v1
+
+  # Canary Deployment with AI-Driven Traffic Splitting
+  - match:
+    - uri:
+        prefix: /api/canary/
+    route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+        subset: canary
+      weight: 10
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+        subset: stable
+      weight: 90
+    timeout: 30s
+    retries:
+      attempts: 2
+      perTryTimeout: 10s
+
+  # A/B Testing Routes
+  - match:
+    - headers:
+        x-experiment-group:
+          exact: "A"
+    route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+        subset: experiment-a
+    timeout: 30s
+
+  - match:
+    - headers:
+        x-experiment-group:
+          exact: "B"
+    route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+        subset: experiment-b
+    timeout: 30s
+
+  # Default Route with Load Balancing
+  - route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+        subset: default
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+    loadBalancer:
+      simple: LEAST_CONN
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 30s
+        tcpKeepalive:
+          time: 7200s
+          interval: 75s
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+        h2UpgradePolicy: UPGRADE
+        useClientProtocol: true
+    circuitBreaker:
+      consecutiveErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 30
+    outlierDetection:
+      consecutiveGatewayErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 30
+
+  # WebSocket Support
+  - match:
+    - uri:
+        prefix: /ws
+    route:
+    - destination:
+        host: dashboard-service
+        port:
+          number: 3000
+    timeout: 0s
+    retries:
+      attempts: 0
+
+  # Health Check Routes
+  - match:
+    - uri:
+        exact: /health
+    route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+    timeout: 5s
+    retries:
+      attempts: 1
+      perTryTimeout: 3s
+
+  # Metrics Routes
+  - match:
+    - uri:
+        prefix: /metrics
+    route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+    timeout: 10s
+    retries:
+      attempts: 2
+      perTryTimeout: 5s
+
+  # Admin Routes with Authentication
+  - match:
+    - uri:
+        prefix: /admin
+    - headers:
+        x-admin-token:
+          regex: ".*"
+    route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+        subset: admin
+    timeout: 60s
+    retries:
+      attempts: 1
+      perTryTimeout: 30s
+
+  # API Routes with Rate Limiting
+  - match:
+    - uri:
+        prefix: /api/
+    route:
+    - destination:
+        host: api-gateway-service
+        port:
+          number: 3000
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+    headers:
+      request:
+        set:
+          x-request-id: "%REQ(x-request-id)%"
+          x-forwarded-for: "%REQ(x-forwarded-for)%"
+          x-forwarded-proto: "%REQ(x-forwarded-proto)%"
+      response:
+        set:
+          x-response-time: "%DURATION%"
+          x-service-version: "%UPSTREAM_METADATA([\"istio\", \"canonical_revision\"])%"
+
+  # Dashboard Routes
+  - match:
+    - uri:
+        prefix: /dashboard
+    route:
+    - destination:
+        host: dashboard-service
+        port:
+          number: 3000
+    timeout: 30s
+    retries:
+      attempts: 2
+      perTryTimeout: 10s
+
+  # Static Assets with Caching
+  - match:
+    - uri:
+        regex: ".*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$"
+    route:
+    - destination:
+        host: dashboard-service
+        port:
+          number: 3000
+    timeout: 10s
+    retries:
+      attempts: 1
+      perTryTimeout: 5s
+    headers:
+      response:
+        set:
+          cache-control: "public, max-age=31536000"
+          expires: "%RESPONSE_TIME% + 31536000s"
+
+  # Default Fallback
+  - route:
+    - destination:
+        host: dashboard-service
+        port:
+          number: 3000
+    timeout: 30s
+    retries:
+      attempts: 2
+      perTryTimeout: 10s

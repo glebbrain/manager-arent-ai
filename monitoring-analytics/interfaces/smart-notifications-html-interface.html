@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Notifications - Universal Project Manager v3.3</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .notifications-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .notifications-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .notifications-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .notifications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .notification-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .notification-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .notification-card.critical {
+            border-left-color: #ef4444;
+        }
+
+        .notification-card.warning {
+            border-left-color: #f59e0b;
+        }
+
+        .notification-card.info {
+            border-left-color: #3b82f6;
+        }
+
+        .notification-card.success {
+            border-left-color: #10b981;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .notification-priority {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .priority-critical {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .priority-high {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .priority-medium {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .priority-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .notification-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .notification-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .notifications-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .notifications-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .notification-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recent-notifications {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .notifications-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .notification-icon.critical {
+            background: #ef4444;
+        }
+
+        .notification-icon.warning {
+            background: #f59e0b;
+        }
+
+        .notification-icon.info {
+            background: #3b82f6;
+        }
+
+        .notification-icon.success {
+            background: #10b981;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .notification-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .notification-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .notifications-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .notifications-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-bell"></i> Smart Notifications</h1>
+            <p>Contextual notifications about important events - Universal Project Manager v3.3</p>
+        </div>
+
+        <div class="notifications-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-bell"></i></div>
+                <div class="overview-value">47</div>
+                <div class="overview-label">Active Notifications</div>
+                <div class="overview-trend trend-up">+8 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="overview-value">12</div>
+                <div class="overview-label">Critical Alerts</div>
+                <div class="overview-trend trend-down">-3 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="overview-value">89%</div>
+                <div class="overview-label">Response Rate</div>
+                <div class="overview-trend trend-up">+5% this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-clock"></i></div>
+                <div class="overview-value">2.3m</div>
+                <div class="overview-label">Avg Response Time</div>
+                <div class="overview-trend trend-down">-0.5m this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">94%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+3% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-users"></i></div>
+                <div class="overview-value">24</div>
+                <div class="overview-label">Subscribed Users</div>
+                <div class="overview-trend trend-up">+2 this week</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="notifications-section">
+                <h2><i class="fas fa-chart-area"></i> Notification Analytics</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Notification Volume Over Time</div>
+                    <canvas id="volumeChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Notification Types Distribution</div>
+                    <canvas id="typesChart"></canvas>
+                </div>
+
+                <div class="notifications-grid">
+                    <div class="notification-card critical">
+                        <div class="notification-header">
+                            <div class="notification-title">System Overload Alert</div>
+                            <div class="notification-priority priority-critical">Critical</div>
+                        </div>
+                        <div class="notification-description">Server CPU usage exceeded 95% for 5 minutes</div>
+                        <div class="notification-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">95%</div>
+                                <div class="metric-label">CPU Usage</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">5m</div>
+                                <div class="metric-label">Duration</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">3</div>
+                                <div class="metric-label">Affected</div>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn">Acknowledge</button>
+                            <button class="action-btn secondary">View Details</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card warning">
+                        <div class="notification-header">
+                            <div class="notification-title">Task Deadline Approaching</div>
+                            <div class="notification-priority priority-high">High</div>
+                        </div>
+                        <div class="notification-description">API Integration task due in 2 hours</div>
+                        <div class="notification-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">2h</div>
+                                <div class="metric-label">Time Left</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">45%</div>
+                                <div class="metric-label">Progress</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">1</div>
+                                <div class="metric-label">Assignee</div>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn">Extend</button>
+                            <button class="action-btn secondary">View Task</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card info">
+                        <div class="notification-header">
+                            <div class="notification-title">New Team Member Added</div>
+                            <div class="notification-priority priority-medium">Medium</div>
+                        </div>
+                        <div class="notification-description">Sarah Chen joined the development team</div>
+                        <div class="notification-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">1</div>
+                                <div class="metric-label">New Member</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">24</div>
+                                <div class="metric-label">Total Team</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">3</div>
+                                <div class="metric-label">Skills</div>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn">Welcome</button>
+                            <button class="action-btn secondary">View Profile</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card success">
+                        <div class="notification-header">
+                            <div class="notification-title">Deployment Successful</div>
+                            <div class="notification-priority priority-low">Low</div>
+                        </div>
+                        <div class="notification-description">Version 3.3.0 deployed to production</div>
+                        <div class="notification-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">3.3.0</div>
+                                <div class="metric-label">Version</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2m</div>
+                                <div class="metric-label">Deploy Time</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn">View Logs</button>
+                            <button class="action-btn secondary">Monitor</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card warning">
+                        <div class="notification-header">
+                            <div class="notification-title">Security Scan Alert</div>
+                            <div class="notification-priority priority-high">High</div>
+                        </div>
+                        <div class="notification-description">3 vulnerabilities found in dependencies</div>
+                        <div class="notification-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">3</div>
+                                <div class="metric-label">Vulnerabilities</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2</div>
+                                <div class="metric-label">High Risk</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">1</div>
+                                <div class="metric-label">Medium</div>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn">Fix Now</button>
+                            <button class="action-btn secondary">View Report</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card info">
+                        <div class="notification-header">
+                            <div class="notification-title">Performance Optimization</div>
+                            <div class="notification-priority priority-medium">Medium</div>
+                        </div>
+                        <div class="notification-description">Database query optimization completed</div>
+                        <div class="notification-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">35%</div>
+                                <div class="metric-label">Improvement</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">12</div>
+                                <div class="metric-label">Queries</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2.1s</div>
+                                <div class="metric-label">Avg Time</div>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn">View Report</button>
+                            <button class="action-btn secondary">Monitor</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card success">
+                        <div class="notification-header">
+                            <div class="notification-title">Code Review Completed</div>
+                            <div class="notification-priority priority-low">Low</div>
+                        </div>
+                        <div class="notification-description">Pull request #1234 approved and merged</div>
+                        <div class="notification-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">#1234</div>
+                                <div class="metric-label">PR Number</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2</div>
+                                <div class="metric-label">Reviewers</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">5</div>
+                                <div class="metric-label">Comments</div>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn">View PR</button>
+                            <button class="action-btn secondary">View Changes</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card warning">
+                        <div class="notification-header">
+                            <div class="notification-title">Resource Usage Alert</div>
+                            <div class="notification-priority priority-high">High</div>
+                        </div>
+                        <div class="notification-description">Memory usage exceeded 85% threshold</div>
+                        <div class="notification-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">87%</div>
+                                <div class="metric-label">Memory</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">15m</div>
+                                <div class="metric-label">Duration</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2</div>
+                                <div class="metric-label">Services</div>
+                            </div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn">Scale Up</button>
+                            <button class="action-btn secondary">View Metrics</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notifications-controls">
+                <h2><i class="fas fa-cogs"></i> Notification Controls</h2>
+                
+                <div class="notification-actions">
+                    <button class="control-btn" onclick="sendNotification()">
+                        <i class="fas fa-paper-plane"></i> Send Notification
+                    </button>
+                    <button class="control-btn secondary" onclick="configureAlerts()">
+                        <i class="fas fa-bell-slash"></i> Configure Alerts
+                    </button>
+                    <button class="control-btn secondary" onclick="viewAnalytics()">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </button>
+                </div>
+
+                <div class="notification-status">
+                    <div class="status-title">Notification Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Last Update</div>
+                        <div class="status-value">1 minute ago</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Active Notifications</div>
+                        <div class="status-value">47 notifications</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Critical Alerts</div>
+                        <div class="status-value">12 alerts</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Response Rate</div>
+                        <div class="status-value">89%</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Subscribed Users</div>
+                        <div class="status-value">24 users</div>
+                    </div>
+                </div>
+
+                <div class="recent-notifications">
+                    <div class="notifications-title">Recent Notifications</div>
+                    <div class="notification-item">
+                        <div class="notification-icon critical">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">System Overload Alert</div>
+                            <div class="notification-description">Server CPU usage exceeded 95%</div>
+                        </div>
+                        <div class="notification-time">2 minutes ago</div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-icon warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">Task Deadline Approaching</div>
+                            <div class="notification-description">API Integration task due in 2 hours</div>
+                        </div>
+                        <div class="notification-time">5 minutes ago</div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-icon info">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">New Team Member Added</div>
+                            <div class="notification-description">Sarah Chen joined the development team</div>
+                        </div>
+                        <div class="notification-time">15 minutes ago</div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">Deployment Successful</div>
+                            <div class="notification-description">Version 3.3.0 deployed to production</div>
+                        </div>
+                        <div class="notification-time">1 hour ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI Notification Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        Notification accuracy improved by 20% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Some notifications need priority adjustment
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI patterns available for better targeting
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let volumeChart, typesChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Volume Chart
+            const volumeCtx = document.getElementById('volumeChart').getContext('2d');
+            volumeChart = new Chart(volumeCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(7),
+                    datasets: [{
+                        label: 'Notifications Sent',
+                        data: [12, 15, 18, 22, 19, 25, 23],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Notifications Read',
+                        data: [10, 13, 16, 20, 17, 22, 21],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Types Chart
+            const typesCtx = document.getElementById('typesChart').getContext('2d');
+            typesChart = new Chart(typesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low'],
+                    datasets: [{
+                        data: [12, 18, 25, 15],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels(days) {
+            const labels = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function sendNotification() {
+            alert('Sending smart notification...');
+        }
+
+        function configureAlerts() {
+            alert('Opening notification configuration...');
+        }
+
+        function viewAnalytics() {
+            alert('Opening notification analytics...');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: edge-computing-enhanced-service
+  namespace: edge-computing
+  labels:
+    app: edge-computing-enhanced
+    version: "3.1.0"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  selector:
+    app: edge-computing-enhanced
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edge-computing-enhanced-loadbalancer
+  namespace: edge-computing
+  labels:
+    app: edge-computing-enhanced
+    version: "3.1.0"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  selector:
+    app: edge-computing-enhanced

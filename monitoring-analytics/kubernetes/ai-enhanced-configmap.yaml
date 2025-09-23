@@ -1,0 +1,140 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: manager-agent-ai-config
+  namespace: manager-agent-ai
+  labels:
+    app: manager-agent-ai
+    version: "2.9"
+    ai-enhanced: "true"
+data:
+  # Environment Configuration
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  DEBUG: "false"
+  
+  # Service URLs
+  EVENT_BUS_URL: "http://event-bus:4000"
+  DATABASE_URL: "postgresql://postgres:password@postgres:5432/manager_agent_ai"
+  REDIS_URL: "redis://redis:6379"
+  PROMETHEUS_URL: "http://prometheus:9090"
+  GRAFANA_URL: "http://grafana:3000"
+  JAEGER_URL: "http://jaeger:14268"
+  
+  # AI Configuration
+  AI_ENABLED: "true"
+  AI_MODEL_PROVIDER: "openai"
+  AI_MODEL_VERSION: "gpt-4"
+  AI_MAX_TOKENS: "4000"
+  AI_TEMPERATURE: "0.7"
+  AI_TOP_P: "0.9"
+  AI_FREQUENCY_PENALTY: "0.0"
+  AI_PRESENCE_PENALTY: "0.0"
+  
+  # Performance Configuration
+  PERFORMANCE_MONITORING: "true"
+  PERFORMANCE_THRESHOLD_MS: "1000"
+  PERFORMANCE_SAMPLING_RATE: "0.1"
+  PERFORMANCE_METRICS_RETENTION: "30d"
+  
+  # Security Configuration
+  SECURITY_ENABLED: "true"
+  CORS_ORIGINS: "https://app.manageragentai.com,https://admin.manageragentai.com"
+  RATE_LIMIT_WINDOW_MS: "900000"
+  RATE_LIMIT_MAX_REQUESTS: "1000"
+  JWT_EXPIRY: "24h"
+  JWT_REFRESH_EXPIRY: "7d"
+  
+  # Monitoring Configuration
+  MONITORING_ENABLED: "true"
+  METRICS_ENABLED: "true"
+  TRACING_ENABLED: "true"
+  LOGGING_ENABLED: "true"
+  ALERTING_ENABLED: "true"
+  
+  # Scaling Configuration
+  AUTO_SCALING_ENABLED: "true"
+  MIN_REPLICAS: "2"
+  MAX_REPLICAS: "10"
+  TARGET_CPU_UTILIZATION: "70"
+  TARGET_MEMORY_UTILIZATION: "80"
+  
+  # Cost Optimization
+  COST_OPTIMIZATION_ENABLED: "true"
+  RESOURCE_OPTIMIZATION_ENABLED: "true"
+  SPOT_INSTANCE_ENABLED: "true"
+  PREEMPTIBLE_ENABLED: "true"
+  
+  # Compliance Configuration
+  COMPLIANCE_ENABLED: "true"
+  GDPR_COMPLIANCE: "true"
+  HIPAA_COMPLIANCE: "true"
+  SOX_COMPLIANCE: "true"
+  AUDIT_LOGGING: "true"
+  
+  # Disaster Recovery
+  BACKUP_ENABLED: "true"
+  BACKUP_SCHEDULE: "0 2 * * *"
+  BACKUP_RETENTION: "30d"
+  DISASTER_RECOVERY_ENABLED: "true"
+  
+  # Multi-Cloud Configuration
+  MULTI_CLOUD_ENABLED: "true"
+  PRIMARY_CLOUD: "aws"
+  SECONDARY_CLOUD: "azure"
+  TERTIARY_CLOUD: "gcp"
+  
+  # Network Configuration
+  NETWORK_POLICY_ENABLED: "true"
+  MTLS_ENABLED: "true"
+  SERVICE_MESH_ENABLED: "true"
+  INGRESS_CONTROLLER: "nginx"
+  
+  # Storage Configuration
+  STORAGE_CLASS: "ssd"
+  STORAGE_ENCRYPTION: "true"
+  STORAGE_BACKUP: "true"
+  
+  # Feature Flags
+  FEATURE_FLAGS: "ai_enhanced_routing,circuit_breaker,rate_limiting,auto_scaling,cost_optimization"
+  
+  # API Configuration
+  API_VERSION: "v1"
+  API_TIMEOUT: "30000"
+  API_RETRY_ATTEMPTS: "3"
+  API_RETRY_DELAY: "1000"
+  
+  # Database Configuration
+  DB_POOL_SIZE: "20"
+  DB_POOL_MIN: "5"
+  DB_POOL_MAX: "30"
+  DB_TIMEOUT: "30000"
+  DB_RETRY_ATTEMPTS: "3"
+  
+  # Cache Configuration
+  CACHE_TTL: "3600"
+  CACHE_MAX_SIZE: "1000"
+  CACHE_STRATEGY: "lru"
+  
+  # Queue Configuration
+  QUEUE_CONCURRENCY: "10"
+  QUEUE_RETRY_ATTEMPTS: "3"
+  QUEUE_RETRY_DELAY: "5000"
+  
+  # Notification Configuration
+  NOTIFICATION_ENABLED: "true"
+  EMAIL_ENABLED: "true"
+  SMS_ENABLED: "true"
+  PUSH_ENABLED: "true"
+  
+  # Integration Configuration
+  WEBHOOK_ENABLED: "true"
+  API_WEBHOOK_URL: "https://api.manageragentai.com/webhooks"
+  SLACK_WEBHOOK_URL: "https://hooks.slack.com/services/..."
+  TEAMS_WEBHOOK_URL: "https://outlook.office.com/webhook/..."
+  
+  # Development Configuration
+  HOT_RELOAD: "false"
+  DEBUG_MODE: "false"
+  PROFILING_ENABLED: "false"
+  TESTING_ENABLED: "false"

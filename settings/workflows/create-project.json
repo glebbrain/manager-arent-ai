@@ -1,0 +1,82 @@
+{
+  "name": "Create Project",
+  "description": "Complete project creation workflow with template selection and configuration",
+  "version": "1.0.0",
+  "author": "ManagerAgentAI",
+  "steps": [
+    {
+      "name": "Validate Input",
+      "type": "condition",
+      "condition": "{{projectName}} && {{templateType}}",
+      "onError": "stop"
+    },
+    {
+      "name": "Create Project Directory",
+      "type": "command",
+      "command": "mkdir -p {{projectName}}",
+      "onError": "stop"
+    },
+    {
+      "name": "Initialize Git Repository",
+      "type": "command",
+      "command": "cd {{projectName}} && git init",
+      "onError": "continue"
+    },
+    {
+      "name": "Generate Project Structure",
+      "type": "script",
+      "script": "scripts/template-generator.js",
+      "onError": "stop"
+    },
+    {
+      "name": "Configure Project",
+      "type": "script",
+      "script": "scripts/auto-configurator.js",
+      "onError": "continue"
+    },
+    {
+      "name": "Install Dependencies",
+      "type": "command",
+      "command": "cd {{projectName}} && npm install",
+      "onError": "continue"
+    },
+    {
+      "name": "Create Initial Commit",
+      "type": "command",
+      "command": "cd {{projectName}} && git add . && git commit -m \"Initial commit\"",
+      "onError": "continue"
+    },
+    {
+      "name": "Setup Development Environment",
+      "type": "parallel",
+      "steps": [
+        {
+          "name": "Create VS Code Settings",
+          "type": "file",
+          "operation": {
+            "operation": "write",
+            "path": "{{projectName}}/.vscode/settings.json",
+            "content": "{\n  \"editor.formatOnSave\": true,\n  \"editor.codeActionsOnSave\": {\n    \"source.fixAll.eslint\": true\n  },\n  \"typescript.preferences.importModuleSpecifier\": \"relative\"\n}"
+          }
+        },
+        {
+          "name": "Create Git Hooks",
+          "type": "file",
+          "operation": {
+            "operation": "write",
+            "path": "{{projectName}}/.husky/pre-commit",
+            "content": "#!/bin/sh\nnpm run lint && npm run test"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Send Success Notification",
+      "type": "notification",
+      "notification": {
+        "message": "Project '{{projectName}}' created successfully with template '{{templateType}}'",
+        "type": "success"
+      }
+    }
+  ]
+}

@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discovery - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .logo i {
+            margin-right: 0.5rem;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #6b7280;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            color: #2563eb;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .search-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .search-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .search-header p {
+            font-size: 1.2rem;
+            color: #6b7280;
+        }
+
+        .search-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-input-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        .ai-recommendations {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .ai-recommendations h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+        }
+
+        .ai-recommendations h2 i {
+            margin-right: 0.5rem;
+            color: #2563eb;
+        }
+
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .recommendation-card {
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: #2563eb;
+        }
+
+        .recommendation-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+
+        .recommendation-card p {
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .recommendation-card .confidence {
+            font-size: 0.9rem;
+            color: #10b981;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .recommendation-card .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .categories {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .categories h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #1f2937;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .category-card {
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: #2563eb;
+        }
+
+        .category-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #2563eb;
+        }
+
+        .category-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+
+        .category-card p {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .projects-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .projects-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .projects-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .project-card {
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: #2563eb;
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .project-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-tech {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stars {
+            color: #fbbf24;
+        }
+
+        .rating-text {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .project-time {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            color: #374151;
+        }
+
+        .btn-outline:hover {
+            background: #f3f4f6;
+        }
+
+        .favorite-btn {
+            background: none;
+            border: none;
+            color: #d1d5db;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .favorite-btn.favorited {
+            color: #ef4444;
+        }
+
+        .favorite-btn:hover {
+            color: #ef4444;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #2563eb;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #d1d5db;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover {
+            background: #f3f4f6;
+        }
+
+        .pagination button.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav {
+                gap: 1rem;
+            }
+
+            .search-container {
+                padding: 1rem;
+            }
+
+            .search-header h1 {
+                font-size: 2rem;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .recommendations-grid,
+            .categories-grid,
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .project-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-rocket"></i>
+                Universal Project Manager v3.1
+            </div>
+            <nav class="nav">
+                <a href="main-gui-interface.html">Главная</a>
+                <a href="discovery-html-interface.html" class="active">Discovery</a>
+                <a href="chat-html-interface.html">Чат</a>
+                <a href="moderator-dashboard-html-interface.html">Модератор</a>
+            </nav>
+            <div class="user-menu">
+                <button class="btn btn-secondary">
+                    <i class="fas fa-user"></i> Профиль
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="search-container">
+        <div class="search-header">
+            <h1><i class="fas fa-search"></i> Discovery - Поиск и выбор проектов</h1>
+            <p>Найдите идеальный проект для ваших задач с помощью AI-рекомендаций</p>
+        </div>
+
+        <div class="search-bar">
+            <div class="search-input-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Поиск по названию, типу, технологии..." id="searchInput">
+            </div>
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Статус</label>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">Все</option>
+                        <option value="active">Активные</option>
+                        <option value="completed">Завершенные</option>
+                        <option value="archived">Архивные</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Тип</label>
+                    <select class="filter-select" id="typeFilter">
+                        <option value="">Все</option>
+                        <option value="web">Web App</option>
+                        <option value="mobile">Mobile App</option>
+                        <option value="python">Python</option>
+                        <option value="java">Java</option>
+                        <option value="nodejs">Node.js</option>
+                        <option value="dotnet">.NET</option>
+                        <option value="rust">Rust</option>
+                        <option value="ai">AI/ML</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Сложность</label>
+                    <select class="filter-select" id="difficultyFilter">
+                        <option value="">Все</option>
+                        <option value="beginner">Начинающий</option>
+                        <option value="intermediate">Средний</option>
+                        <option value="advanced">Продвинутый</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Сортировка</label>
+                    <select class="filter-select" id="sortFilter">
+                        <option value="date">По дате</option>
+                        <option value="rating">По рейтингу</option>
+                        <option value="name">По названию</option>
+                        <option value="popularity">По популярности</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="ai-recommendations">
+            <h2><i class="fas fa-robot"></i> AI-рекомендации для вас</h2>
+            <div class="recommendations-grid">
+                <div class="recommendation-card" onclick="createProject('react-typescript')">
+                    <h3>🎯 React + TypeScript</h3>
+                    <p>Основано на ваших предыдущих проектах</p>
+                    <div class="confidence">Уверенность: 87%</div>
+                    <div class="actions">
+                        <button class="btn btn-primary">Создать проект</button>
+                        <button class="btn btn-secondary">Подробнее</button>
+                    </div>
+                </div>
+                <div class="recommendation-card" onclick="createProject('vue-fastapi')">
+                    <h3>🔥 Vue.js + FastAPI</h3>
+                    <p>Популярно в вашей сфере деятельности</p>
+                    <div class="confidence">Уверенность: 72%</div>
+                    <div class="actions">
+                        <button class="btn btn-primary">Создать проект</button>
+                        <button class="btn btn-secondary">Подробнее</button>
+                    </div>
+                </div>
+                <div class="recommendation-card" onclick="createProject('nextjs-prisma')">
+                    <h3>🚀 Next.js + Prisma</h3>
+                    <p>Современный стек для веб-разработки</p>
+                    <div class="confidence">Уверенность: 68%</div>
+                    <div class="actions">
+                        <button class="btn btn-primary">Создать проект</button>
+                        <button class="btn btn-secondary">Подробнее</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="categories">
+            <h2>Категории проектов</h2>
+            <div class="categories-grid">
+                <div class="category-card" onclick="filterByCategory('web')">
+                    <i class="fas fa-globe"></i>
+                    <h3>Web Apps</h3>
+                    <p>15 проектов</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('mobile')">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Mobile Apps</h3>
+                    <p>8 проектов</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('python')">
+                    <i class="fab fa-python"></i>
+                    <h3>Python</h3>
+                    <p>12 проектов</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('java')">
+                    <i class="fab fa-java"></i>
+                    <h3>Java</h3>
+                    <p>6 проектов</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('nodejs')">
+                    <i class="fab fa-node-js"></i>
+                    <h3>Node.js</h3>
+                    <p>10 проектов</p>
+                </div>
+                <div class="category-card" onclick="filterByCategory('ai')">
+                    <i class="fas fa-brain"></i>
+                    <h3>AI/ML</h3>
+                    <p>9 проектов</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="projects-section">
+            <div class="projects-header">
+                <h2>Результаты поиска</h2>
+                <div>
+                    <button class="btn btn-secondary" onclick="exportProjects()">
+                        <i class="fas fa-download"></i> Экспорт
+                    </button>
+                </div>
+            </div>
+            <div id="projectsContainer">
+                <div class="loading" id="loadingIndicator">
+                    <div class="spinner"></div>
+                    <p>Загрузка проектов...</p>
+                </div>
+                <div class="projects-grid" id="projectsGrid" style="display: none;">
+                    <!-- Projects will be loaded here -->
+                </div>
+            </div>
+            <div class="pagination" id="pagination" style="display: none;">
+                <button onclick="changePage(-1)" id="prevBtn">Назад</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button onclick="changePage(1)" id="nextBtn">Далее</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample projects data
+        const projects = [
+            {
+                id: 1,
+                title: "React E-commerce Platform",
+                tech: "React + Node.js + MongoDB",
+                rating: 4.8,
+                reviews: 156,
+                time: "2 дня назад",
+                type: "web",
+                difficulty: "intermediate",
+                description: "Полнофункциональная платформа электронной коммерции с современным дизайном и AI-рекомендациями.",
+                features: ["Корзина покупок", "Интеграция платежей", "AI-рекомендации", "Адаптивный дизайн"],
+                author: "@dev123",
+                isFavorite: false
+            },
+            {
+                id: 2,
+                title: "Vue.js Admin Dashboard",
+                tech: "Vue + TypeScript + Ant Design",
+                rating: 4.6,
+                reviews: 89,
+                time: "1 неделя назад",
+                type: "web",
+                difficulty: "intermediate",
+                description: "Современная админ-панель с интуитивным интерфейсом и мощными возможностями аналитики.",
+                features: ["Аналитика в реальном времени", "Управление пользователями", "Настраиваемые виджеты"],
+                author: "@designer456",
+                isFavorite: true
+            },
+            {
+                id: 3,
+                title: "React Native Mobile App",
+                tech: "React Native + Firebase",
+                rating: 4.7,
+                reviews: 234,
+                time: "3 дня назад",
+                type: "mobile",
+                difficulty: "advanced",
+                description: "Кроссплатформенное мобильное приложение с push-уведомлениями и офлайн-режимом.",
+                features: ["Push-уведомления", "Офлайн-режим", "Синхронизация данных", "Биометрическая аутентификация"],
+                author: "@mobile_dev",
+                isFavorite: false
+            },
+            {
+                id: 4,
+                title: "Python FastAPI Backend",
+                tech: "Python + FastAPI + PostgreSQL",
+                rating: 4.9,
+                reviews: 78,
+                time: "5 дней назад",
+                type: "python",
+                difficulty: "advanced",
+                description: "Высокопроизводительный REST API с автоматической документацией и валидацией данных.",
+                features: ["Автодокументация", "Валидация данных", "Асинхронная обработка", "JWT аутентификация"],
+                author: "@python_dev",
+                isFavorite: true
+            },
+            {
+                id: 5,
+                title: "AI Chat Assistant",
+                tech: "Python + TensorFlow + OpenAI",
+                rating: 4.5,
+                reviews: 45,
+                time: "1 неделя назад",
+                type: "ai",
+                difficulty: "advanced",
+                description: "Интеллектуальный чат-бот с поддержкой контекста и обучением на пользовательских данных.",
+                features: ["NLP обработка", "Контекстные ответы", "Обучение на данных", "Мультиязычность"],
+                author: "@ai_researcher",
+                isFavorite: false
+            }
+        ];
+
+        let filteredProjects = [...projects];
+        let currentPage = 1;
+        const projectsPerPage = 6;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProjects();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', debounce(filterProjects, 300));
+            document.getElementById('statusFilter').addEventListener('change', filterProjects);
+            document.getElementById('typeFilter').addEventListener('change', filterProjects);
+            document.getElementById('difficultyFilter').addEventListener('change', filterProjects);
+            document.getElementById('sortFilter').addEventListener('change', sortProjects);
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function loadProjects() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const projectsGrid = document.getElementById('projectsGrid');
+            const pagination = document.getElementById('pagination');
+
+            // Show loading
+            loadingIndicator.style.display = 'block';
+            projectsGrid.style.display = 'none';
+            pagination.style.display = 'none';
+
+            // Simulate loading delay
+            setTimeout(() => {
+                displayProjects();
+                loadingIndicator.style.display = 'none';
+                projectsGrid.style.display = 'grid';
+                pagination.style.display = 'flex';
+            }, 1000);
+        }
+
+        function displayProjects() {
+            const projectsGrid = document.getElementById('projectsGrid');
+            const startIndex = (currentPage - 1) * projectsPerPage;
+            const endIndex = startIndex + projectsPerPage;
+            const projectsToShow = filteredProjects.slice(startIndex, endIndex);
+
+            if (projectsToShow.length === 0) {
+                projectsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>Проекты не найдены</h3>
+                        <p>Попробуйте изменить параметры поиска</p>
+                    </div>
+                `;
+                return;
+            }
+
+            projectsGrid.innerHTML = projectsToShow.map(project => `
+                <div class="project-card" onclick="viewProject(${project.id})">
+                    <div class="project-header">
+                        <div>
+                            <div class="project-title">${project.title}</div>
+                            <div class="project-tech">${project.tech}</div>
+                        </div>
+                        <button class="favorite-btn ${project.isFavorite ? 'favorited' : ''}" 
+                                onclick="toggleFavorite(event, ${project.id})">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="project-rating">
+                        <div class="stars">
+                            ${'★'.repeat(Math.floor(project.rating))}${'☆'.repeat(5 - Math.floor(project.rating))}
+                        </div>
+                        <span class="rating-text">${project.rating} (${project.reviews})</span>
+                    </div>
+                    <div class="project-meta">
+                        <span class="project-time">${project.time}</span>
+                        <span>${project.author}</span>
+                    </div>
+                    <div class="project-actions">
+                        <button class="btn btn-primary btn-sm" onclick="viewProject(${project.id})">
+                            Подробнее
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="cloneProject(${project.id})">
+                            Клонировать
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterProjects() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const difficultyFilter = document.getElementById('difficultyFilter').value;
+
+            filteredProjects = projects.filter(project => {
+                const matchesSearch = project.title.toLowerCase().includes(searchTerm) ||
+                                    project.tech.toLowerCase().includes(searchTerm) ||
+                                    project.description.toLowerCase().includes(searchTerm);
+                
+                const matchesStatus = !statusFilter || project.status === statusFilter;
+                const matchesType = !typeFilter || project.type === typeFilter;
+                const matchesDifficulty = !difficultyFilter || project.difficulty === difficultyFilter;
+
+                return matchesSearch && matchesStatus && matchesType && matchesDifficulty;
+            });
+
+            currentPage = 1;
+            displayProjects();
+        }
+
+        function sortProjects() {
+            const sortBy = document.getElementById('sortFilter').value;
+            
+            filteredProjects.sort((a, b) => {
+                switch (sortBy) {
+                    case 'rating':
+                        return b.rating - a.rating;
+                    case 'name':
+                        return a.title.localeCompare(b.title);
+                    case 'popularity':
+                        return b.reviews - a.reviews;
+                    case 'date':
+                    default:
+                        return 0; // Already sorted by date
+                }
+            });
+
+            displayProjects();
+        }
+
+        function filterByCategory(category) {
+            document.getElementById('typeFilter').value = category;
+            filterProjects();
+        }
+
+        function toggleFavorite(event, projectId) {
+            event.stopPropagation();
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                project.isFavorite = !project.isFavorite;
+                displayProjects();
+            }
+        }
+
+        function viewProject(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                alert(`Просмотр проекта: ${project.title}\n\nОписание: ${project.description}\n\nВозможности:\n${project.features.map(f => '• ' + f).join('\n')}`);
+            }
+        }
+
+        function cloneProject(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                if (confirm(`Клонировать проект "${project.title}"?`)) {
+                    alert('Проект успешно клонирован!');
+                }
+            }
+        }
+
+        function createProject(template) {
+            alert(`Создание проекта на основе шаблона: ${template}`);
+        }
+
+        function exportProjects() {
+            alert('Экспорт проектов в CSV...');
+        }
+
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
+            const newPage = currentPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                displayProjects();
+            }
+        }
+    </script>
+</body>
+</html>

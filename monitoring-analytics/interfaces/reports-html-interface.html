@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Analytics - Universal Project Manager v3.1</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .header { background: #ffffff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .back-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280; }
+        .header-title { font-size: 1.5rem; font-weight: bold; color: #1f2937; }
+        .header-actions { display: flex; gap: 1rem; align-items: center; }
+        .main-container { display: flex; min-height: calc(100vh - 80px); }
+        .sidebar { width: 250px; background: #ffffff; border-right: 1px solid #e5e7eb; padding: 2rem 0; }
+        .filter-section { padding: 0 2rem 2rem; border-bottom: 1px solid #e5e7eb; margin-bottom: 2rem; }
+        .filter-title { font-weight: bold; margin-bottom: 1rem; color: #1f2937; }
+        .filter-options { display: flex; flex-direction: column; gap: 0.5rem; }
+        .filter-option { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 0.25rem; cursor: pointer; transition: background 0.2s; }
+        .filter-option:hover { background: #f3f4f6; }
+        .filter-option.active { background: #dbeafe; color: #1e40af; }
+        .main-content { flex: 1; padding: 2rem; }
+        .report-overview { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+        .kpi-card { text-align: center; padding: 1.5rem; background: #f8fafc; border-radius: 0.5rem; }
+        .kpi-value { font-size: 2rem; font-weight: bold; color: #1f2937; margin-bottom: 0.5rem; }
+        .kpi-label { color: #6b7280; font-size: 0.875rem; }
+        .kpi-change { font-size: 0.875rem; margin-top: 0.25rem; }
+        .kpi-positive { color: #10b981; }
+        .kpi-negative { color: #ef4444; }
+        .chart-container { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .chart-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; color: #1f2937; }
+        .chart-canvas { width: 100%; height: 300px; }
+        .chart-controls { display: flex; gap: 1rem; margin-bottom: 1rem; }
+        .chart-btn { padding: 0.5rem 1rem; border: 1px solid #d1d5db; background: #ffffff; border-radius: 0.5rem; cursor: pointer; }
+        .chart-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
+        .comparison-matrix { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .matrix-table th, .matrix-table td { padding: 0.75rem; text-align: center; border: 1px solid #e5e7eb; }
+        .matrix-table th { background: #f8fafc; font-weight: bold; }
+        .matrix-table tr:hover { background: #f8fafc; }
+        .ai-insights { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .insight-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .insight-icon { font-size: 1.5rem; }
+        .insight-suggestion { color: #2563eb; }
+        .insight-warning { color: #f59e0b; }
+        .insight-opportunity { color: #10b981; }
+        .insight-trend { color: #3b82f6; }
+        .detailed-metrics { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .metric-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .metric-value { font-weight: bold; }
+        .metric-good { color: #10b981; }
+        .metric-warning { color: #f59e0b; }
+        .metric-critical { color: #ef4444; }
+        .team-performance { background: #ffffff; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .team-member { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .member-info { flex: 1; }
+        .member-name { font-weight: bold; margin-bottom: 0.25rem; }
+        .member-stats { color: #6b7280; font-size: 0.875rem; }
+        .performance-bar { width: 100px; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+        .performance-fill { height: 100%; background: #2563eb; transition: width 0.3s; }
+        .export-options { background: #ffffff; padding: 2rem; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .export-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1rem 0; }
+        .export-btn { padding: 1rem; border: 2px solid #e5e7eb; background: #ffffff; border-radius: 0.5rem; cursor: pointer; text-align: center; transition: all 0.2s; }
+        .export-btn:hover { border-color: #2563eb; background: #f0f9ff; }
+        .export-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .action-btn { background: #f3f4f6; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; margin-right: 0.5rem; }
+        .action-btn:hover { background: #2563eb; color: white; }
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; padding: 1rem 0; }
+            .main-content { padding: 1rem; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .chart-controls { flex-wrap: wrap; }
+            .export-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="back-btn">←</button>
+            <h1 class="header-title">Reports & Analytics</h1>
+        </div>
+        <div class="header-actions">
+            <button class="action-btn">📤 Export</button>
+            <button class="action-btn">📅 Schedule</button>
+            <button class="action-btn">❓ Help</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <nav class="sidebar">
+            <div class="filter-section">
+                <h3 class="filter-title">📅 Date Range</h3>
+                <div class="filter-options">
+                    <div class="filter-option active">Last 7 days</div>
+                    <div class="filter-option">Last 30 days</div>
+                    <div class="filter-option">Last 3 months</div>
+                    <div class="filter-option">Custom</div>
+                </div>
+            </div>
+            <div class="filter-section">
+                <h3 class="filter-title">📊 Report Type</h3>
+                <div class="filter-options">
+                    <div class="filter-option active">All</div>
+                    <div class="filter-option">Performance</div>
+                    <div class="filter-option">Quality</div>
+                    <div class="filter-option">Security</div>
+                </div>
+            </div>
+            <div class="filter-section">
+                <h3 class="filter-title">👥 Team</h3>
+                <div class="filter-options">
+                    <div class="filter-option active">All</div>
+                    <div class="filter-option">Dev</div>
+                    <div class="filter-option">QA</div>
+                    <div class="filter-option">Design</div>
+                </div>
+            </div>
+            <div class="filter-section">
+                <h3 class="filter-title">📁 Project</h3>
+                <div class="filter-options">
+                    <div class="filter-option active">All</div>
+                    <div class="filter-option">E-commerce</div>
+                    <div class="filter-option">Mobile</div>
+                    <div class="filter-option">API</div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <!-- Report Overview -->
+            <section class="report-overview">
+                <h2>📊 Report Overview: Performance Analysis | Last 30 days</h2>
+                <p>Generated: 2025-01-31 14:30 | Next: 2025-02-01 14:30</p>
+                <p>AI Confidence: 94% | Data Points: 15,847 | Status: Complete</p>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-value">92/100</div>
+                        <div class="kpi-label">Code Quality</div>
+                        <div class="kpi-change kpi-positive">+5% vs last month</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">88/100</div>
+                        <div class="kpi-label">Performance</div>
+                        <div class="kpi-change kpi-positive">+3% vs last month</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">95/100</div>
+                        <div class="kpi-label">Security</div>
+                        <div class="kpi-change kpi-positive">+2% vs last month</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">87%</div>
+                        <div class="kpi-label">Team Productivity</div>
+                        <div class="kpi-change kpi-positive">+8% vs last month</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interactive Charts -->
+            <section class="chart-container">
+                <h3 class="chart-title">📈 Performance Trends Over Time</h3>
+                <div class="chart-controls">
+                    <button class="chart-btn active">Line Chart</button>
+                    <button class="chart-btn">Bar Chart</button>
+                    <button class="chart-btn">Area Chart</button>
+                    <button class="chart-btn">Export Chart</button>
+                </div>
+                <canvas id="performanceChart" class="chart-canvas"></canvas>
+            </section>
+
+            <!-- Project Comparison Matrix -->
+            <section class="comparison-matrix">
+                <h2>📊 Project Comparison Matrix</h2>
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Quality</th>
+                            <th>Performance</th>
+                            <th>Security</th>
+                            <th>Team</th>
+                            <th>Overall</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>E-commerce</td>
+                            <td>92</td>
+                            <td>88</td>
+                            <td>95</td>
+                            <td>87</td>
+                            <td>91</td>
+                        </tr>
+                        <tr>
+                            <td>Mobile App</td>
+                            <td>85</td>
+                            <td>92</td>
+                            <td>88</td>
+                            <td>92</td>
+                            <td>89</td>
+                        </tr>
+                        <tr>
+                            <td>API Gateway</td>
+                            <td>95</td>
+                            <td>85</td>
+                            <td>98</td>
+                            <td>85</td>
+                            <td>91</td>
+                        </tr>
+                        <tr>
+                            <td>Data Analytics</td>
+                            <td>88</td>
+                            <td>90</td>
+                            <td>92</td>
+                            <td>90</td>
+                            <td>90</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="margin-top: 1rem;">
+                    <button class="action-btn">Sort by Quality</button>
+                    <button class="action-btn">Sort by Performance</button>
+                    <button class="action-btn">Export Matrix</button>
+                </div>
+            </section>
+
+            <!-- AI Insights and Recommendations -->
+            <section class="ai-insights">
+                <h2>🤖 AI Insights & Recommendations</h2>
+                <div class="insight-item">
+                    <div class="insight-icon insight-suggestion">💡</div>
+                    <div>
+                        <strong>Key Insights:</strong>
+                        <ul style="margin-top: 0.5rem; margin-left: 1rem;">
+                            <li>Code quality improved 15% this quarter</li>
+                            <li>Performance bottlenecks identified in 3 modules</li>
+                            <li>Security vulnerabilities reduced by 40%</li>
+                            <li>Team productivity increased 12% with AI assistance</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon insight-warning">🎯</div>
+                    <div>
+                        <strong>Recommendations:</strong>
+                        <ul style="margin-top: 0.5rem; margin-left: 1rem;">
+                            <li>Refactor UserService class for better maintainability</li>
+                            <li>Add caching layer to improve API response times</li>
+                            <li>Implement automated security scanning</li>
+                            <li>Schedule team training on new AI tools</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <button class="action-btn">Apply All</button>
+                    <button class="action-btn">Review Details</button>
+                    <button class="action-btn">Schedule Implementation</button>
+                </div>
+            </section>
+
+            <!-- Detailed Metrics Breakdown -->
+            <section class="detailed-metrics">
+                <h2>📋 Detailed Metrics Breakdown</h2>
+                <h3>Code Quality Metrics:</h3>
+                <div class="metric-item">
+                    <span>Maintainability:</span>
+                    <span class="metric-value metric-good">88/100</span>
+                </div>
+                <div class="metric-item">
+                    <span>Reliability:</span>
+                    <span class="metric-value metric-good">92/100</span>
+                </div>
+                <div class="metric-item">
+                    <span>Security:</span>
+                    <span class="metric-value metric-good">95/100</span>
+                </div>
+                <div class="metric-item">
+                    <span>Performance:</span>
+                    <span class="metric-value metric-good">85/100</span>
+                </div>
+                <h3 style="margin-top: 1.5rem;">Performance Metrics:</h3>
+                <div class="metric-item">
+                    <span>Response Time:</span>
+                    <span class="metric-value metric-warning">245ms (↓15ms from last month)</span>
+                </div>
+                <div class="metric-item">
+                    <span>Memory Usage:</span>
+                    <span class="metric-value metric-good">512MB (↓50MB from last month)</span>
+                </div>
+                <div class="metric-item">
+                    <span>CPU Usage:</span>
+                    <span class="metric-value metric-warning">78% (↑5% from last month)</span>
+                </div>
+                <div class="metric-item">
+                    <span>Database Queries:</span>
+                    <span class="metric-value metric-good">156 (↓20 from last month)</span>
+                </div>
+                <h3 style="margin-top: 1.5rem;">Security Metrics:</h3>
+                <div class="metric-item">
+                    <span>Vulnerabilities:</span>
+                    <span class="metric-value metric-good">2 (↓3 from last month)</span>
+                </div>
+                <div class="metric-item">
+                    <span>Dependencies:</span>
+                    <span class="metric-value metric-warning">156 packages (3 outdated)</span>
+                </div>
+                <div class="metric-item">
+                    <span>Secrets:</span>
+                    <span class="metric-value metric-good">0 exposed (✅)</span>
+                </div>
+                <div class="metric-item">
+                    <span>Permissions:</span>
+                    <span class="metric-value metric-warning">12 files with 777 permissions (⚠️)</span>
+                </div>
+            </section>
+
+            <!-- Team Performance Analysis -->
+            <section class="team-performance">
+                <h2>👥 Team Performance Analysis</h2>
+                <div class="team-member">
+                    <div class="member-avatar">JS</div>
+                    <div class="member-info">
+                        <div class="member-name">John Smith</div>
+                        <div class="member-stats">8 tasks, 2 days avg</div>
+                    </div>
+                    <div class="performance-bar">
+                        <div class="performance-fill" style="width: 95%"></div>
+                    </div>
+                    <div>95%</div>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">SL</div>
+                    <div class="member-info">
+                        <div class="member-name">Sarah Lee</div>
+                        <div class="member-stats">6 tasks, 3 days avg</div>
+                    </div>
+                    <div class="performance-bar">
+                        <div class="performance-fill" style="width: 85%"></div>
+                    </div>
+                    <div>85%</div>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">MC</div>
+                    <div class="member-info">
+                        <div class="member-name">Mike Chen</div>
+                        <div class="member-stats">7 tasks, 2.5 days avg</div>
+                    </div>
+                    <div class="performance-bar">
+                        <div class="performance-fill" style="width: 92%"></div>
+                    </div>
+                    <div>92%</div>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">LW</div>
+                    <div class="member-info">
+                        <div class="member-name">Lisa Wang</div>
+                        <div class="member-stats">5 tasks, 4 days avg</div>
+                    </div>
+                    <div class="performance-bar">
+                        <div class="performance-fill" style="width: 75%"></div>
+                    </div>
+                    <div>75%</div>
+                </div>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <strong>Team Average: 87% | This Week: +5% improvement</strong>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <h4>Team Collaboration:</h4>
+                    <div style="margin-top: 0.5rem;">
+                        <div>Code Reviews: 45 this month (↑12 from last)</div>
+                        <div>Pair Programming: 23 sessions (↑8 from last)</div>
+                        <div>Knowledge Sharing: 8 sessions (↑3 from last)</div>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <h4>Workload Distribution:</h4>
+                    <div style="margin-top: 0.5rem;">
+                        <div>Frontend: 35% | Backend: 45% | DevOps: 20%</div>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <button class="action-btn">View Detailed Breakdown</button>
+                    <button class="action-btn">Export Team Report</button>
+                </div>
+            </section>
+
+            <!-- Export and Sharing Options -->
+            <section class="export-options">
+                <h2>📤 Export and Sharing Options</h2>
+                <div class="export-grid">
+                    <div class="export-btn">
+                        <div class="export-icon">📄</div>
+                        <div>PDF Report</div>
+                    </div>
+                    <div class="export-btn">
+                        <div class="export-icon">📊</div>
+                        <div>Excel Spreadsheet</div>
+                    </div>
+                    <div class="export-btn">
+                        <div class="export-icon">📋</div>
+                        <div>CSV Data</div>
+                    </div>
+                    <div class="export-btn">
+                        <div class="export-icon">📈</div>
+                        <div>PowerPoint</div>
+                    </div>
+                    <div class="export-btn">
+                        <div class="export-icon">📝</div>
+                        <div>JSON Data</div>
+                    </div>
+                    <div class="export-btn">
+                        <div class="export-icon">🔗</div>
+                        <div>Share Link</div>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <h4>Report Sections:</h4>
+                    <div style="margin-top: 0.5rem;">
+                        <label><input type="checkbox" checked> Executive Summary</label><br>
+                        <label><input type="checkbox" checked> Key Metrics</label><br>
+                        <label><input type="checkbox" checked> Performance Analysis</label><br>
+                        <label><input type="checkbox" checked> AI Insights</label><br>
+                        <label><input type="checkbox"> Detailed Breakdown</label><br>
+                        <label><input type="checkbox"> Team Performance</label>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <h4>Scheduling:</h4>
+                    <div style="margin-top: 0.5rem;">
+                        <label>Frequency: </label>
+                        <select style="margin-left: 0.5rem; padding: 0.25rem;">
+                            <option>Weekly</option>
+                            <option>Monthly</option>
+                            <option>Quarterly</option>
+                        </select>
+                    </div>
+                    <div style="margin-top: 0.5rem;">
+                        <label>Email: </label>
+                        <input type="email" value="reports@company.com" style="margin-left: 0.5rem; padding: 0.25rem; border: 1px solid #d1d5db; border-radius: 0.25rem;">
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <button class="action-btn">Schedule Report</button>
+                        <button class="action-btn">Test Email</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Chart.js
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Code Quality',
+                        data: [75, 80, 85, 88, 90, 92],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Performance',
+                        data: [70, 75, 80, 85, 87, 88],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Chart controls
+            const chartBtns = document.querySelectorAll('.chart-btn');
+            chartBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    chartBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Filter functionality
+            const filterOptions = document.querySelectorAll('.filter-option');
+            filterOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const parent = this.parentElement;
+                    const siblings = parent.querySelectorAll('.filter-option');
+                    siblings.forEach(sibling => sibling.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Export functionality
+            const exportBtns = document.querySelectorAll('.export-btn');
+            exportBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    console.log('Exporting:', this.textContent.trim());
+                });
+            });
+
+            // Simulate real-time updates
+            setInterval(() => {
+                updateKPIs();
+            }, 30000);
+        });
+
+        function updateKPIs() {
+            const kpiValues = document.querySelectorAll('.kpi-value');
+            kpiValues.forEach(kpi => {
+                if (kpi.textContent.includes('/100')) {
+                    const currentValue = parseInt(kpi.textContent);
+                    const change = Math.random() > 0.5 ? 1 : -1;
+                    const newValue = Math.max(0, Math.min(100, currentValue + change));
+                    kpi.textContent = newValue + '/100';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

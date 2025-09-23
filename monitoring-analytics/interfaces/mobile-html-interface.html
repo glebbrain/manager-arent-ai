@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile App - Universal Project Manager v3.1</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1f2937; }
+        .mobile-app { max-width: 375px; margin: 0 auto; background: white; min-height: 100vh; position: relative; }
+        .status-bar { height: 44px; background: #000; color: white; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 14px; font-weight: 600; }
+        .status-left { display: flex; align-items: center; gap: 5px; }
+        .status-right { display: flex; align-items: center; gap: 5px; }
+        .header { background: white; padding: 15px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .header-title { font-size: 18px; font-weight: 600; color: #1f2937; }
+        .header-actions { display: flex; gap: 10px; }
+        .header-btn { width: 36px; height: 36px; border-radius: 18px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #6b7280; }
+        .content { padding: 20px; padding-bottom: 80px; }
+        .welcome-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .welcome-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .welcome-subtitle { font-size: 14px; opacity: 0.9; }
+        .quick-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; }
+        .stat-icon { width: 40px; height: 40px; border-radius: 20px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; }
+        .stat-value { font-size: 20px; font-weight: 700; color: #1f2937; margin-bottom: 4px; }
+        .stat-label { font-size: 12px; color: #6b7280; }
+        .section-title { font-size: 16px; font-weight: 600; color: #1f2937; margin-bottom: 15px; }
+        .projects-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .project-card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .project-header { display: flex; align-items: center; margin-bottom: 12px; }
+        .project-icon { width: 40px; height: 40px; border-radius: 8px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
+        .project-info { flex: 1; }
+        .project-name { font-size: 14px; font-weight: 600; color: #1f2937; margin-bottom: 4px; }
+        .project-tech { font-size: 12px; color: #6b7280; }
+        .project-status { padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: 500; }
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .project-progress { margin-top: 12px; }
+        .progress-bar { height: 4px; background: #f3f4f6; border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #2563eb; border-radius: 2px; transition: width 0.3s ease; }
+        .progress-text { font-size: 12px; color: #6b7280; margin-top: 4px; }
+        .tasks-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .task-item { display: flex; align-items: center; padding: 12px; background: white; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .task-checkbox { width: 20px; height: 20px; border: 2px solid #d1d5db; border-radius: 4px; margin-right: 12px; display: flex; align-items: center; justify-content: center; }
+        .task-checkbox.checked { background: #10b981; border-color: #10b981; color: white; }
+        .task-content { flex: 1; }
+        .task-title { font-size: 14px; font-weight: 500; color: #1f2937; margin-bottom: 2px; }
+        .task-project { font-size: 12px; color: #6b7280; }
+        .task-priority { width: 8px; height: 8px; border-radius: 50%; margin-left: 8px; }
+        .priority-high { background: #ef4444; }
+        .priority-medium { background: #f59e0b; }
+        .priority-low { background: #10b981; }
+        .ai-chat { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .ai-chat-header { display: flex; align-items: center; margin-bottom: 12px; }
+        .ai-avatar { width: 32px; height: 32px; border-radius: 16px; background: #10b981; color: white; display: flex; align-items: center; justify-content: center; margin-right: 10px; }
+        .ai-name { font-size: 14px; font-weight: 600; color: #1f2937; }
+        .ai-status { font-size: 12px; color: #10b981; margin-left: auto; }
+        .ai-message { background: #f8fafc; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+        .ai-message-text { font-size: 14px; color: #374151; margin-bottom: 8px; }
+        .ai-message-time { font-size: 12px; color: #6b7280; }
+        .chat-input { display: flex; gap: 8px; }
+        .chat-input input { flex: 1; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 20px; font-size: 14px; }
+        .chat-send { width: 36px; height: 36px; border-radius: 18px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; }
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 375px; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 8px 0; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; padding: 8px; color: #6b7280; text-decoration: none; transition: color 0.3s ease; }
+        .nav-item.active { color: #2563eb; }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+        .nav-item span { font-size: 10px; font-weight: 500; }
+        .floating-btn { position: fixed; bottom: 80px; right: 20px; width: 56px; height: 56px; border-radius: 28px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); }
+        .notifications { position: fixed; top: 60px; left: 20px; right: 20px; z-index: 1000; }
+        .notification { background: white; border-radius: 8px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 8px; display: flex; align-items: center; }
+        .notification-icon { width: 32px; height: 32px; border-radius: 16px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
+        .notification-content { flex: 1; }
+        .notification-title { font-size: 14px; font-weight: 600; color: #1f2937; margin-bottom: 2px; }
+        .notification-text { font-size: 12px; color: #6b7280; }
+        .notification-close { color: #6b7280; font-size: 16px; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: flex-end; z-index: 1000; }
+        .modal-content { background: white; border-radius: 16px 16px 0 0; padding: 20px; width: 100%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 18px; font-weight: 600; color: #1f2937; }
+        .modal-close { width: 32px; height: 32px; border-radius: 16px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #6b7280; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-block { width: 100%; }
+        .search-bar { position: relative; margin-bottom: 20px; }
+        .search-input { width: 100%; padding: 12px 40px 12px 12px; border: 1px solid #d1d5db; border-radius: 20px; font-size: 14px; }
+        .search-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #6b7280; }
+        .filter-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
+        .filter-tab { padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 20px; background: white; color: #6b7280; font-size: 12px; font-weight: 500; white-space: nowrap; }
+        .filter-tab.active { background: #2563eb; color: white; border-color: #2563eb; }
+        .swipe-indicator { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 40px; height: 4px; background: #d1d5db; border-radius: 2px; }
+        @media (max-width: 375px) {
+            .mobile-app { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-app">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span>9:41</span>
+            </div>
+            <div class="status-right">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">Проекты</div>
+            <div class="header-actions">
+                <div class="header-btn" onclick="openSearch()">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="header-btn" onclick="openNotifications()">
+                    <i class="fas fa-bell"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Welcome Card -->
+            <div class="welcome-card">
+                <div class="welcome-title">Добро пожаловать, Иван!</div>
+                <div class="welcome-subtitle">У вас 3 активных проекта и 8 задач на сегодня</div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">Задач</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value">4.5ч</div>
+                    <div class="stat-label">Время</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value">92%</div>
+                    <div class="stat-label">Прогресс</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">Команда</div>
+                </div>
+            </div>
+
+            <!-- Projects Section -->
+            <div class="section-title">Активные проекты</div>
+            <div class="projects-list">
+                <div class="project-card" onclick="openProject(1)">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-name">React E-commerce</div>
+                            <div class="project-tech">React + Node.js</div>
+                        </div>
+                        <span class="project-status status-active">Активный</span>
+                    </div>
+                    <div class="project-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%"></div>
+                        </div>
+                        <div class="progress-text">75% завершено</div>
+                    </div>
+                </div>
+                <div class="project-card" onclick="openProject(2)">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-name">Vue Dashboard</div>
+                            <div class="project-tech">Vue + TypeScript</div>
+                        </div>
+                        <span class="project-status status-pending">Тест</span>
+                    </div>
+                    <div class="project-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%"></div>
+                        </div>
+                        <div class="progress-text">60% завершено</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks Section -->
+            <div class="section-title">Задачи на сегодня</div>
+            <div class="tasks-list">
+                <div class="task-item">
+                    <div class="task-checkbox" onclick="toggleTask(this)">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">Настройка аутентификации</div>
+                        <div class="task-project">React E-commerce</div>
+                    </div>
+                    <div class="task-priority priority-high"></div>
+                </div>
+                <div class="task-item">
+                    <div class="task-checkbox checked" onclick="toggleTask(this)">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">Создание API эндпоинтов</div>
+                        <div class="task-project">Vue Dashboard</div>
+                    </div>
+                    <div class="task-priority priority-medium"></div>
+                </div>
+                <div class="task-item">
+                    <div class="task-checkbox" onclick="toggleTask(this)">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">Тестирование компонентов</div>
+                        <div class="task-project">React E-commerce</div>
+                    </div>
+                    <div class="task-priority priority-low"></div>
+                </div>
+            </div>
+
+            <!-- AI Chat Section -->
+            <div class="ai-chat">
+                <div class="ai-chat-header">
+                    <div class="ai-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="ai-name">AI Assistant</div>
+                    <div class="ai-status">Онлайн</div>
+                </div>
+                <div class="ai-message">
+                    <div class="ai-message-text">Привет! Я могу помочь с анализом кода или планированием задач. Что вас интересует?</div>
+                    <div class="ai-message-time">2 минуты назад</div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" placeholder="Напишите сообщение..." id="chatInput">
+                    <div class="chat-send" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Action Button -->
+        <div class="floating-btn" onclick="openAddModal()">
+            <i class="fas fa-plus"></i>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-project-diagram"></i>
+                <span>Проекты</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-tasks"></i>
+                <span>Задачи</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-chat"></i>
+                <span>Чат</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="notifications" id="notifications">
+        <div class="notification">
+            <div class="notification-icon">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">Новая задача</div>
+                <div class="notification-text">Вам назначена задача "Оптимизация производительности"</div>
+            </div>
+            <div class="notification-close" onclick="closeNotification(this)">&times;</div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="swipe-indicator"></div>
+            <div class="modal-header">
+                <div class="modal-title">Добавить задачу</div>
+                <div class="modal-close" onclick="closeModal()">&times;</div>
+            </div>
+            <form id="addTaskForm">
+                <div class="form-group">
+                    <label>Название задачи</label>
+                    <input type="text" placeholder="Введите название задачи" required>
+                </div>
+                <div class="form-group">
+                    <label>Проект</label>
+                    <select required>
+                        <option value="">Выберите проект</option>
+                        <option value="react-ecommerce">React E-commerce</option>
+                        <option value="vue-dashboard">Vue Dashboard</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Приоритет</label>
+                    <select required>
+                        <option value="low">Низкий</option>
+                        <option value="medium">Средний</option>
+                        <option value="high">Высокий</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea placeholder="Описание задачи (необязательно)"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Добавить задачу</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="modal" id="searchModal">
+        <div class="modal-content">
+            <div class="swipe-indicator"></div>
+            <div class="modal-header">
+                <div class="modal-title">Поиск</div>
+                <div class="modal-close" onclick="closeModal()">&times;</div>
+            </div>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Поиск проектов, задач...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="filter-tabs">
+                <div class="filter-tab active">Все</div>
+                <div class="filter-tab">Проекты</div>
+                <div class="filter-tab">Задачи</div>
+                <div class="filter-tab">Команда</div>
+            </div>
+            <div class="projects-list">
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="project-info">
+                            <div class="project-name">React E-commerce</div>
+                            <div class="project-tech">React + Node.js</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadTasks();
+        });
+
+        function setupEventListeners() {
+            // Form submission
+            document.getElementById('addTaskForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addTask();
+            });
+
+            // Chat input
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Filter tabs
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        }
+
+        function toggleTask(checkbox) {
+            checkbox.classList.toggle('checked');
+            // Update task status
+            console.log('Task toggled');
+        }
+
+        function openProject(id) {
+            alert(`Открытие проекта ${id}...`);
+        }
+
+        function openAddModal() {
+            document.getElementById('addModal').style.display = 'flex';
+        }
+
+        function openSearch() {
+            document.getElementById('searchModal').style.display = 'flex';
+        }
+
+        function openNotifications() {
+            const notifications = document.getElementById('notifications');
+            notifications.style.display = notifications.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+
+        function closeNotification(element) {
+            element.closest('.notification').remove();
+        }
+
+        function addTask() {
+            const form = document.getElementById('addTaskForm');
+            const formData = new FormData(form);
+            
+            // Create new task
+            const taskList = document.querySelector('.tasks-list');
+            const newTask = document.createElement('div');
+            newTask.className = 'task-item';
+            newTask.innerHTML = `
+                <div class="task-checkbox" onclick="toggleTask(this)">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">${form.querySelector('input[type="text"]').value}</div>
+                    <div class="task-project">${form.querySelector('select').value}</div>
+                </div>
+                <div class="task-priority priority-medium"></div>
+            `;
+            
+            taskList.appendChild(newTask);
+            form.reset();
+            closeModal();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Add user message
+                const chatContainer = document.querySelector('.ai-chat');
+                const userMessage = document.createElement('div');
+                userMessage.className = 'ai-message';
+                userMessage.innerHTML = `
+                    <div class="ai-message-text">${message}</div>
+                    <div class="ai-message-time">Сейчас</div>
+                `;
+                chatContainer.insertBefore(userMessage, chatContainer.querySelector('.chat-input'));
+                
+                input.value = '';
+                
+                // Simulate AI response
+                setTimeout(() => {
+                    const aiResponse = document.createElement('div');
+                    aiResponse.className = 'ai-message';
+                    aiResponse.innerHTML = `
+                        <div class="ai-message-text">Понял! Я помогу вам с этой задачей. Давайте разберем пошагово...</div>
+                        <div class="ai-message-time">Сейчас</div>
+                    `;
+                    chatContainer.insertBefore(aiResponse, chatContainer.querySelector('.chat-input'));
+                }, 1000);
+            }
+        }
+
+        function loadTasks() {
+            // Load tasks from localStorage or API
+            console.log('Loading tasks...');
+        }
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        });
+
+        // Auto-hide notifications
+        setTimeout(() => {
+            const notifications = document.getElementById('notifications');
+            if (notifications) {
+                notifications.style.display = 'none';
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

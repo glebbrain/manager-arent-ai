@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Distribution - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .task-distribution {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-distribution h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .distribution-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .team-member {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .team-member:hover {
+            transform: translateY(-5px);
+        }
+
+        .member-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .member-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+
+        .member-info h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .member-role {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .workload-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .workload-bar {
+            flex: 1;
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            margin-right: 10px;
+            overflow: hidden;
+        }
+
+        .workload-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .workload-fill.low {
+            background: #10b981;
+        }
+
+        .workload-fill.medium {
+            background: #f59e0b;
+        }
+
+        .workload-fill.high {
+            background: #ef4444;
+        }
+
+        .workload-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .task-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .task-meta {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .task-priority {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .task-priority.high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .task-priority.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .task-priority.low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .ai-suggestions {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .ai-suggestions h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .suggestion-item {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .suggestion-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .suggestion-description {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .suggestion-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .suggestion-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .distribution-settings {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .distribution-settings h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .setting-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .setting-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .setting-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .setting-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle.active {
+            background: #667eea;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle.active::after {
+            transform: translateX(26px);
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            background: #f3f4f6;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .performance-metrics {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .performance-metrics h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-icon {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-users-cog"></i> Task Distribution</h1>
+            <p>Intelligent task assignment and workload management with AI optimization</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-tasks"></i></div>
+                    <div class="stat-number">156</div>
+                    <div class="stat-label">Total Tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-user-check"></i></div>
+                    <div class="stat-number">24</div>
+                    <div class="stat-label">Team Members</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-balance-scale"></i></div>
+                    <div class="stat-number">87%</div>
+                    <div class="stat-label">Workload Balance</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-number">2.3h</div>
+                    <div class="stat-label">Avg. Completion</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="distribution-settings">
+            <h2><i class="fas fa-cog"></i> Distribution Settings</h2>
+            
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <div class="setting-title">Auto-Assignment</div>
+                    <div class="setting-description">Automatically assign tasks based on workload and expertise</div>
+                    <div class="setting-control">
+                        <div class="toggle active" onclick="toggleSetting(this)"></div>
+                        <span>Enabled</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Load Balancing</div>
+                    <div class="setting-description">Distribute tasks evenly across team members</div>
+                    <div class="setting-control">
+                        <div class="toggle active" onclick="toggleSetting(this)"></div>
+                        <span>Enabled</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Skill Matching</div>
+                    <div class="setting-description">Match tasks to team members based on skills</div>
+                    <div class="setting-control">
+                        <div class="toggle active" onclick="toggleSetting(this)"></div>
+                        <span>Enabled</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Priority Weighting</div>
+                    <div class="setting-description">Consider task priority in assignment decisions</div>
+                    <div class="setting-control">
+                        <div class="toggle active" onclick="toggleSetting(this)"></div>
+                        <span>Enabled</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Workload Threshold</div>
+                    <div class="setting-description">Maximum workload percentage per team member</div>
+                    <div class="setting-control">
+                        <input type="range" class="slider" min="50" max="100" value="85">
+                        <span>85%</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-title">Notification Frequency</div>
+                    <div class="setting-description">How often to send assignment notifications</div>
+                    <div class="setting-control">
+                        <select style="padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+                            <option>Immediate</option>
+                            <option>Every 15 minutes</option>
+                            <option>Every hour</option>
+                            <option>Daily</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="task-distribution">
+                <h2><i class="fas fa-project-diagram"></i> Team Workload Distribution</h2>
+                
+                <div class="distribution-controls">
+                    <button class="control-btn" onclick="redistributeTasks()">
+                        <i class="fas fa-sync"></i> Redistribute
+                    </button>
+                    <button class="control-btn" onclick="optimizeWorkload()">
+                        <i class="fas fa-magic"></i> AI Optimize
+                    </button>
+                    <button class="control-btn secondary" onclick="exportDistribution()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="control-btn secondary" onclick="viewHistory()">
+                        <i class="fas fa-history"></i> History
+                    </button>
+                </div>
+
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="member-header">
+                            <div class="member-avatar">JS</div>
+                            <div class="member-info">
+                                <h3>John Smith</h3>
+                                <div class="member-role">Senior Developer</div>
+                            </div>
+                        </div>
+                        <div class="workload-indicator">
+                            <div class="workload-bar">
+                                <div class="workload-fill medium" style="width: 75%"></div>
+                            </div>
+                            <div class="workload-text">75%</div>
+                        </div>
+                        <div class="task-list">
+                            <div class="task-item">
+                                <div class="task-info">
+                                    <div class="task-title">API Integration</div>
+                                    <div class="task-meta">Due: 2 days</div>
+                                </div>
+                                <div class="task-priority high">High</div>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-info">
+                                    <div class="task-title">Code Review</div>
+                                    <div class="task-meta">Due: 1 day</div>
+                                </div>
+                                <div class="task-priority medium">Medium</div>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-info">
+                                    <div class="task-title">Documentation</div>
+                                    <div class="task-meta">Due: 3 days</div>
+                                </div>
+                                <div class="task-priority low">Low</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-header">
+                            <div class="member-avatar">MJ</div>
+                            <div class="member-info">
+                                <h3>Maria Johnson</h3>
+                                <div class="member-role">Frontend Developer</div>
+                            </div>
+                        </div>
+                        <div class="workload-indicator">
+                            <div class="workload-bar">
+                                <div class="workload-fill low" style="width: 45%"></div>
+                            </div>
+                            <div class="workload-text">45%</div>
+                        </div>
+                        <div class="task-list">
+                            <div class="task-item">
+                                <div class="task-info">
+                                    <div class="task-title">UI Components</div>
+                                    <div class="task-meta">Due: 2 days</div>
+                                </div>
+                                <div class="task-priority high">High</div>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-info">
+                                    <div class="task-title">Responsive Design</div>
+                                    <div class="task-meta">Due: 4 days</div>
+                                </div>
+                                <div class="task-priority medium">Medium</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-header">
+                            <div class="member-avatar">DB</div>
+                            <div class="member-info">
+                                <h3>David Brown</h3>
+                                <div class="member-role">DevOps Engineer</div>
+                            </div>
+                        </div>
+                        <div class="workload-indicator">
+                            <div class="workload-bar">
+                                <div class="workload-fill high" style="width: 90%"></div>
+                            </div>
+                            <div class="workload-text">90%</div>
+                        </div>
+                        <div class="task-list">
+                            <div class="task-item">
+                                <div class="task-info">
+                                    <div class="task-title">Deployment Pipeline</div>
+                                    <div class="task-meta">Due: 1 day</div>
+                                </div>
+                                <div class="task-priority high">High</div>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-info">
+                                    <div class="task-title">Infrastructure Setup</div>
+                                    <div class="task-meta">Due: 2 days</div>
+                                </div>
+                                <div class="task-priority high">High</div>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-info">
+                                    <div class="task-title">Monitoring Setup</div>
+                                    <div class="task-meta">Due: 3 days</div>
+                                </div>
+                                <div class="task-priority medium">Medium</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-header">
+                            <div class="member-avatar">SL</div>
+                            <div class="member-info">
+                                <h3>Sarah Lee</h3>
+                                <div class="member-role">QA Engineer</div>
+                            </div>
+                        </div>
+                        <div class="workload-indicator">
+                            <div class="workload-bar">
+                                <div class="workload-fill medium" style="width: 60%"></div>
+                            </div>
+                            <div class="workload-text">60%</div>
+                        </div>
+                        <div class="task-list">
+                            <div class="task-item">
+                                <div class="task-info">
+                                    <div class="task-title">Test Automation</div>
+                                    <div class="task-meta">Due: 3 days</div>
+                                </div>
+                                <div class="task-priority medium">Medium</div>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-info">
+                                    <div class="task-title">Bug Testing</div>
+                                    <div class="task-meta">Due: 1 day</div>
+                                </div>
+                                <div class="task-priority high">High</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-suggestions">
+                <h2><i class="fas fa-brain"></i> AI Suggestions</h2>
+                
+                <div class="suggestion-item">
+                    <div class="suggestion-title">Workload Rebalancing</div>
+                    <div class="suggestion-description">
+                        David Brown is overloaded (90%). Consider reassigning 2 tasks to Maria Johnson (45% workload).
+                    </div>
+                    <div class="suggestion-actions">
+                        <button class="suggestion-btn">Apply Suggestion</button>
+                        <button class="suggestion-btn">View Details</button>
+                    </div>
+                </div>
+
+                <div class="suggestion-item">
+                    <div class="suggestion-title">Skill-Based Assignment</div>
+                    <div class="suggestion-description">
+                        New API documentation task matches John Smith's expertise better than current assignee.
+                    </div>
+                    <div class="suggestion-actions">
+                        <button class="suggestion-btn">Reassign Task</button>
+                        <button class="suggestion-btn">Learn More</button>
+                    </div>
+                </div>
+
+                <div class="suggestion-item">
+                    <div class="suggestion-title">Deadline Optimization</div>
+                    <div class="suggestion-description">
+                        Moving UI Components task to Sarah Lee could improve delivery time by 1 day.
+                    </div>
+                    <div class="suggestion-actions">
+                        <button class="suggestion-btn">Optimize Schedule</button>
+                        <button class="suggestion-btn">Analyze Impact</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="performance-metrics">
+            <h2><i class="fas fa-chart-line"></i> Performance Metrics</h2>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon"><i class="fas fa-clock"></i></div>
+                    <div class="metric-value">2.3h</div>
+                    <div class="metric-label">Avg. Task Time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="metric-value">94%</div>
+                    <div class="metric-label">Completion Rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon"><i class="fas fa-balance-scale"></i></div>
+                    <div class="metric-value">87%</div>
+                    <div class="metric-label">Workload Balance</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon"><i class="fas fa-thumbs-up"></i></div>
+                    <div class="metric-value">91%</div>
+                    <div class="metric-label">Satisfaction</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon"><i class="fas fa-robot"></i></div>
+                    <div class="metric-value">78%</div>
+                    <div class="metric-label">AI Accuracy</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon"><i class="fas fa-trending-up"></i></div>
+                    <div class="metric-value">+15%</div>
+                    <div class="metric-label">Efficiency Gain</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSetting(element) {
+            element.classList.toggle('active');
+            const isActive = element.classList.contains('active');
+            const span = element.nextElementSibling;
+            span.textContent = isActive ? 'Enabled' : 'Disabled';
+        }
+
+        function redistributeTasks() {
+            // Simulate task redistribution
+            const workloadBars = document.querySelectorAll('.workload-fill');
+            workloadBars.forEach(bar => {
+                const newWidth = Math.random() * 40 + 40; // 40-80%
+                bar.style.width = newWidth + '%';
+                
+                // Update workload class
+                bar.className = 'workload-fill';
+                if (newWidth < 50) bar.classList.add('low');
+                else if (newWidth < 80) bar.classList.add('medium');
+                else bar.classList.add('high');
+            });
+            
+            // Update workload text
+            const workloadTexts = document.querySelectorAll('.workload-text');
+            workloadTexts.forEach(text => {
+                const newValue = Math.floor(Math.random() * 40 + 40);
+                text.textContent = newValue + '%';
+            });
+            
+            alert('Tasks redistributed successfully!');
+        }
+
+        function optimizeWorkload() {
+            // Simulate AI optimization
+            const workloadBars = document.querySelectorAll('.workload-fill');
+            workloadBars.forEach(bar => {
+                const currentWidth = parseFloat(bar.style.width);
+                const optimizedWidth = Math.min(85, Math.max(40, currentWidth + (Math.random() - 0.5) * 20));
+                bar.style.width = optimizedWidth + '%';
+                
+                // Update workload class
+                bar.className = 'workload-fill';
+                if (optimizedWidth < 50) bar.classList.add('low');
+                else if (optimizedWidth < 80) bar.classList.add('medium');
+                else bar.classList.add('high');
+            });
+            
+            alert('Workload optimized using AI!');
+        }
+
+        function exportDistribution() {
+            alert('Distribution data exported successfully!');
+        }
+
+        function viewHistory() {
+            alert('Opening distribution history...');
+        }
+
+        // Auto-update metrics
+        setInterval(function() {
+            const metricValues = document.querySelectorAll('.metric-value');
+            metricValues.forEach(metric => {
+                const currentValue = parseFloat(metric.textContent);
+                if (!isNaN(currentValue)) {
+                    const change = (Math.random() - 0.5) * 0.1;
+                    const newValue = Math.max(0, currentValue + change);
+                    if (metric.textContent.includes('%')) {
+                        metric.textContent = newValue.toFixed(1) + '%';
+                    } else if (metric.textContent.includes('h')) {
+                        metric.textContent = newValue.toFixed(1) + 'h';
+                    } else if (metric.textContent.includes('+')) {
+                        metric.textContent = '+' + newValue.toFixed(1) + '%';
+                    } else {
+                        metric.textContent = newValue.toFixed(0);
+                    }
+                }
+            });
+        }, 10000);
+    </script>
+</body>
+</html>

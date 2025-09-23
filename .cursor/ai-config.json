@@ -1,0 +1,153 @@
+{
+  "model": {
+    "primary": "gpt-4o",
+    "fallback": "gpt-4",
+    "multiModal": "gpt-4o-vision",
+    "quantum": "claude-3.5-sonnet",
+    "maxTokens": 16000,
+    "temperature": 0.1,
+    "topP": 0.9
+  },
+  
+  "context": {
+    "maxFiles": 50,
+    "maxLinesPerFile": 1000,
+    "includePatterns": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js", 
+      "**/*.jsx",
+      "**/*.py",
+      "**/*.c",
+      "**/*.cpp",
+      "**/*.h",
+      "**/*.s",
+      "**/*.asm",
+      "**/*.md",
+      "**/*.ps1",
+      "**/cursor.json",
+      "**/package.json",
+      "**/tsconfig.json",
+      "**/Makefile",
+      "**/quantum-*.js",
+      "**/multi-modal-*.js",
+      "**/quantum-*.py",
+      "**/multi-modal-*.py"
+    ],
+    "excludePatterns": [
+      "**/node_modules/**",
+      "**/build/**",
+      "**/dist/**",
+      "**/obj/**",
+      "**/bin/**",
+      "**/__pycache__/**",
+      "**/venv/**",
+      "**/env/**",
+      "**/qdrant_storage/**",
+      "**/data/asm_raw/**",
+      "**/data/asm_norm/**",
+      "**/data/benchmarks/**",
+      "**/temp/**",
+      "**/logs/**"
+    ]
+  },
+  
+  "codeGeneration": {
+    "languages": {
+      "typescript": {
+        "preferred": true,
+        "addTypes": true,
+        "useStrictMode": true,
+        "preferInterfaces": true
+      },
+      "python": {
+        "preferred": true,
+        "addTypeHints": true,
+        "useFStrings": true,
+        "followPEP8": true
+      },
+      "assembly": {
+        "preferred": true,
+        "useIntelSyntax": true,
+        "addComments": true,
+        "optimizeForSize": true
+      },
+      "c": {
+        "preferred": true,
+        "addHeaderGuards": true,
+        "useConst": true,
+        "addDocumentation": true
+      },
+      "cpp": {
+        "preferred": true,
+        "useModernCpp": true,
+        "addRAII": true,
+        "preferSmartPointers": true
+      }
+    }
+  },
+  
+  "projectSpecific": {
+    "vectorDatabase": {
+      "enabled": true,
+      "preferredLibrary": "qdrant",
+      "optimizeForPerformance": true
+    },
+    "assemblyOptimization": {
+      "enabled": true,
+      "targetArchitecture": "x86_64",
+      "optimizeForSpeed": true,
+      "useSIMD": true
+    },
+    "machineLearning": {
+      "enabled": true,
+      "preferredFramework": "scikit-learn",
+      "useGPU": false,
+      "optimizeMemory": true
+    },
+    "browserIntegration": {
+      "enabled": true,
+      "preferredFramework": "React",
+      "useTypeScript": true,
+      "optimizeBundle": true
+    },
+    "multiModalAI": {
+      "enabled": true,
+      "textProcessing": true,
+      "imageProcessing": true,
+      "audioProcessing": true,
+      "videoProcessing": true,
+      "fusionEnabled": true
+    },
+    "quantumML": {
+      "enabled": true,
+      "quantumNeuralNetworks": true,
+      "quantumOptimization": true,
+      "quantumAlgorithms": true,
+      "quantumSimulator": true
+    }
+  },
+  
+  "workflow": {
+    "autoReadFiles": true,
+    "validateAfterEdit": true,
+    "runLinterAfterEdit": true,
+    "suggestImprovements": true,
+    "autoFormatCode": true,
+    "addDocumentation": true
+  },
+  
+  "memory": {
+    "maxMemories": 100,
+    "autoUpdateMemories": true,
+    "contextAwareMemories": true,
+    "persistentMemories": true
+  },
+  
+  "debugging": {
+    "enableLogging": true,
+    "logLevel": "info",
+    "saveDebugInfo": true,
+    "trackPerformance": true
+  }
+}

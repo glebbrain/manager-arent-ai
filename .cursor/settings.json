@@ -1,0 +1,97 @@
+{
+  "cursor.ai.enabled": true,
+  "cursor.ai.autoComplete": true,
+  "cursor.ai.autoImport": true,
+  "cursor.ai.autoFix": true,
+  "cursor.ai.suggestions": true,
+  "cursor.ai.experimental": true,
+  
+  "cursor.ai.context": {
+    "maxTokens": 16000,
+    "includeComments": true,
+    "includeImports": true,
+    "includeTests": true,
+    "includeDocumentation": true,
+    "includeMultiModal": true,
+    "includeQuantum": true
+  },
+  
+  "cursor.ai.codeGeneration": {
+    "preferTypeScript": true,
+    "preferPython": true,
+    "preferAssembly": true,
+    "addComments": true,
+    "addTypeAnnotations": true,
+    "followExistingPatterns": true,
+    "enableMultiModalAI": true,
+    "enableQuantumML": true,
+    "addQuantumComments": true
+  },
+  
+  "cursor.ai.fileHandling": {
+    "autoReadBeforeEdit": true,
+    "preferEditOverCreate": true,
+    "backupBeforeEdit": false,
+    "validateAfterEdit": true
+  },
+  
+  "cursor.ai.search": {
+    "includePatterns": [
+      "**/*.ts",
+      "**/*.tsx", 
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.py",
+      "**/*.c",
+      "**/*.cpp",
+      "**/*.h",
+      "**/*.s",
+      "**/*.asm",
+      "**/*.md",
+      "**/*.ps1",
+      "**/cursor.json",
+      "**/quantum-*.js",
+      "**/multi-modal-*.js",
+      "**/quantum-*.py",
+      "**/multi-modal-*.py",
+      "**/advanced-*-ai-*.js",
+      "**/advanced-*-quantum-*.js"
+    ],
+    "excludePatterns": [
+      "**/node_modules/**",
+      "**/build/**",
+      "**/dist/**",
+      "**/obj/**",
+      "**/bin/**",
+      "**/__pycache__/**",
+      "**/venv/**",
+      "**/env/**",
+      "**/qdrant_storage/**",
+      "**/data/asm_raw/**",
+      "**/data/asm_norm/**",
+      "**/data/benchmarks/**"
+    ]
+  },
+  
+  "cursor.ai.performance": {
+    "maxConcurrentOperations": 3,
+    "timeoutSeconds": 300,
+    "memoryLimitMB": 2048,
+    "enableCaching": true
+  },
+  
+  "cursor.ai.debugging": {
+    "enableLogging": true,
+    "logLevel": "info",
+    "saveLogs": true,
+    "logDirectory": ".cursor/logs"
+  },
+  
+  "cursor.ai.integration": {
+    "enableGitIntegration": true,
+    "enableLinterIntegration": true,
+    "enableTestIntegration": true,
+    "autoRunTests": false,
+    "autoCommit": false
+  }
+}

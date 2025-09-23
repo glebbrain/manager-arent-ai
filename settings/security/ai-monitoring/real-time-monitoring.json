@@ -1,0 +1,66 @@
+{
+  "alerts": {
+    "anomalyDetection": {
+      "severity": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "enabled": true,
+      "aiGenerated": true
+    },
+    "behavioralAnalysis": {
+      "severity": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "enabled": true,
+      "aiGenerated": true
+    },
+    "threatDetection": {
+      "severity": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "enabled": true,
+      "aiGenerated": true
+    }
+  },
+  "systemName": "ZeroTrust-RealTimeAI-Monitoring-v4.8",
+  "version": "4.8.0",
+  "capabilities": [
+    "real-time-threat-detection",
+    "continuous-behavioral-analysis",
+    "instant-anomaly-detection",
+    "quantum-enhanced-monitoring"
+  ],
+  "dataSources": {
+    "networkTraffic": {
+      "frequency": "real-time",
+      "enabled": true,
+      "aiProcessing": true
+    },
+    "quantumEvents": {
+      "quantumProcessing": true,
+      "frequency": "real-time",
+      "enabled": {
+        "IsPresent": true
+      }
+    },
+    "userBehavior": {
+      "frequency": "real-time",
+      "enabled": true,
+      "aiProcessing": true
+    },
+    "securityLogs": {
+      "frequency": "real-time",
+      "enabled": true,
+      "aiProcessing": true
+    }
+  }
+}

@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Containerization - Universal Project Manager v3.2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .containerization-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .overview-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .trend-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .containerization-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .containerization-section h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .containerization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .container-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .container-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .container-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .container-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .container-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-running {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-stopped {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-building {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .container-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .container-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .container-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        .action-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .containerization-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .containerization-controls h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .containerization-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .control-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .containerization-status {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recent-deployments {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .deployments-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .deployment-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.3s ease;
+        }
+
+        .deployment-item:hover {
+            background: #f8f9fa;
+        }
+
+        .deployment-item:last-child {
+            border-bottom: none;
+        }
+
+        .deployment-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .deployment-icon.success {
+            background: #10b981;
+        }
+
+        .deployment-icon.warning {
+            background: #f59e0b;
+        }
+
+        .deployment-icon.error {
+            background: #ef4444;
+        }
+
+        .deployment-content {
+            flex: 1;
+        }
+
+        .deployment-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .deployment-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .deployment-time {
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .ai-insights {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .insights-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .insight-item.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .insight-item.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .insight-item.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .containerization-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .containerization-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-cube"></i> Containerization</h1>
+            <p>Full containerization of all components - Universal Project Manager v3.2</p>
+        </div>
+
+        <div class="containerization-overview">
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-cube"></i></div>
+                <div class="overview-value">45</div>
+                <div class="overview-label">Active Containers</div>
+                <div class="overview-trend trend-up">+5 this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-memory"></i></div>
+                <div class="overview-value">2.1GB</div>
+                <div class="overview-label">Memory Usage</div>
+                <div class="overview-trend trend-down">-156MB this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-microchip"></i></div>
+                <div class="overview-value">65%</div>
+                <div class="overview-label">CPU Usage</div>
+                <div class="overview-trend trend-down">-8% this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-hdd"></i></div>
+                <div class="overview-value">12GB</div>
+                <div class="overview-label">Storage Used</div>
+                <div class="overview-trend trend-up">+2GB this week</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="overview-value">99.8%</div>
+                <div class="overview-label">Uptime</div>
+                <div class="overview-trend trend-up">+0.2% improvement</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon"><i class="fas fa-robot"></i></div>
+                <div class="overview-value">97%</div>
+                <div class="overview-label">AI Accuracy</div>
+                <div class="overview-trend trend-up">+2% improvement</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="containerization-section">
+                <h2><i class="fas fa-chart-area"></i> Container Management</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Container Resource Usage</div>
+                    <canvas id="resourceChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Container Scaling Over Time</div>
+                    <canvas id="scalingChart"></canvas>
+                </div>
+
+                <div class="containerization-grid">
+                    <div class="container-card">
+                        <div class="container-header">
+                            <div class="container-title">User Service Container</div>
+                            <div class="container-status status-running">Running</div>
+                        </div>
+                        <div class="container-description">User management and authentication service</div>
+                        <div class="container-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">256MB</div>
+                                <div class="metric-label">Memory</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">15%</div>
+                                <div class="metric-label">CPU</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2.1GB</div>
+                                <div class="metric-label">Storage</div>
+                            </div>
+                        </div>
+                        <div class="container-actions">
+                            <button class="action-btn">Restart</button>
+                            <button class="action-btn secondary">Logs</button>
+                        </div>
+                    </div>
+
+                    <div class="container-card">
+                        <div class="container-header">
+                            <div class="container-title">Project Service Container</div>
+                            <div class="container-status status-running">Running</div>
+                        </div>
+                        <div class="container-description">Project management and lifecycle service</div>
+                        <div class="container-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">512MB</div>
+                                <div class="metric-label">Memory</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">25%</div>
+                                <div class="metric-label">CPU</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">3.2GB</div>
+                                <div class="metric-label">Storage</div>
+                            </div>
+                        </div>
+                        <div class="container-actions">
+                            <button class="action-btn">Restart</button>
+                            <button class="action-btn secondary">Logs</button>
+                        </div>
+                    </div>
+
+                    <div class="container-card">
+                        <div class="container-header">
+                            <div class="container-title">AI Service Container</div>
+                            <div class="container-status status-running">Running</div>
+                        </div>
+                        <div class="container-description">AI processing and machine learning service</div>
+                        <div class="container-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">1.2GB</div>
+                                <div class="metric-label">Memory</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">45%</div>
+                                <div class="metric-label">CPU</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">4.5GB</div>
+                                <div class="metric-label">Storage</div>
+                            </div>
+                        </div>
+                        <div class="container-actions">
+                            <button class="action-btn">Restart</button>
+                            <button class="action-btn secondary">Logs</button>
+                        </div>
+                    </div>
+
+                    <div class="container-card">
+                        <div class="container-header">
+                            <div class="container-title">Database Container</div>
+                            <div class="container-status status-running">Running</div>
+                        </div>
+                        <div class="container-description">PostgreSQL database service</div>
+                        <div class="container-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">768MB</div>
+                                <div class="metric-label">Memory</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">30%</div>
+                                <div class="metric-label">CPU</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">8.2GB</div>
+                                <div class="metric-label">Storage</div>
+                            </div>
+                        </div>
+                        <div class="container-actions">
+                            <button class="action-btn">Restart</button>
+                            <button class="action-btn secondary">Logs</button>
+                        </div>
+                    </div>
+
+                    <div class="container-card">
+                        <div class="container-header">
+                            <div class="container-title">Redis Container</div>
+                            <div class="container-status status-running">Running</div>
+                        </div>
+                        <div class="container-description">Redis cache and session store</div>
+                        <div class="container-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">128MB</div>
+                                <div class="metric-label">Memory</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">8%</div>
+                                <div class="metric-label">CPU</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">512MB</div>
+                                <div class="metric-label">Storage</div>
+                            </div>
+                        </div>
+                        <div class="container-actions">
+                            <button class="action-btn">Restart</button>
+                            <button class="action-btn secondary">Logs</button>
+                        </div>
+                    </div>
+
+                    <div class="container-card">
+                        <div class="container-header">
+                            <div class="container-title">Nginx Container</div>
+                            <div class="container-status status-running">Running</div>
+                        </div>
+                        <div class="container-description">Reverse proxy and load balancer</div>
+                        <div class="container-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">64MB</div>
+                                <div class="metric-label">Memory</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">5%</div>
+                                <div class="metric-label">CPU</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">256MB</div>
+                                <div class="metric-label">Storage</div>
+                            </div>
+                        </div>
+                        <div class="container-actions">
+                            <button class="action-btn">Restart</button>
+                            <button class="action-btn secondary">Logs</button>
+                        </div>
+                    </div>
+
+                    <div class="container-card">
+                        <div class="container-header">
+                            <div class="container-title">Analytics Container</div>
+                            <div class="container-status status-running">Running</div>
+                        </div>
+                        <div class="container-description">Analytics and reporting service</div>
+                        <div class="container-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">384MB</div>
+                                <div class="metric-label">Memory</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">20%</div>
+                                <div class="metric-label">CPU</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">1.8GB</div>
+                                <div class="metric-label">Storage</div>
+                            </div>
+                        </div>
+                        <div class="container-actions">
+                            <button class="action-btn">Restart</button>
+                            <button class="action-btn secondary">Logs</button>
+                        </div>
+                    </div>
+
+                    <div class="container-card">
+                        <div class="container-header">
+                            <div class="container-title">Notification Container</div>
+                            <div class="container-status status-building">Building</div>
+                        </div>
+                        <div class="container-description">Notification and messaging service</div>
+                        <div class="container-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">192MB</div>
+                                <div class="metric-label">Memory</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">12%</div>
+                                <div class="metric-label">CPU</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">896MB</div>
+                                <div class="metric-label">Storage</div>
+                            </div>
+                        </div>
+                        <div class="container-actions">
+                            <button class="action-btn">Build</button>
+                            <button class="action-btn secondary">Monitor</button>
+                        </div>
+                    </div>
+
+                    <div class="container-card">
+                        <div class="container-header">
+                            <div class="container-title">Security Container</div>
+                            <div class="container-status status-running">Running</div>
+                        </div>
+                        <div class="container-description">Security and authorization service</div>
+                        <div class="container-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">320MB</div>
+                                <div class="metric-label">Memory</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">18%</div>
+                                <div class="metric-label">CPU</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">1.2GB</div>
+                                <div class="metric-label">Storage</div>
+                            </div>
+                        </div>
+                        <div class="container-actions">
+                            <button class="action-btn">Restart</button>
+                            <button class="action-btn secondary">Logs</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="containerization-controls">
+                <h2><i class="fas fa-cogs"></i> Container Controls</h2>
+                
+                <div class="containerization-actions">
+                    <button class="control-btn" onclick="deployContainer()">
+                        <i class="fas fa-rocket"></i> Deploy Container
+                    </button>
+                    <button class="control-btn secondary" onclick="scaleContainers()">
+                        <i class="fas fa-expand-arrows-alt"></i> Scale All
+                    </button>
+                    <button class="control-btn secondary" onclick="healthCheck()">
+                        <i class="fas fa-heartbeat"></i> Health Check
+                    </button>
+                </div>
+
+                <div class="containerization-status">
+                    <div class="status-title">Containerization Status</div>
+                    <div class="status-item">
+                        <div class="status-label">Last Update</div>
+                        <div class="status-value">3 minutes ago</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Active Containers</div>
+                        <div class="status-value">45 containers</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Total Memory</div>
+                        <div class="status-value">2.1 GB</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Total CPU</div>
+                        <div class="status-value">65%</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Storage Used</div>
+                        <div class="status-value">12 GB</div>
+                    </div>
+                </div>
+
+                <div class="recent-deployments">
+                    <div class="deployments-title">Recent Deployments</div>
+                    <div class="deployment-item">
+                        <div class="deployment-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="deployment-content">
+                            <div class="deployment-title">User Service v2.1.0</div>
+                            <div class="deployment-description">Successfully deployed to production</div>
+                        </div>
+                        <div class="deployment-time">5 minutes ago</div>
+                    </div>
+                    <div class="deployment-item">
+                        <div class="deployment-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="deployment-content">
+                            <div class="deployment-title">AI Service v1.8.0</div>
+                            <div class="deployment-description">AI model updated and deployed</div>
+                        </div>
+                        <div class="deployment-time">12 minutes ago</div>
+                    </div>
+                    <div class="deployment-item">
+                        <div class="deployment-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="deployment-content">
+                            <div class="deployment-title">Notification Service v3.2.0</div>
+                            <div class="deployment-description">Building in progress - 75% complete</div>
+                        </div>
+                        <div class="deployment-time">18 minutes ago</div>
+                    </div>
+                    <div class="deployment-item">
+                        <div class="deployment-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="deployment-content">
+                            <div class="deployment-title">Database v13.2.0</div>
+                            <div class="deployment-description">PostgreSQL updated and deployed</div>
+                        </div>
+                        <div class="deployment-time">1 hour ago</div>
+                    </div>
+                </div>
+
+                <div class="ai-insights">
+                    <div class="insights-title">AI Containerization Insights</div>
+                    <div class="insight-item success">
+                        <i class="fas fa-check-circle insight-icon"></i>
+                        Containerization improved resource efficiency by 40% this month
+                    </div>
+                    <div class="insight-item warning">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        Some containers need optimization for better performance
+                    </div>
+                    <div class="insight-item info">
+                        <i class="fas fa-info-circle insight-icon"></i>
+                        New AI patterns available for better container orchestration
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let resourceChart, scalingChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Resource Chart
+            const resourceCtx = document.getElementById('resourceChart').getContext('2d');
+            resourceChart = new Chart(resourceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['User Service', 'Project Service', 'AI Service', 'Database', 'Redis', 'Nginx', 'Analytics', 'Notification', 'Security'],
+                    datasets: [{
+                        data: [256, 512, 1200, 768, 128, 64, 384, 192, 320],
+                        backgroundColor: ['#667eea', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444', '#f97316', '#06b6d4', '#84cc16'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Scaling Chart
+            const scalingCtx = document.getElementById('scalingChart').getContext('2d');
+            scalingChart = new Chart(scalingCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(7),
+                    datasets: [{
+                        label: 'Container Count',
+                        data: [35, 38, 40, 42, 43, 44, 45],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Memory Usage (GB)',
+                        data: [2.8, 2.6, 2.4, 2.3, 2.2, 2.1, 2.1],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels(days) {
+            const labels = [];
+            const now = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function deployContainer() {
+            alert('Deploying new container...');
+        }
+
+        function scaleContainers() {
+            alert('Scaling all containers...');
+        }
+
+        function healthCheck() {
+            alert('Running health check on all containers...');
+        }
+    </script>
+</body>
+</html>
