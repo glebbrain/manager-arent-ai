@@ -1,7 +1,7 @@
 # 🌐 Universal Project Manager v4.8
 
 **Version:** 4.8.0  
-**Date:** 2025-01-31  
+**Date:** 2025-09-23  
 **Status:** Production Ready - Maximum Performance & Optimization v4.8  
 **Platform:** Universal Project Management Platform  
 **AI Integration:** Advanced AI Processing, Enterprise Integration & Maximum Performance & Optimization v4.8  
@@ -9,6 +9,39 @@
 ## 📋 Overview
 
 Universal Project Manager v4.8 is a maximally optimized automation system with AI integration for managing projects of any type. A collection of 300+ PowerShell scripts and modules providing complete development, testing, deployment, and monitoring cycles for various technology stacks with intelligent optimization, Maximum Performance & Optimization v4.8, Next-Generation Technologies support, Intelligent Caching, Parallel Execution, Memory Optimization, Performance Monitoring, and new v4.8 capabilities with maximum performance.
+
+## Easy start
+
+A. Copy the project to your folder
+B. Create start_IDEA.md in the root. Write your idea in the start_IDEA.md or chat with AI.
+C. Write in AgentAI:
+
+1. Analyze and decompose start_IDEA.md
+2. Add all ideas and the project gist to /.manager/IDEA.md
+3. Update phases, epics, tasks, and subtasks in TODO.md
+4. Optimize files for the idea from /.manager/IDEA.md:
+4.1. deployment-config.json
+4.2. dev-config.json
+4.3. start-smart-config.json
+5. Delete start_IDEA.md
+
+D. Press Enter
+E. You wait for the agent to work.
+F. In a new session, write to the agent (every 5 commands):
+
+Perform project analysis and optimization according to the instructions: `/.project-analysis-optimization.md`
+
+E. Add each subsequent task to the agent's queue up to 5 times:
+
+Continue executing tasks from TODO.md according to the instructions: `/.manager/start.md`
+
+G. At the end send AgentAI:
+How many main and development tasks remain should be saved in needtasks.json in the project root? Also add the date and time for which tasks remain, how many errors have been fixed from ERRORS.md, and the project's status (is it ready for PROM or PROD)?
+
+H. You can set up 20 commands in a queue, the agent with the queue will work from 30 minutes to 3 hours depending on the complexity of the project.
+J. Enjoy
+
+* Tested on Cursor (Version: 1.6.45 (user setup), OS: Windows_NT x64 10)
 
 ## ⚡ New Features v4.8 - Maximum Performance & Optimization
 
@@ -594,7 +627,7 @@ pwsh -File .\.automation\Quick-Access-Optimized-v4.8.ps1 -Action setup -Verbose 
 
 ---
 
-**Last Updated**: 2025-01-31  
+**Last Updated**: 2025-09-23  
 **Version**: 4.8.0  
 **Status**: Production Ready - Maximum Performance & Optimization v4.8
 
