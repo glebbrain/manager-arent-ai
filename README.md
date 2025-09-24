@@ -10,6 +10,17 @@
 
 Universal Project Manager v4.8 is a maximally optimized automation system with AI integration for managing projects of any type. A collection of 300+ PowerShell scripts and modules providing complete development, testing, deployment, and monitoring cycles for various technology stacks with intelligent optimization, Maximum Performance & Optimization v4.8, Next-Generation Technologies support, Intelligent Caching, Parallel Execution, Memory Optimization, Performance Monitoring, and new v4.8 capabilities with maximum performance.
 
+## Disclaimer
+ManagerAgentAI is provided under the MIT License and comes with no warranties of any kind. The author and contributors are **not responsible** for any issues, damages, or data loss that may occur when using this software.
+
+By using ManagerAgentAI, you acknowledge and agree that:
+
+* You are solely responsible for how you use the tool in your projects.
+* The maintainers of ManagerAgentAI cannot be held liable for any problems it may cause, including but not limited to broken functionality, corrupted files, or failed deployments.
+* **Always make backups** of your projects and data before using ManagerAgentAI.
+
+Use this software at your own risk.
+
 ## Easy start
 
 A. Copy the project to your folder.
